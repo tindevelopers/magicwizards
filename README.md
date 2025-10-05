@@ -8,6 +8,24 @@ easily.
 
 - [🚀 GitHub Repository](https://github.com/tindevelopers/tinadmin-master-admin-panel)
 - [📄 Documentation](https://github.com/tindevelopers/tinadmin-master-admin-panel/blob/main/README.md)
+- [🏗️ Multi-Template System](https://github.com/tindevelopers/tinadmin-master-admin-panel/blob/main/DEVELOPMENT.md)
+
+## 🎯 Available Templates
+
+- **E-commerce** - Complete e-commerce management dashboard
+- **Healthcare** - Healthcare management system  
+- **Finance** - Financial management dashboard
+- **Education** - Educational institution management
+- **SaaS** - SaaS application dashboard
+
+### Quick Start with Templates
+
+```bash
+# Create a new dashboard project
+npx create-tinadmin@latest ecommerce
+npx create-tinadmin@latest healthcare
+npx create-tinadmin@latest finance
+```
 
 ## Installation
 
