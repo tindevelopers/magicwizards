@@ -1,0 +1,20 @@
+{
+  "name": "create-tinadmin",
+  "version": "1.0.0",
+  "description": "Create TinAdmin dashboard templates",
+  "main": "index.js",
+  "bin": {
+    "create-tinadmin": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": ["dashboard", "admin", "template", "tinadmin"],
+  "author": "TIN Developers",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "inquirer": "^9.2.0",
+    "chalk": "^4.1.2"
+  }
+}
