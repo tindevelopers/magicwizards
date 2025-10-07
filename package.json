@@ -14,6 +14,8 @@
     "template:create": "node scripts/create-template.js",
     "template:build": "node scripts/build-template.js",
     "template:list": "ls templates/",
+    "template:extract": "node scripts/extract-template.js",
+    "template:github": "node scripts/create-github-repo.js",
     "publish:template": "npm run template:build && npm publish"
   },
   "dependencies": {

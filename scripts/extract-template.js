@@ -20,7 +20,8 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const AVAILABLE_TEMPLATES = {
-  'ai-customer-care': 'AI Customer Care Template - Enterprise-grade admin platform for managing AI voice agents, chat conversations, and call analytics'
+  'ai-customer-care': 'AI Customer Care Template - Enterprise-grade admin platform for managing AI voice agents, chat conversations, and call analytics',
+  'blog-writer': 'Blog Writer Template - Comprehensive blog management and content creation platform with team collaboration and analytics'
 };
 
 function printUsage() {
@@ -35,7 +36,9 @@ function printUsage() {
   console.log('');
   console.log('Examples:');
   console.log('  node scripts/extract-template.js ai-customer-care');
+  console.log('  node scripts/extract-template.js blog-writer');
   console.log('  node scripts/extract-template.js ai-customer-care ./my-ai-app');
+  console.log('  node scripts/extract-template.js blog-writer ./my-blog-app');
 }
 
 function main() {
@@ -62,6 +65,12 @@ function main() {
   try {
     if (templateName === 'ai-customer-care') {
       const extractorPath = path.join(__dirname, 'extract-ai-customer-care.js');
+      const command = `node "${extractorPath}"${outputDir ? ` "${outputDir}"` : ''}`;
+      
+      console.log(`Running: ${command}`);
+      execSync(command, { stdio: 'inherit' });
+    } else if (templateName === 'blog-writer') {
+      const extractorPath = path.join(__dirname, 'extract-blog-writer.js');
       const command = `node "${extractorPath}"${outputDir ? ` "${outputDir}"` : ''}`;
       
       console.log(`Running: ${command}`);

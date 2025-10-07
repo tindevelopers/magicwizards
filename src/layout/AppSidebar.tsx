@@ -134,10 +134,16 @@ const navItems: NavItem[] = [
     new: true,
     subItems: [
       { name: "Dashboard", path: "/templates/blog-writer" },
+      { name: "Drafts", path: "/templates/blog-writer/drafts", new: true },
+      { name: "Media Library", path: "/templates/blog-writer/media", new: true },
       { name: "Content Calendar", path: "/templates/blog-writer/calendar", pro: true },
       { name: "Post Analytics", path: "/templates/blog-writer/analytics", pro: true },
       { name: "SEO Tools", path: "/templates/blog-writer/seo", pro: true },
       { name: "Publishing", path: "/templates/blog-writer/publishing", pro: true },
+      { name: "Team Management", path: "/templates/blog-writer/team", new: true },
+      { name: "Content Templates", path: "/templates/blog-writer/templates", new: true },
+      { name: "Workflows", path: "/templates/blog-writer/workflows", new: true },
+      { name: "Integrations", path: "/templates/blog-writer/integrations", new: true },
     ],
   },
   {
