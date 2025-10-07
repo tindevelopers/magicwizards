@@ -134,10 +134,10 @@ const navItems: NavItem[] = [
     new: true,
     subItems: [
       { name: "Dashboard", path: "/templates/blog-writer" },
-      { name: "Content Calendar", path: "/templates/blog-writer", pro: true },
-      { name: "Post Analytics", path: "/templates/blog-writer", pro: true },
-      { name: "SEO Tools", path: "/templates/blog-writer", pro: true },
-      { name: "Publishing", path: "/templates/blog-writer", pro: true },
+      { name: "Content Calendar", path: "/templates/blog-writer/calendar", pro: true },
+      { name: "Post Analytics", path: "/templates/blog-writer/analytics", pro: true },
+      { name: "SEO Tools", path: "/templates/blog-writer/seo", pro: true },
+      { name: "Publishing", path: "/templates/blog-writer/publishing", pro: true },
     ],
   },
   {
