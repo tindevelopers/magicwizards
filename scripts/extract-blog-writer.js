@@ -375,6 +375,10 @@ function createPackageJson() {
     scripts: REQUIRED_SCRIPTS,
     dependencies: {},
     devDependencies: {},
+    optionalDependencies: {
+      '@tailwindcss/oxide-linux-x64-gnu': '^4.0.0',
+      'lightningcss-linux-x64-gnu': '^1.29.0'
+    },
     engines: {
       node: '>=18.0.0',
       npm: '>=8.0.0'
