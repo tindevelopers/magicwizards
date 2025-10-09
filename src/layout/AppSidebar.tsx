@@ -46,154 +46,17 @@ const navItems: NavItem[] = [
     icon: <GridIcon />,
     path: "/",
   },
-  {
-    name: "Analytics",
-    icon: <PieChartIcon />,
-    path: "/analytics",
-  },
-  {
-    name: "Marketing",
-    icon: <MailIcon />,
-    path: "/marketing",
-  },
-  {
-    name: "CRM",
-    icon: <UserCircleIcon />,
-    path: "/crm",
-  },
-  {
-    name: "Stocks",
-    icon: <BoxCubeIcon />,
-    path: "/stocks",
-  },
-  {
-    name: "Logistics",
-    icon: <TaskIcon />,
-    new: true,
-    path: "/logistics",
-  },
-  {
-    name: "AI Assistant",
-    icon: <AiIcon />,
-    new: true,
-    subItems: [
-      { name: "Text Generator", path: "/text-generator" },
-      { name: "Code Generator", path: "/code-generator" },
-      { name: "Image Generator", path: "/image-generator" },
-      { name: "Video Generator", path: "/video-generator" },
-    ],
-  },
-  {
-    name: "E-commerce",
-    icon: <CartIcon />,
-    new: true,
-    subItems: [
-      { name: "Dashboard", path: "/" },
-      { name: "Products List", path: "/products-list" },
-      { name: "Add Product", path: "/add-product" },
-      { name: "Transactions", path: "/transactions" },
-      { name: "Single Transaction", path: "/single-transaction" },
-      { name: "Invoices", path: "/invoices" },
-      { name: "Single Invoice", path: "/single-invoice" },
-      { name: "Create Invoice", path: "/create-invoice" },
-      { name: "Billing", path: "/billing" },
-    ],
-  },
-  {
-    name: "Calendar",
-    icon: <CalenderIcon />,
-    path: "/calendar",
-  },
-  {
-    name: "User Profile",
-    icon: <UserCircleIcon />,
-    path: "/profile",
-  },
-  {
-    name: "Task",
-    icon: <TaskIcon />,
-    subItems: [
-      { name: "Task List", path: "/task-list" },
-      { name: "Task Kanban", path: "/task-kanban" },
-    ],
-  },
-  {
-    name: "Forms",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Form Elements", path: "/form-elements" },
-      { name: "Form Layout", path: "/form-layout" },
-    ],
-  },
-  {
-    name: "Tables",
-    icon: <TableIcon />,
-    subItems: [
-      { name: "Basic Tables", path: "/basic-tables" },
-      { name: "Data Tables", path: "/data-tables" },
-    ],
-  },
-  {
-    name: "Pages",
-    icon: <PageIcon />,
-    subItems: [
-      { name: "Blank", path: "/blank" },
-      { name: "FAQ", path: "/faq" },
-      { name: "Pricing Tables", path: "/pricing-tables" },
-      { name: "File Manager", path: "/file-manager" },
-      { name: "Integrations", path: "/integrations" },
-      { name: "Multi Tenant", path: "/multi-tenant" },
-      { name: "API Keys", path: "/api-keys" },
-    ],
-  },
 ];
 
-const othersItems: NavItem[] = [
-  {
-    name: "Email",
-    icon: <MailIcon />,
-    subItems: [
-      { name: "Inbox", path: "/inbox" },
-      { name: "Inbox Details", path: "/inbox-details" },
-    ],
-  },
-  {
-    name: "Chart",
-    icon: <PieChartIcon />,
-    subItems: [
-      { name: "Bar Chart", path: "/bar-chart" },
-      { name: "Line Chart", path: "/line-chart" },
-      { name: "Pie Chart", path: "/pie-chart" },
-    ],
-  },
-  {
-    name: "Support",
-    icon: <CallIcon />,
-    subItems: [
-      { name: "Support Tickets", path: "/support-tickets" },
-      { name: "Support Ticket Reply", path: "/support-ticket-reply" },
-    ],
-  },
-];
+const othersItems: NavItem[] = [];
 
-const supportItems: NavItem[] = [
-  {
-    name: "Chat",
-    icon: <ChatIcon />,
-    path: "/chat",
-  },
-];
+const supportItems: NavItem[] = [];
 
-// Template navigation items
+// Blog Writer specific navigation items
 const templateItems: NavItem[] = [
   {
-    name: "All Templates",
-    icon: <GridIcon />,
-    path: "/",
-  },
-  {
     name: "Blog Writer",
-    icon: <MailIcon />,
+    icon: <AiIcon />,
     new: true,
     subItems: [
       { name: "Dashboard", path: "/templates/blog-writer" },
@@ -212,92 +75,19 @@ const templateItems: NavItem[] = [
         isAccordionHeader: true,
         new: true,
         subItems: [
-          { name: "Drafts", path: "/templates/blog-writer/drafts", new: true },
+          { name: "Content Editor", path: "/templates/blog-writer/editor", new: true },
+          { name: "Article Manager", path: "/templates/blog-writer/articles", new: true },
+          { name: "SEO Tools", path: "/templates/blog-writer/seo", new: true },
           { name: "Media Library", path: "/templates/blog-writer/media", new: true },
-          { name: "Comments Management", path: "/templates/blog-writer/comments", new: true },
-          { name: "Categories & Tags", path: "/templates/blog-writer/categories", new: true },
-          { name: "Authors Management", path: "/templates/blog-writer/authors", new: true },
-          { name: "Content Calendar", path: "/templates/blog-writer/calendar", pro: true },
-          { name: "Post Analytics", path: "/templates/blog-writer/analytics", pro: true },
-          { name: "SEO Tools", path: "/templates/blog-writer/seo", pro: true },
-          { name: "Publishing", path: "/templates/blog-writer/publishing", pro: true },
-          { name: "Team Management", path: "/templates/blog-writer/team", new: true },
-          { name: "Content Templates", path: "/templates/blog-writer/templates", new: true },
-          { name: "Workflows", path: "/templates/blog-writer/workflows", new: true },
-          { name: "Integrations", path: "/templates/blog-writer/integrations", new: true },
+          { name: "Publishing", path: "/templates/blog-writer/publishing", new: true },
+          { name: "Analytics", path: "/templates/blog-writer/analytics", pro: true },
+          { name: "Templates", path: "/templates/blog-writer/templates", new: true },
+          { name: "Categories", path: "/templates/blog-writer/categories", new: true },
+          { name: "Tags", path: "/templates/blog-writer/tags", new: true },
+          { name: "Settings", path: "/templates/blog-writer/settings", new: true },
         ]
       },
     ],
-  },
-  {
-    name: "AI Customer Care",
-    icon: <AiIcon />,
-    new: true,
-    subItems: [
-      { name: "Dashboard", path: "/templates/ai-customer-care" },
-      { 
-        name: "User Profile", 
-        isAccordionHeader: true,
-        new: true,
-        subItems: [
-          { name: "User Details", path: "/templates/ai-customer-care/profile/details" },
-          { name: "Change Password", path: "/templates/ai-customer-care/profile/change-password" },
-          { name: "Access Control", path: "/templates/ai-customer-care/profile/access" },
-        ]
-      },
-      { 
-        name: "Components", 
-        isAccordionHeader: true,
-        new: true,
-        subItems: [
-          { name: "Chat Agent", path: "/templates/ai-customer-care/agents/chat", new: true },
-          { name: "Voice Agent", path: "/templates/ai-customer-care/agents/voice", new: true },
-          { name: "Knowledge Base", path: "/templates/ai-customer-care/knowledge", new: true },
-          { name: "Conversation Flows", path: "/templates/ai-customer-care/flows", new: true },
-          { name: "Call History", path: "/templates/ai-customer-care/calls/history", new: true },
-          { name: "Analytics", path: "/templates/ai-customer-care/analytics", pro: true },
-          { name: "Quality Control", path: "/templates/ai-customer-care/quality", pro: true },
-          { name: "Monitoring", path: "/templates/ai-customer-care/monitoring", pro: true },
-          { name: "Phone Numbers", path: "/templates/ai-customer-care/numbers", new: true },
-          { name: "Integrations", path: "/templates/ai-customer-care/integrations", new: true },
-          { name: "API Playground", path: "/templates/ai-customer-care/api-playground", new: true },
-          { name: "Webhooks", path: "/templates/ai-customer-care/webhooks", new: true },
-          { name: "Users", path: "/templates/ai-customer-care/users", new: true },
-          { name: "Settings", path: "/templates/ai-customer-care/settings", new: true },
-          { name: "Tenant Settings", path: "/templates/ai-customer-care/tenant-settings", pro: true },
-        ]
-      },
-    ],
-  },
-  {
-    name: "E-commerce Template",
-    icon: <CartIcon />,
-    path: "/templates/ecommerce",
-  },
-  {
-    name: "Restaurant Template",
-    icon: <UserCircleIcon />,
-    path: "/templates/restaurant",
-  },
-  {
-    name: "Healthcare Template",
-    icon: <UserCircleIcon />,
-    path: "/templates/healthcare",
-  },
-  {
-    name: "Finance Template",
-    icon: <PieChartIcon />,
-    path: "/templates/finance",
-  },
-  {
-    name: "Education Template",
-    icon: <UserCircleIcon />,
-    path: "/templates/education",
-  },
-  {
-    name: "SaaS Template",
-    icon: <PlugInIcon />,
-    path: "/templates/saas",
   },
 ];
 
@@ -753,10 +543,8 @@ const AppSidebar: React.FC = () => {
                 height={32}
               />
               <span className="text-xl font-bold text-gray-900 dark:text-white">
-                {pathname.startsWith('/templates/blog-writer') 
-                  ? 'Blog Writer:' 
-                  : pathname.startsWith('/templates/ai-customer-care')
-                  ? 'AI Customer Care:'
+                {pathname.startsWith('/templates/blog-writer')
+                  ? 'Blog Writer:'
                   : 'TIN Admin:'}
               </span>
             </div>
@@ -773,83 +561,23 @@ const AppSidebar: React.FC = () => {
       <div className="flex flex-col overflow-y-auto  duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
           <div className="flex flex-col gap-4">
-            {/* Main Navigation */}
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "xl:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Menu"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(navItems, "main")}
-            </div>
-
-            {/* Other Pages */}
-            {othersItems.length > 0 && (
-              <div>
-                <h2
-                  className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
-                    !isExpanded && !isHovered
-                      ? "xl:justify-center"
-                      : "justify-start"
-                  }`}
-                >
-                  {isExpanded || isHovered || isMobileOpen ? (
-                    "Others"
-                  ) : (
-                    <HorizontaLDots />
-                  )}
-                </h2>
-                {renderMenuItems(othersItems, "others")}
-              </div>
-            )}
-
-            {/* Support */}
-            {supportItems.length > 0 && (
-              <div>
-                <h2
-                  className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
-                    !isExpanded && !isHovered
-                      ? "xl:justify-center"
-                      : "justify-start"
-                  }`}
-                >
-                  {isExpanded || isHovered || isMobileOpen ? (
-                    "Support"
-                  ) : (
-                    <HorizontaLDots />
-                  )}
-                </h2>
-                {renderMenuItems(supportItems, "support")}
-              </div>
-            )}
-
-            {/* Templates */}
-            {templateItems.length > 0 && (
-              <div>
-                <h2
-                  className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
-                    !isExpanded && !isHovered
-                      ? "xl:justify-center"
-                      : "justify-start"
-                  }`}
-                >
-                  {isExpanded || isHovered || isMobileOpen ? (
-                    "Templates"
-                  ) : (
-                    <HorizontaLDots />
-                  )}
-                </h2>
-                {renderMenuItems(templateItems, "templates")}
-              </div>
-            )}
+            {/* Blog Writer Navigation */}
+          <div>
+            <h2
+              className={`mb-4 text-xs uppercase flex leading-5 text-gray-400 ${
+                !isExpanded && !isHovered
+                  ? "xl:justify-center"
+                  : "justify-start"
+              }`}
+            >
+              {isExpanded || isHovered || isMobileOpen ? (
+                "Blog Writer"
+              ) : (
+                <HorizontaLDots />
+              )}
+            </h2>
+            {renderMenuItems(templateItems, "templates")}
+          </div>
           </div>
         </nav>
         {isExpanded || isHovered || isMobileOpen ? <SidebarWidget /> : null}
