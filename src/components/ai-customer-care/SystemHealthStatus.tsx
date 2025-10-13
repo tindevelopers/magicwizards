@@ -58,6 +58,7 @@ export default function SystemHealthStatus() {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const getStatusText = (status: string) => {
     switch (status) {
       case "healthy": return "Healthy";

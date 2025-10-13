@@ -33,36 +33,32 @@ export default function NumberSearch() {
     setTimeout(() => {
       const mockResults = [
         {
-          number: "+1 (555) 111-2233",
-          type: "local",
+          phoneNumber: "+1 (555) 111-2233",
+          friendlyName: "Local Number - NY",
           region: "New York, NY",
-          monthlyCost: "$1.00",
+          price: "$1.00",
           capabilities: ["voice", "sms"],
-          availability: "available",
         },
         {
-          number: "+1 (555) 444-5566",
-          type: "local",
+          phoneNumber: "+1 (555) 444-5566",
+          friendlyName: "Local Number - LA",
           region: "Los Angeles, CA",
-          monthlyCost: "$1.00",
+          price: "$1.00",
           capabilities: ["voice"],
-          availability: "available",
         },
         {
-          number: "+1 (800) 777-8888",
-          type: "toll-free",
+          phoneNumber: "+1 (800) 777-8888",
+          friendlyName: "Toll-Free Number",
           region: "US - National",
-          monthlyCost: "$2.50",
+          price: "$2.50",
           capabilities: ["voice", "sms"],
-          availability: "available",
         },
         {
-          number: "+1 (555) 999-0000",
-          type: "local",
+          phoneNumber: "+1 (555) 999-0000",
+          friendlyName: "Local Number - Chicago",
           region: "Chicago, IL",
-          monthlyCost: "$1.00",
+          price: "$1.00",
           capabilities: ["voice", "sms", "mms"],
-          availability: "available",
         },
       ];
       
@@ -185,10 +181,10 @@ export default function NumberSearch() {
                   </div>
                   <div>
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {result.number}
+                      {result.phoneNumber}
                     </div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">
-                      {result.region} • {result.type}
+                      {result.region} • {result.friendlyName}
                     </div>
                     <div className="mt-1 flex items-center space-x-2">
                       {result.capabilities.map((cap: string) => (
@@ -206,7 +202,7 @@ export default function NumberSearch() {
                 <div className="flex items-center space-x-4">
                   <div className="text-right">
                     <div className="font-medium text-gray-900 dark:text-white">
-                      {result.monthlyCost}
+                      {result.price}
                     </div>
                     <div className="text-xs text-gray-500 dark:text-gray-400">
                       per month

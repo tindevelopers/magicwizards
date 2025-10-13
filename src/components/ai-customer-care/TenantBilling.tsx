@@ -8,6 +8,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function TenantBilling() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [billingData, setBillingData] = useState({
     currentPlan: {
       name: "Enterprise",

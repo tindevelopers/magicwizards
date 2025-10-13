@@ -67,6 +67,7 @@ export default function FlowPreview() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [simulation, setSimulation] = useState<CallSimulation[]>(mockSimulation);
   const [showTranscript, setShowTranscript] = useState(true);
 

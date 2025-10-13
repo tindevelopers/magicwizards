@@ -12,6 +12,7 @@ import {
 
 export default function TenantSecurity() {
   const [showApiKey, setShowApiKey] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [securitySettings, setSecuritySettings] = useState({
     twoFactorAuth: true,
     sessionTimeout: 30,

@@ -91,6 +91,7 @@ const knowledgeItems: KnowledgeItem[] = [
 ];
 
 export default function KnowledgeBaseContent() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const getStatusColor = (status: string) => {

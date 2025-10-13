@@ -11,6 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function SubtenantManagement() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [subtenants, setSubtenants] = useState([
     {
       id: "subtenant_1",
@@ -57,6 +58,7 @@ export default function SubtenantManagement() {
   ]);
 
   const [selectedSubtenant, setSelectedSubtenant] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const getStatusColor = (status: string) => {

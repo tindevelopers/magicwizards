@@ -13,6 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function TenantManagement() {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [tenants, setTenants] = useState([
     {
       id: "tenant_1",
@@ -65,6 +66,7 @@ export default function TenantManagement() {
   ]);
 
   const [selectedTenant, setSelectedTenant] = useState<string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [showCreateModal, setShowCreateModal] = useState(false);
 
   const getTierColor = (tier: string) => {
