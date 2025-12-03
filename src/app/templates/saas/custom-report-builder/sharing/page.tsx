@@ -3,8 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
-import Switch from "@/components/form/switch/Switch";
-import { PlusIcon, PencilIcon, TrashBinIcon, UserIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, PencilIcon, UserIcon } from "@heroicons/react/24/outline";
 import { TrashBinIcon as TrashIcon } from "@/icons";
 import React, { useState } from "react";
 

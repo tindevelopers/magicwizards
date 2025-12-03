@@ -6,14 +6,12 @@ import {
   BanknotesIcon,
   BoltIcon,
   BuildingOffice2Icon,
-  ChartBarIcon,
   CheckBadgeIcon,
   CloudArrowUpIcon,
   Cog6ToothIcon,
   FolderIcon,
   GlobeAltIcon,
   HeartIcon,
-  InboxStackIcon,
   PresentationChartLineIcon,
   ShieldCheckIcon,
   ShoppingBagIcon,
@@ -28,7 +26,8 @@ export const metadata: Metadata = {
     "Foundational multi-tenant navigation system designed to flex across industries, tenants, and operator roles.",
 };
 
-type IconComponent = (props: React.ComponentProps<"svg">) => JSX.Element;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type IconComponent = React.ComponentType<any>;
 
 const tenantProfiles = [
   {

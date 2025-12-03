@@ -34,7 +34,6 @@ import {
   UsersIcon,
   WalletIcon,
 } from "@heroicons/react/24/outline";
-import Link from "next/link";
 import type { Metadata } from "next";
 import Image from "next/image";
 import React from "react";
@@ -567,7 +566,7 @@ export default function SaasDashboardPage() {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Bring every tenant up to enterprise-grade identity with SSO,
               multi-factor, adaptive roles, and a prebuilt reset experience that
-              matches TailAdmin's UI kit.
+              matches TailAdmin&apos;s UI kit.
             </p>
             <div className="space-y-3">
               {authSignals.map((signal) => (
@@ -762,7 +761,7 @@ export default function SaasDashboardPage() {
             Releases
           </p>
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
-            What's next
+            What&apos;s next
           </h3>
           <div className="mt-4 space-y-4">
             {releaseHighlights.map((release) => (

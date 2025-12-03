@@ -205,7 +205,6 @@ export default function SubscriptionPlansPage() {
                 </div>
               ))}
               <Button
-                type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => setFormData({ ...formData, features: [...formData.features, ""] })}

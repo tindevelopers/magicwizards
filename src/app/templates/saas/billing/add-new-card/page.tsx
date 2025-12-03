@@ -90,7 +90,6 @@ export default function AddNewCardPage() {
                   handleChange("cardNumber", formatCardNumber(e.target.value))
                 }
                 placeholder="1234 5678 9012 3456"
-                maxLength={19}
               />
             </div>
 
@@ -156,7 +155,6 @@ export default function AddNewCardPage() {
                     handleChange("cvv", e.target.value.replace(/\D/g, "").slice(0, 4))
                   }
                   placeholder="123"
-                  maxLength={4}
                 />
               </div>
             </div>
@@ -183,7 +181,6 @@ export default function AddNewCardPage() {
 
             <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end">
               <Button
-                type="button"
                 variant="outline"
                 onClick={() => router.push("/billing")}
                 className="w-full sm:w-auto"
@@ -191,7 +188,6 @@ export default function AddNewCardPage() {
                 Cancel
               </Button>
               <Button
-                type="submit"
                 className="w-full sm:w-auto"
                 disabled={
                   !formData.cardNumber ||

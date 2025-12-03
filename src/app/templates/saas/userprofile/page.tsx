@@ -5,7 +5,6 @@ import Input from "@/components/form/input/InputField";
 import {
   UserCircleIcon,
   EnvelopeIcon,
-  PhoneIcon,
   CalendarIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
@@ -496,7 +495,7 @@ function SupportSection() {
                 Email Support
               </h4>
               <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
-                Send us an email and we'll get back to you
+                Send us an email and we&apos;ll get back to you
               </p>
               <Button variant="outline" size="sm">
                 Contact Us

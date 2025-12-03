@@ -403,8 +403,6 @@ export default function RoleManagementPage() {
               <div>
                 <Label htmlFor="edit-role-description">Description</Label>
                 <TextArea
-                  key={`role-desc-${editingRole?.role}`}
-                  id="edit-role-description"
                   value={editFormData.description}
                   onChange={(value) =>
                     setEditFormData((prev) => ({
@@ -523,7 +521,6 @@ export default function RoleManagementPage() {
                       className="h-11 flex-1 rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                     />
                     <Button
-                      type="button"
                       size="sm"
                       variant="outline"
                       onClick={handleAddPermission}
@@ -538,14 +535,13 @@ export default function RoleManagementPage() {
 
             <div className="flex items-center gap-3 justify-end pt-4 border-t border-gray-200 dark:border-gray-700">
               <Button
-                type="button"
                 size="sm"
                 variant="outline"
                 onClick={editModal.closeModal}
               >
                 Cancel
               </Button>
-              <Button type="button" size="sm" onClick={handleSave}>
+              <Button size="sm" onClick={handleSave}>
                 Save Changes
               </Button>
             </div>

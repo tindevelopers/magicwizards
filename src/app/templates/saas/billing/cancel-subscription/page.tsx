@@ -4,7 +4,6 @@ import Button from "@/components/ui/button/Button";
 import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { Metadata } from "next";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
@@ -34,7 +33,7 @@ export default function CancelSubscriptionPage() {
               Cancel Subscription
             </h1>
             <p className="text-gray-500 dark:text-gray-400">
-              We're sorry to see you go. Please let us know why you're canceling.
+              We&apos;re sorry to see you go. Please let us know why you&apos;re canceling.
             </p>
           </div>
 

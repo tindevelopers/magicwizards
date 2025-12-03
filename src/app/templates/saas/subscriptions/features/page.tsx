@@ -1,8 +1,6 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
-import Input from "@/components/form/input/InputField";
-import Label from "@/components/form/Label";
 import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
 import { TrashBinIcon } from "@/icons";
 import React, { useState } from "react";
@@ -52,9 +50,7 @@ const initialFeatures: Feature[] = [
 ];
 
 export default function PlanFeaturesPage() {
-  const [features, setFeatures] = useState<Feature[]>(initialFeatures);
-  const [isCreating, setIsCreating] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  const [features] = useState<Feature[]>(initialFeatures);
 
   return (
     <div>

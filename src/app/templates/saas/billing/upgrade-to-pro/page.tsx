@@ -162,7 +162,7 @@ export default function UpgradeToProPage() {
           </h4>
           <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
             <li>• Your current plan will be upgraded immediately</li>
-            <li>• You'll be charged the prorated difference for the current billing period</li>
+            <li>• You&apos;ll be charged the prorated difference for the current billing period</li>
             <li>• All Pro features will be available immediately</li>
             <li>• Your renewal date will remain the same</li>
           </ul>

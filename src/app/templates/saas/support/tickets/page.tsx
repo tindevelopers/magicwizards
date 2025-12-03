@@ -72,7 +72,7 @@ const statusColors = {
 export default function SupportTicketsPage() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [priorityFilter] = useState<string>("all");
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =

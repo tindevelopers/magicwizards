@@ -171,14 +171,13 @@ export default function UpdateBillingAddressPage() {
 
             <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-end">
               <Button
-                type="button"
                 variant="outline"
                 onClick={() => router.push("/billing")}
                 className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
-              <Button type="submit" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto">
                 Update Billing Address
               </Button>
             </div>

@@ -1,7 +1,6 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
-import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Switch from "@/components/form/switch/Switch";
 import React, { useState } from "react";
@@ -23,7 +22,7 @@ export default function ThemeSettingsPage() {
         <div>
           <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">Theme Settings</h1>
           <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Customize the platform's theme and appearance
+            Customize the platform&apos;s theme and appearance
           </p>
         </div>
 

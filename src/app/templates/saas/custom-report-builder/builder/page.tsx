@@ -69,7 +69,7 @@ export default function CustomReportBuilderPage() {
               <Input
                 id="report-name"
                 type="text"
-                value={reportName}
+                defaultValue={reportName}
                 onChange={(e) => setReportName(e.target.value)}
                 placeholder="Enter report name"
                 className="mt-2"
@@ -115,7 +115,7 @@ export default function CustomReportBuilderPage() {
               <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">Filters</h2>
               {filters.length === 0 ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  No filters applied. Click "Add Filter" to add filtering conditions.
+                  No filters applied. Click &quot;Add Filter&quot; to add filtering conditions.
                 </p>
               ) : (
                 <div className="space-y-2">

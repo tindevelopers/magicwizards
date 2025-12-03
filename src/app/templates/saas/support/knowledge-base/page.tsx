@@ -4,7 +4,7 @@ import Button from "@/components/ui/button/Button";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import TextArea from "@/components/form/input/TextArea";
-import { PlusIcon, PencilIcon, TrashBinIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, PencilIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { TrashBinIcon as TrashIcon } from "@/icons";
 import React, { useState } from "react";
 

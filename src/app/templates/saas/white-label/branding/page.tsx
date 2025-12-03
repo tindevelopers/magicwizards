@@ -25,7 +25,7 @@ export default function WhiteLabelBrandingPage() {
         <div>
           <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">Branding</h1>
           <p className="mt-2 text-gray-500 dark:text-gray-400">
-            Customize your platform's branding and visual identity
+            Customize your platform&apos;s branding and visual identity
           </p>
         </div>
 

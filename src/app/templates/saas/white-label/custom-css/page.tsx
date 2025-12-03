@@ -32,7 +32,7 @@ export default function CustomCSSPage() {
           <div>
             <h1 className="text-3xl font-semibold text-gray-900 dark:text-white">Custom CSS</h1>
             <p className="mt-2 text-gray-500 dark:text-gray-400">
-              Add custom CSS to further customize the platform's appearance
+              Add custom CSS to further customize the platform&apos;s appearance
             </p>
           </div>
           <div className="flex gap-2">

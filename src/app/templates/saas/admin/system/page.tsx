@@ -7,7 +7,6 @@ import {
   KeyIcon,
   ChartBarIcon,
   GlobeAltIcon,
-  BellIcon,
   ClockIcon,
 } from "@heroicons/react/24/outline";
 import type { Metadata } from "next";
@@ -164,4 +163,3 @@ export default function SystemAdminPage() {
     </div>
   );
 }
-
