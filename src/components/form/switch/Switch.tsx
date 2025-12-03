@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 
 interface SwitchProps {
+  id?: string;
   label?: string;
   defaultChecked?: boolean;
   disabled?: boolean;
@@ -10,6 +11,7 @@ interface SwitchProps {
 }
 
 const Switch: React.FC<SwitchProps> = ({
+  id,
   label,
   defaultChecked = false,
   disabled = false,
@@ -48,6 +50,7 @@ const Switch: React.FC<SwitchProps> = ({
 
   return (
     <label
+      id={id}
       className={`flex cursor-pointer select-none items-center gap-3 text-sm font-medium ${
         disabled ? "text-gray-400" : "text-gray-700 dark:text-gray-400"
       }`}
