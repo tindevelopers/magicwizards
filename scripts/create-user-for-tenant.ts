@@ -40,11 +40,11 @@ async function createUserForTenant() {
   const { data: defaultRole } = await adminClient
     .from("roles")
     .select("id, name")
-    .eq("name", "Workspace Admin")
+    .eq("name", "Organization Admin")
     .single();
 
   if (!defaultRole) {
-    console.error("Default role 'Workspace Admin' not found");
+    console.error("Default role 'Organization Admin' not found");
     process.exit(1);
   }
 

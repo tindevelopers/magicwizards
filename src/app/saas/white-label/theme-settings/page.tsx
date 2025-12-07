@@ -3,17 +3,66 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import Switch from "@/components/form/switch/Switch";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getThemeSettings, saveThemeSettings } from "@/app/actions/white-label";
+import type { ThemeSettings } from "@/app/actions/white-label";
 
 export default function ThemeSettingsPage() {
-  const [theme, setTheme] = useState({
-    themeMode: "light" as "light" | "dark" | "auto",
+  const [theme, setTheme] = useState<ThemeSettings>({
+    themeMode: "light",
     fontFamily: "Inter",
     fontSize: "medium",
     borderRadius: "medium",
     enableAnimations: true,
     enableRipple: true,
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    loadTheme();
+  }, []);
+
+  const loadTheme = async () => {
+    try {
+      setLoading(true);
+      const settings = await getThemeSettings();
+      if (Object.keys(settings).length > 0) {
+        setTheme({
+          themeMode: settings.themeMode || "light",
+          fontFamily: settings.fontFamily || "Inter",
+          fontSize: settings.fontSize || "medium",
+          borderRadius: settings.borderRadius || "medium",
+          enableAnimations: settings.enableAnimations ?? true,
+          enableRipple: settings.enableRipple ?? true,
+        });
+      }
+    } catch (error) {
+      console.error("Error loading theme:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setMessage(null);
+      const result = await saveThemeSettings(theme);
+      
+      if (result.success) {
+        setMessage({ type: "success", text: "Theme settings saved successfully!" });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: "error", text: result.error || "Failed to save theme settings" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "Failed to save theme settings" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -137,8 +186,22 @@ export default function ThemeSettingsPage() {
           </div>
         </div>
 
+        {message && (
+          <div
+            className={`rounded-lg p-4 ${
+              message.type === "success"
+                ? "bg-green-50 text-green-800 dark:bg-green-500/15 dark:text-green-300"
+                : "bg-red-50 text-red-800 dark:bg-red-500/15 dark:text-red-300"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
         <div className="flex justify-end">
-          <Button>Save Theme Settings</Button>
+          <Button onClick={handleSave} disabled={saving || loading}>
+            {saving ? "Saving..." : "Save Theme Settings"}
+          </Button>
         </div>
       </div>
     </div>

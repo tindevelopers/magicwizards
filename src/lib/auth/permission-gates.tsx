@@ -8,7 +8,7 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { hasPermission, hasAnyPermission, hasAllPermissions, type Permission } from "./permissions";
+import { hasPermissionClient, hasAnyPermissionClient, hasAllPermissionsClient, type Permission } from "./permissions-client";
 
 interface PermissionGateProps {
   permission: Permission | Permission[];
@@ -43,14 +43,14 @@ export function PermissionGate({
       try {
         if (Array.isArray(permission)) {
           if (requireAll) {
-            const access = await hasAllPermissions(user.id, permission);
+            const access = await hasAllPermissionsClient(user.id, permission);
             setHasAccess(access);
           } else {
-            const access = await hasAnyPermission(user.id, permission);
+            const access = await hasAnyPermissionClient(user.id, permission);
             setHasAccess(access);
           }
         } else {
-          const access = await hasPermission(user.id, permission);
+          const access = await hasPermissionClient(user.id, permission);
           setHasAccess(access);
         }
       } catch (error) {

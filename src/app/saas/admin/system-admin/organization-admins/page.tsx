@@ -153,7 +153,7 @@ export default function OrganizationAdminsPage() {
               Organization Admins
             </h1>
             <p className="max-w-2xl text-white/70">
-              View and manage all Organization Admins (Workspace Admins) across all tenants from a unified control plane.
+              View and manage all Organization Admins (Organization Admins) across all tenants from a unified control plane.
             </p>
           </div>
           <div className="grid w-full max-w-md gap-4 rounded-2xl border border-white/15 bg-white/5 p-5 backdrop-blur">
@@ -188,7 +188,7 @@ export default function OrganizationAdminsPage() {
               Organization Admins Directory
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              All Workspace Admins across all tenants
+              All Organization Admins across all tenants
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">

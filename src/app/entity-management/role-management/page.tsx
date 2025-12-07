@@ -24,7 +24,7 @@ const rolePlaybooks = [
     gradient: "from-indigo-500 to-purple-500",
   },
   {
-    role: "Workspace Admin",
+    role: "Organization Admin",
     description: "Brand, roles, data residency, tenant level automations.",
     coverage: "Regional",
     seats: "128 / 180",

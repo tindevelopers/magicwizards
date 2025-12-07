@@ -99,7 +99,7 @@ CREATE POLICY "Allow all operations for authenticated users on users"
 INSERT INTO roles (name, description, coverage, max_seats, current_seats, permissions, gradient)
 VALUES
   ('Platform Admin', 'Full system control, audit exports, billing + API scope.', 'Global', 40, 32, ARRAY['All permissions', 'Billing', 'API keys', 'Audit logs'], 'from-indigo-500 to-purple-500'),
-  ('Workspace Admin', 'Brand, roles, data residency, tenant level automations.', 'Regional', 180, 128, ARRAY['Workspace settings', 'User management', 'Branding'], 'from-emerald-500 to-teal-500'),
+  ('Organization Admin', 'Manages their organization: users, teams, settings, and day-to-day operations within their company.', 'Regional', 180, 128, ARRAY['Organization settings', 'User management', 'Team management'], 'from-emerald-500 to-teal-500'),
   ('Billing Owner', 'Plan changes, usage alerts, dunning + collections.', 'Per tenant', 60, 44, ARRAY['Billing', 'Usage reports', 'Payment methods'], 'from-amber-500 to-orange-500'),
   ('Developer', 'API keys, webhooks, environments, feature flags.', 'Per project', 500, 310, ARRAY['API access', 'Webhooks', 'Feature flags'], 'from-sky-500 to-blue-500'),
   ('Viewer', 'Read-only access to dashboards and reports.', 'Per workspace', 200, 89, ARRAY['View dashboards', 'View reports'], 'from-gray-400 to-gray-600')

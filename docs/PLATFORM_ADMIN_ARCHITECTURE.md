@@ -21,7 +21,7 @@ Tenant Level (Organizations)
 │   ├── Organization Admin (admin@acme.com) - tenant_id = Tenant A
 │   │   ├── Can manage Tenant A users
 │   │   ├── Can configure Tenant A settings
-│   │   └── Role: "Workspace Admin"
+│   │   └── Role: "Organization Admin"
 │   └── Regular Users (user1@acme.com, user2@acme.com)
 │
 ├── Tenant B (TechStart Inc)
@@ -52,7 +52,7 @@ Tenant Level (Organizations)
 ```sql
 -- Users table already supports tenant_id = NULL
 -- Platform Admins: tenant_id = NULL, role_id = Platform Admin role
--- Organization Admins: tenant_id = <tenant_id>, role_id = Workspace Admin role
+-- Organization Admins: tenant_id = <tenant_id>, role_id = Organization Admin role
 
 -- Example:
 -- Platform Admin
@@ -73,7 +73,7 @@ VALUES (
   'user-uuid',
   'admin@acme.com',
   'Acme Admin',
-  (SELECT id FROM roles WHERE name = 'Workspace Admin'),
+  (SELECT id FROM roles WHERE name = 'Organization Admin'),
   'tenant-uuid',  -- Belongs to tenant
   'enterprise',
   'active'
@@ -160,14 +160,14 @@ VALUES (
    FROM users u
    JOIN tenants t ON u.tenant_id = t.id
    JOIN roles r ON u.role_id = r.id
-   WHERE r.name = 'Workspace Admin'
+   WHERE r.name = 'Organization Admin'
    ORDER BY t.name, u.created_at;
    ```
 
 ### Phase 2: Update RLS Policies
 
 ```sql
--- Platform Admins can see all Organization Admins (Workspace Admins)
+-- Platform Admins can see all Organization Admins (Organization Admins)
 CREATE POLICY "Platform admins can view all organization admins"
   ON users FOR SELECT
   USING (
@@ -187,7 +187,7 @@ CREATE POLICY "Platform admins can view all organization admins"
         tenant_id IN (
           SELECT tenant_id FROM users WHERE id = auth.uid()
         )
-        AND role_id IN (SELECT id FROM roles WHERE name = 'Workspace Admin')
+        AND role_id IN (SELECT id FROM roles WHERE name = 'Organization Admin')
       )
     )
   );
@@ -208,7 +208,7 @@ type OrganizationAdmin = Database["public"]["Tables"]["users"]["Row"] & {
 };
 
 /**
- * Get all Organization Admins (Workspace Admins) across all tenants
+ * Get all Organization Admins (Organization Admins) across all tenants
  * Only accessible by Platform Admins
  */
 export async function getAllOrganizationAdmins() {
@@ -232,7 +232,7 @@ export async function getAllOrganizationAdmins() {
     throw new Error("Only Platform Admins can view all Organization Admins");
   }
 
-  // Get all Workspace Admins with tenant info
+  // Get all Organization Admins with tenant info
   const { data, error } = await supabase
     .from("users")
     .select(`
@@ -250,7 +250,7 @@ export async function getAllOrganizationAdmins() {
         status
       )
     `)
-    .eq("roles.name", "Workspace Admin")
+    .eq("roles.name", "Organization Admin")
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -281,7 +281,7 @@ export async function getTenantOrganizationAdmins(tenantId: string) {
       )
     `)
     .eq("tenant_id", tenantId)
-    .eq("roles.name", "Workspace Admin")
+    .eq("roles.name", "Organization Admin")
     .order("created_at", { ascending: false });
 
   if (error) throw error;
@@ -341,7 +341,7 @@ export default function OrganizationAdminsPage() {
       <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
         <h1 className="text-3xl font-semibold mb-2">Organization Admins</h1>
         <p className="text-gray-600">
-          View all Organization Admins (Workspace Admins) across all tenants
+          View all Organization Admins (Organization Admins) across all tenants
         </p>
       </section>
 
@@ -428,7 +428,7 @@ if (roleName === "Platform Admin") {
 ## 🎯 Key Benefits
 
 1. **Clear Separation**: Platform Admins are system-level, Organization Admins are tenant-level
-2. **Easy Querying**: Simple to get all Organization Admins: `WHERE role = 'Workspace Admin' AND tenant_id IS NOT NULL`
+2. **Easy Querying**: Simple to get all Organization Admins: `WHERE role = 'Organization Admin' AND tenant_id IS NOT NULL`
 3. **Better Security**: Platform Admins clearly separated from tenant data
 4. **Scalable**: Easy to add more system-level roles in the future
 5. **Clean UI**: Platform Admins don't appear in tenant user lists
@@ -445,7 +445,7 @@ SELECT
 FROM users u
 JOIN tenants t ON u.tenant_id = t.id
 JOIN roles r ON u.role_id = r.id
-WHERE r.name = 'Workspace Admin'
+WHERE r.name = 'Organization Admin'
 ORDER BY t.name, u.created_at;
 ```
 
@@ -474,7 +474,7 @@ AND u.role_id NOT IN (
 
 **Recommended Approach:**
 - ✅ Platform Admins: `tenant_id = NULL`, `role = 'Platform Admin'`
-- ✅ Organization Admins: `tenant_id = <tenant_id>`, `role = 'Workspace Admin'`
+- ✅ Organization Admins: `tenant_id = <tenant_id>`, `role = 'Organization Admin'`
 - ✅ Create view/query to show all Organization Admins grouped by tenant
 - ✅ Update RLS policies to allow Platform Admins to see all Organization Admins
 - ✅ Create UI page for Platform Admins to view all Organization Admins

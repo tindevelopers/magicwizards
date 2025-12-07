@@ -1,14 +1,56 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Label from "../form/Label";
 import Input from "@/components/form/input/InputField";
+import Button from "@/components/ui/button/Button";
+import { sendPasswordResetEmail } from "@/app/actions/password";
 
 export default function ResetPasswordForm() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMessage(null);
+
+    if (!email) {
+      setMessage({ type: "error", text: "Please enter your email address" });
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await sendPasswordResetEmail(email);
+
+      if (result.success) {
+        setMessage({
+          type: "success",
+          text: "Password reset email sent! Please check your inbox for instructions.",
+        });
+        setEmail("");
+      } else {
+        setMessage({ type: "error", text: result.error || "Failed to send reset email" });
+      }
+    } catch (error) {
+      setMessage({
+        type: "error",
+        text: error instanceof Error ? error.message : "An unexpected error occurred",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="w-full max-w-md pt-10 mx-auto">
         <Link
-          href="/"
+          href="/signin"
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
         >
           <svg
@@ -27,7 +69,7 @@ export default function ResetPasswordForm() {
               strokeLinejoin="round"
             />
           </svg>
-          Back to dashboard
+          Back to sign in
         </Link>
       </div>
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
@@ -36,16 +78,27 @@ export default function ResetPasswordForm() {
             Forgot Your Password?
           </h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Enter the email address linked to your account, and we’ll send you a
+            Enter the email address linked to your account, and we&apos;ll send you a
             link to reset your password.
           </p>
         </div>
         <div>
-          <form>
+          {message && (
+            <div
+              className={`mb-5 rounded-lg p-4 ${
+                message.type === "success"
+                  ? "bg-green-50 text-green-800 dark:bg-green-500/15 dark:text-green-300"
+                  : "bg-red-50 text-red-800 dark:bg-red-500/15 dark:text-red-300"
+              }`}
+            >
+              {message.text}
+            </div>
+          )}
+          <form onSubmit={handleSubmit}>
             <div className="space-y-5">
               {/* <!-- Email --> */}
               <div>
-                <Label>
+                <Label htmlFor="email">
                   Email<span className="text-error-500">*</span>
                 </Label>
                 <Input
@@ -53,22 +106,25 @@ export default function ResetPasswordForm() {
                   id="email"
                   name="email"
                   placeholder="Enter your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
 
               {/* <!-- Button --> */}
               <div>
-                <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
-                  Send Reset Link
-                </button>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Sending..." : "Send Reset Link"}
+                </Button>
               </div>
             </div>
           </form>
           <div className="mt-5">
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
-              Wait, I remember my password...
+              Wait, I remember my password...{" "}
               <Link
-                href="/"
+                href="/signin"
                 className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
               >
                 Click here

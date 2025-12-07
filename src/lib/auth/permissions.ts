@@ -1,5 +1,7 @@
-import { createClient } from "@/lib/supabase/client";
+import { createClient as createServerClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin-client";
 import type { Database } from "@/lib/supabase/types";
+import { getEffectiveRole } from "@/lib/supabase/user-tenant-roles";
 
 type Role = Database["public"]["Tables"]["roles"]["Row"];
 
@@ -29,15 +31,25 @@ export interface UserPermissions {
 
 /**
  * Get user permissions based on their role
+ * @param userId - User ID
+ * @param tenantId - Optional tenant ID to check tenant-specific role
  */
-export async function getUserPermissions(userId: string): Promise<UserPermissions> {
-  const supabase = createClient();
+export async function getUserPermissions(
+  userId: string,
+  tenantId?: string | null
+): Promise<UserPermissions> {
+  // Use admin client to bypass RLS for permission checks
+  // This ensures we can always check a user's role, even if RLS would block it
+  const adminClient = createAdminClient();
   
-  const { data: user, error } = await supabase
+  // First, check platform role (users.role_id)
+  const { data: user, error } = await adminClient
     .from("users")
     .select(`
       role_id,
+      tenant_id,
       roles:role_id (
+        id,
         name,
         permissions
       )
@@ -45,7 +57,8 @@ export async function getUserPermissions(userId: string): Promise<UserPermission
     .eq("id", userId)
     .single();
 
-  if (error || !user) {
+  if (error) {
+    console.error(`[getUserPermissions] Error fetching user ${userId}:`, error);
     return {
       role: null,
       permissions: [],
@@ -53,20 +66,28 @@ export async function getUserPermissions(userId: string): Promise<UserPermission
     };
   }
 
-  const role = user.roles as Role | null;
-  const roleName = role?.name || null;
-  const isPlatformAdmin = roleName === "Platform Admin";
+  if (!user) {
+    console.warn(`[getUserPermissions] User ${userId} not found in users table`);
+    return {
+      role: null,
+      permissions: [],
+      isPlatformAdmin: false,
+    };
+  }
 
-  // Extract permissions from role
-  const rolePermissions = (role?.permissions || []) as string[];
+  const platformRole = user.roles as { id: string; name: string; permissions: string[] } | null;
+  const platformRoleName = platformRole?.name || null;
+  const isPlatformAdmin = platformRoleName === "Platform Admin";
   
-  // Map role permissions to Permission type
-  const permissions: Permission[] = [];
-  
-  // Platform Admin has all permissions
+  // Debug logging for Platform Admin detection
+  if (isPlatformAdmin) {
+    console.log(`[getUserPermissions] User ${userId} detected as Platform Admin (role: ${platformRoleName}, tenant_id: ${user.tenant_id})`);
+  }
+
+  // Platform Admin always has all permissions (regardless of tenant role)
   if (isPlatformAdmin) {
     return {
-      role: roleName,
+      role: platformRoleName,
       permissions: [
         "users.read",
         "users.write",
@@ -89,8 +110,42 @@ export async function getUserPermissions(userId: string): Promise<UserPermission
     };
   }
 
-  // Map role permissions based on role name
-  if (roleName === "Workspace Admin") {
+  // If tenant context provided, check for tenant-specific role
+  if (tenantId) {
+    const effectiveRole = await getEffectiveRole(userId, tenantId);
+    if (effectiveRole && effectiveRole.source === "tenant") {
+      // Use tenant role for permissions
+      const { data: tenantRoleData } = await supabase
+        .from("roles")
+        .select("name, permissions")
+        .eq("id", effectiveRole.roleId)
+        .single();
+
+      if (tenantRoleData) {
+        return mapRoleToPermissions(tenantRoleData.name, tenantRoleData.permissions as string[]);
+      }
+    }
+  }
+
+  // Otherwise, use platform role
+  if (platformRole) {
+    return mapRoleToPermissions(platformRole.name, platformRole.permissions as string[]);
+  }
+
+  return {
+    role: null,
+    permissions: [],
+    isPlatformAdmin: false,
+  };
+}
+
+/**
+ * Map role name and permissions array to UserPermissions
+ */
+function mapRoleToPermissions(roleName: string, rolePermissions: string[]): UserPermissions {
+  const permissions: Permission[] = [];
+  
+  if (roleName === "Organization Admin") {
     permissions.push(
       "users.read",
       "users.write",
@@ -170,4 +225,3 @@ export async function hasAllPermissions(
     userPermissions.permissions.includes(permission)
   );
 }
-

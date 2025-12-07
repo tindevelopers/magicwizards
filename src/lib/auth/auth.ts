@@ -68,11 +68,11 @@ export async function signUp(data: SignUpData) {
   }
 
   // 3. Create user record in users table using admin client
-  // Get default "Workspace Admin" role
+  // Get default "Organization Admin" role
   const { data: defaultRole } = await adminClient
     .from("roles")
     .select("id")
-    .eq("name", "Workspace Admin")
+    .eq("name", "Organization Admin")
     .single();
 
   const userData: UserInsert = {

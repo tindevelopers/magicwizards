@@ -5,10 +5,12 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Image from "next/image";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getBrandingSettings, saveBrandingSettings } from "@/app/actions/white-label";
+import type { BrandingSettings } from "@/app/actions/white-label";
 
 export default function WhiteLabelBrandingPage() {
-  const [branding, setBranding] = useState({
+  const [branding, setBranding] = useState<BrandingSettings>({
     companyName: "SaaS Platform",
     logo: "/images/logo/logo.svg",
     favicon: "/images/logo/favicon.png",
@@ -17,6 +19,54 @@ export default function WhiteLabelBrandingPage() {
     supportEmail: "support@example.com",
     supportPhone: "+1 (555) 123-4567",
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    loadBranding();
+  }, []);
+
+  const loadBranding = async () => {
+    try {
+      setLoading(true);
+      const settings = await getBrandingSettings();
+      if (Object.keys(settings).length > 0) {
+        setBranding({
+          companyName: settings.companyName || "SaaS Platform",
+          logo: settings.logo || "/images/logo/logo.svg",
+          favicon: settings.favicon || "/images/logo/favicon.png",
+          primaryColor: settings.primaryColor || "#4F46E5",
+          secondaryColor: settings.secondaryColor || "#7C3AED",
+          supportEmail: settings.supportEmail || "support@example.com",
+          supportPhone: settings.supportPhone || "+1 (555) 123-4567",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading branding:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setMessage(null);
+      const result = await saveBrandingSettings(branding);
+      
+      if (result.success) {
+        setMessage({ type: "success", text: "Branding settings saved successfully!" });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: "error", text: result.error || "Failed to save branding settings" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "Failed to save branding settings" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -169,8 +219,22 @@ export default function WhiteLabelBrandingPage() {
           </div>
         </div>
 
+        {message && (
+          <div
+            className={`rounded-lg p-4 ${
+              message.type === "success"
+                ? "bg-green-50 text-green-800 dark:bg-green-500/15 dark:text-green-300"
+                : "bg-red-50 text-red-800 dark:bg-red-500/15 dark:text-red-300"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
         <div className="flex justify-end">
-          <Button>Save Branding Settings</Button>
+          <Button onClick={handleSave} disabled={saving || loading}>
+            {saving ? "Saving..." : "Save Branding Settings"}
+          </Button>
         </div>
       </div>
     </div>

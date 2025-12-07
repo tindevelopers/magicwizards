@@ -70,7 +70,7 @@ const userDirectory = [
   {
     name: "Emily Brooks",
     email: "emily@evergreen.edu",
-    role: "Workspace Admin",
+    role: "Organization Admin",
     plan: "Education",
     status: "Active",
     lastActive: "4m ago",

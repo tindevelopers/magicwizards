@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import { useTenant } from "@/lib/tenant/context";
+import { useWhiteLabel } from "@/context/WhiteLabelContext";
 import {
   AiIcon,
   BoxCubeIcon,
@@ -41,15 +42,7 @@ const navItems: NavItem[] = [
   {
     icon: <GridIcon />,
     name: "Dashboard",
-    subItems: [
-      { name: "Ecommerce", path: "/" },
-      { name: "Analytics", path: "/analytics" },
-      { name: "Marketing", path: "/marketing" },
-      { name: "CRM", path: "/crm" },
-      { name: "Stocks", path: "/stocks" },
-      { name: "SaaS", path: "/saas", new: true },
-      { name: "Logistics", path: "/logistics", new: true },
-    ],
+    path: "/saas/dashboard",
   },
   {
     name: "AI Assistant",
@@ -90,38 +83,43 @@ const navItems: NavItem[] = [
     ],
   },
   {
-    name: "System Admin",
-    icon: <LockIcon />,
+    name: "Billing & Plans",
+    icon: <CartIcon />,
     subItems: [
-      { name: "Tenant Management", path: "/saas/admin/entity/tenant-management" },
-      { name: "Organization Admins", path: "/saas/admin/system-admin/organization-admins" },
-      { name: "Organization Management", path: "/saas/admin/entity/organization-management" },
-      { name: "Role Management", path: "/saas/admin/entity/role-management" },
-      { name: "API Configuration", path: "/saas/admin/system-admin/api-configuration" },
+      { name: "Billing Dashboard", path: "/saas/billing/dashboard" },
+      { name: "Cancel Subscription", path: "/saas/billing/cancel-subscription" },
+      { name: "Upgrade to Pro", path: "/saas/billing/upgrade-to-pro" },
+      { name: "Update Billing Address", path: "/saas/billing/update-billing-address" },
+      { name: "Add New Card", path: "/saas/billing/add-new-card" },
       {
-        name: "Webhooks",
+        name: "Invoicing",
         subItems: [
-          { name: "Management", path: "/saas/webhooks/management" },
-          { name: "Events", path: "/saas/webhooks/events" },
-          { name: "Logs", path: "/saas/webhooks/logs" },
-          { name: "Testing", path: "/saas/webhooks/testing" },
+          { name: "Invoices", path: "/saas/invoicing/invoices" },
+          { name: "Payment History", path: "/saas/invoicing/payment-history" },
+          { name: "Failed Payments", path: "/saas/invoicing/failed-payments" },
+          { name: "Refunds", path: "/saas/invoicing/refunds" },
+          { name: "Tax Settings", path: "/saas/invoicing/tax-settings" },
         ],
       },
     ],
   },
   {
-    name: "SaaS",
-    icon: <ShootingStarIcon />,
-    new: true,
+    name: "Admin",
+    icon: <UserCircleIcon />,
     subItems: [
-      { name: "Dashboard", path: "/saas/dashboard" },
-      { name: "User Profile", path: "/saas/userprofile" },
-      {
-        name: "Admin",
-        subItems: [
-          { name: "User Management", path: "/saas/admin/entity/user-management" },
-        ],
-      },
+      { name: "User Management", path: "/saas/admin/entity/user-management" },
+      { name: "Tenant Management", path: "/saas/admin/entity/tenant-management" },
+      { name: "Organization Management", path: "/saas/admin/entity/organization-management" },
+      { name: "Role Management", path: "/saas/admin/entity/role-management" },
+    ],
+  },
+  {
+    name: "System Admin",
+    icon: <LockIcon />,
+    subItems: [
+      { name: "Organization Admins", path: "/saas/admin/system-admin/organization-admins" },
+      { name: "API Configuration", path: "/saas/admin/system-admin/api-configuration" },
+      { name: "Multi-Tenant", path: "/multi-tenant", new: true },
       {
         name: "Subscriptions",
         subItems: [
@@ -133,15 +131,33 @@ const navItems: NavItem[] = [
         ],
       },
       {
-        name: "Invoicing",
+        name: "Webhooks",
         subItems: [
-          { name: "Invoices", path: "/saas/invoicing/invoices" },
-          { name: "Payment History", path: "/saas/invoicing/payment-history" },
-          { name: "Failed Payments", path: "/saas/invoicing/failed-payments" },
-          { name: "Refunds", path: "/saas/invoicing/refunds" },
-          { name: "Tax Settings", path: "/saas/invoicing/tax-settings" },
+          { name: "Management", path: "/saas/webhooks/management" },
+          { name: "Events", path: "/saas/webhooks/events" },
+          { name: "Logs", path: "/saas/webhooks/logs" },
+          { name: "Testing", path: "/saas/webhooks/testing" },
         ],
       },
+      {
+        name: "White-Label",
+        subItems: [
+          { name: "Branding", path: "/saas/white-label/branding" },
+          { name: "Domain Settings", path: "/saas/white-label/domain-settings" },
+          { name: "Email Customization", path: "/saas/white-label/email-customization" },
+          { name: "Theme Settings", path: "/saas/white-label/theme-settings" },
+          { name: "Custom CSS", path: "/saas/white-label/custom-css" },
+        ],
+      },
+    ],
+  },
+  {
+    name: "SaaS",
+    icon: <ShootingStarIcon />,
+    new: true,
+    subItems: [
+      { name: "Dashboard", path: "/saas/dashboard" },
+      { name: "User Profile", path: "/profile" },
       {
         name: "Usage & Metering",
         subItems: [
@@ -236,26 +252,6 @@ const navItems: NavItem[] = [
           { name: "Sharing", path: "/saas/custom-report-builder/sharing" },
         ],
       },
-      {
-        name: "White-Label",
-        subItems: [
-          { name: "Branding", path: "/saas/white-label/branding" },
-          { name: "Domain Settings", path: "/saas/white-label/domain-settings" },
-          { name: "Email Customization", path: "/saas/white-label/email-customization" },
-          { name: "Theme Settings", path: "/saas/white-label/theme-settings" },
-          { name: "Custom CSS", path: "/saas/white-label/custom-css" },
-        ],
-      },
-      {
-        name: "Billing & Plans",
-        subItems: [
-          { name: "Billing Dashboard", path: "/billing" },
-          { name: "Cancel Subscription", path: "/saas/billing/cancel-subscription" },
-          { name: "Upgrade to Pro", path: "/saas/billing/upgrade-to-pro" },
-          { name: "Update Billing Address", path: "/saas/billing/update-billing-address" },
-          { name: "Add New Card", path: "/saas/billing/add-new-card" },
-        ],
-      },
     ],
   },
   {
@@ -265,7 +261,7 @@ const navItems: NavItem[] = [
   },
   {
     icon: <UserCircleIcon />,
-    name: "User Profile",
+    name: "Profile",
     path: "/profile",
   },
   {
@@ -297,7 +293,6 @@ const navItems: NavItem[] = [
     icon: <PageIcon />,
     subItems: [
       { name: "File Manager", path: "/file-manager" },
-      { name: "Multi-Tenant", path: "/multi-tenant", new: true },
       { name: "Pricing Tables", path: "/pricing-tables" },
       { name: "FAQ", path: "/faq" },
       { name: "API Keys", path: "/api-keys", new: true },
@@ -395,6 +390,11 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
   const { tenant, isLoading: isTenantLoading } = useTenant();
+  const { branding } = useWhiteLabel();
+  
+  const logoUrl = branding.logo || "/images/logo/logo.svg";
+  const logoDarkUrl = branding.logo || "/images/logo/logo-dark.svg";
+  const logoIconUrl = branding.favicon || "/images/logo/logo-icon.svg";
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -710,23 +710,23 @@ const AppSidebar: React.FC = () => {
             <>
               <Image
                 className="dark:hidden"
-                src="/images/logo/logo.svg"
-                alt="Logo"
+                src={logoUrl}
+                alt={branding.companyName || "Logo"}
                 width={150}
                 height={40}
               />
               <Image
                 className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
+                src={logoDarkUrl}
+                alt={branding.companyName || "Logo"}
                 width={150}
                 height={40}
               />
             </>
           ) : (
             <Image
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
+              src={logoIconUrl}
+              alt={branding.companyName || "Logo"}
               width={32}
               height={32}
             />

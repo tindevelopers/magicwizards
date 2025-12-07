@@ -33,7 +33,7 @@ const initialRoles: Role[] = [
     gradient: "from-indigo-500 to-purple-500",
   },
   {
-    role: "Workspace Admin",
+    role: "Organization Admin",
     description: "Brand, roles, data residency, tenant level automations.",
     coverage: "Regional",
     seats: "128 / 180",
@@ -249,7 +249,7 @@ export default function RoleManagementPage() {
         <div className="lg:col-span-2 space-y-4 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-2xl font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-2xl font-semibold text-gray-900 dark:text-white">
                 Role Directory
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -369,9 +369,9 @@ export default function RoleManagementPage() {
       <Modal
         isOpen={editModal.isOpen}
         onClose={editModal.closeModal}
-        className="max-w-[800px] m-4"
+        className="max-w-[800px] w-full"
       >
-        <div className="relative w-full overflow-y-auto bg-white rounded-3xl dark:bg-gray-900 p-6 lg:p-10">
+        <div className="w-full bg-white rounded-3xl dark:bg-gray-900 p-6 lg:p-10">
           <div className="mb-6">
             <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
               Edit Role

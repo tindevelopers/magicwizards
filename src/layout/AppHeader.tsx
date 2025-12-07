@@ -5,6 +5,7 @@ import UserDropdown from "@/components/header/UserDropdown";
 import TenantSwitcher from "@/components/tenant/TenantSwitcher";
 import WorkspaceSwitcher from "@/components/workspace/WorkspaceSwitcher";
 import { useSidebar } from "@/context/SidebarContext";
+import { useWhiteLabel } from "@/context/WhiteLabelContext";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
@@ -13,6 +14,10 @@ const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
 
   const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
+  const { branding } = useWhiteLabel();
+  
+  const logoUrl = branding.logo || "/images/logo/logo.svg";
+  const logoDarkUrl = branding.logo || "/images/logo/logo-dark.svg";
 
   const handleToggle = () => {
     if (window.innerWidth >= 1280) {
@@ -93,15 +98,15 @@ const AppHeader: React.FC = () => {
               width={154}
               height={32}
               className="dark:hidden"
-              src="/images/logo/logo.svg"
-              alt="Logo"
+              src={logoUrl}
+              alt={branding.companyName || "Logo"}
             />
             <Image
               width={154}
               height={32}
               className="hidden dark:block"
-              src="/images/logo/logo-dark.svg"
-              alt="Logo"
+              src={logoDarkUrl}
+              alt={branding.companyName || "Logo"}
             />
           </Link>
 

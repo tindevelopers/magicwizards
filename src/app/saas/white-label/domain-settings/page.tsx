@@ -5,35 +5,13 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Switch from "@/components/form/switch/Switch";
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getCustomDomains, addCustomDomain, saveCustomDomains } from "@/app/actions/white-label";
+import type { CustomDomain } from "@/app/actions/white-label";
 
-interface Domain {
+interface Domain extends CustomDomain {
   id: string;
-  domain: string;
-  type: "primary" | "custom";
-  status: "active" | "pending" | "failed";
-  sslStatus: "valid" | "expired" | "pending";
-  verified: boolean;
 }
-
-const domains: Domain[] = [
-  {
-    id: "1",
-    domain: "app.example.com",
-    type: "primary",
-    status: "active",
-    sslStatus: "valid",
-    verified: true,
-  },
-  {
-    id: "2",
-    domain: "custom.example.com",
-    type: "custom",
-    status: "pending",
-    sslStatus: "pending",
-    verified: false,
-  },
-];
 
 const statusIcons = {
   active: CheckIcon,
@@ -48,12 +26,90 @@ const statusColors = {
 };
 
 export default function DomainSettingsPage() {
+  const [domains, setDomains] = useState<Domain[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     domain: "",
     type: "custom" as "primary" | "custom",
   });
   const [enableCustomDomain, setEnableCustomDomain] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    loadDomains();
+  }, []);
+
+  const loadDomains = async () => {
+    try {
+      setLoading(true);
+      const customDomains = await getCustomDomains();
+      setDomains(
+        customDomains.map((d, idx) => ({
+          ...d,
+          id: `${idx}`,
+        }))
+      );
+    } catch (error) {
+      console.error("Error loading domains:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddDomain = async () => {
+    if (!formData.domain) {
+      setMessage({ type: "error", text: "Please enter a domain name" });
+      return;
+    }
+
+    try {
+      setSaving(true);
+      setMessage(null);
+      const result = await addCustomDomain({
+        domain: formData.domain,
+        type: formData.type,
+        status: "pending",
+        sslStatus: "pending",
+      });
+
+      if (result.success) {
+        setMessage({ type: "success", text: "Domain added successfully!" });
+        setFormData({ domain: "", type: "custom" });
+        setShowForm(false);
+        await loadDomains();
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: "error", text: result.error || "Failed to add domain" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "Failed to add domain" });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleRemoveDomain = async (index: number) => {
+    if (!confirm("Are you sure you want to remove this domain?")) {
+      return;
+    }
+
+    try {
+      const updatedDomains = domains.filter((_, idx) => idx !== index);
+      const result = await saveCustomDomains(updatedDomains.map(({ id, ...rest }) => rest));
+      
+      if (result.success) {
+        await loadDomains();
+        setMessage({ type: "success", text: "Domain removed successfully!" });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: "error", text: result.error || "Failed to remove domain" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "Failed to remove domain" });
+    }
+  };
 
   return (
     <div>
@@ -66,8 +122,22 @@ export default function DomainSettingsPage() {
               Configure custom domains and SSL certificates
             </p>
           </div>
-          <Button onClick={() => setShowForm(!showForm)}>Add Domain</Button>
+          <Button onClick={() => setShowForm(!showForm)} disabled={loading}>
+            Add Domain
+          </Button>
         </div>
+
+        {message && (
+          <div
+            className={`rounded-lg p-4 ${
+              message.type === "success"
+                ? "bg-green-50 text-green-800 dark:bg-green-500/15 dark:text-green-300"
+                : "bg-red-50 text-red-800 dark:bg-red-500/15 dark:text-red-300"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
 
         {/* Enable Custom Domain */}
         <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
@@ -116,10 +186,12 @@ export default function DomainSettingsPage() {
               </div>
             </div>
             <div className="mt-4 flex gap-3">
-              <Button variant="outline" onClick={() => setShowForm(false)}>
+              <Button variant="outline" onClick={() => setShowForm(false)} disabled={saving}>
                 Cancel
               </Button>
-              <Button>Add Domain</Button>
+              <Button onClick={handleAddDomain} disabled={saving}>
+                {saving ? "Adding..." : "Add Domain"}
+              </Button>
             </div>
           </div>
         )}
@@ -183,6 +255,14 @@ export default function DomainSettingsPage() {
                   </Button>
                   <Button variant="outline" size="sm" className="flex-1">
                     Renew SSL
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    onClick={() => handleRemoveDomain(domains.findIndex((d) => d.domain === domain.domain))}
+                  >
+                    Remove
                   </Button>
                 </div>
               </div>

@@ -6,10 +6,12 @@ import Label from "@/components/form/Label";
 import TextArea from "@/components/form/input/TextArea";
 import Image from "next/image";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getEmailSettings, saveEmailSettings } from "@/app/actions/white-label";
+import type { EmailSettings } from "@/app/actions/white-label";
 
 export default function EmailCustomizationPage() {
-  const [emailSettings, setEmailSettings] = useState({
+  const [emailSettings, setEmailSettings] = useState<EmailSettings>({
     fromName: "SaaS Platform",
     fromEmail: "noreply@example.com",
     replyTo: "support@example.com",
@@ -18,6 +20,54 @@ export default function EmailCustomizationPage() {
     headerColor: "#4F46E5",
     footerColor: "#1F2937",
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    loadEmailSettings();
+  }, []);
+
+  const loadEmailSettings = async () => {
+    try {
+      setLoading(true);
+      const settings = await getEmailSettings();
+      if (Object.keys(settings).length > 0) {
+        setEmailSettings({
+          fromName: settings.fromName || "SaaS Platform",
+          fromEmail: settings.fromEmail || "noreply@example.com",
+          replyTo: settings.replyTo || "support@example.com",
+          footerText: settings.footerText || "© 2025 SaaS Platform. All rights reserved.",
+          headerLogo: settings.headerLogo || "/images/logo/logo.svg",
+          headerColor: settings.headerColor || "#4F46E5",
+          footerColor: settings.footerColor || "#1F2937",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading email settings:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setMessage(null);
+      const result = await saveEmailSettings(emailSettings);
+      
+      if (result.success) {
+        setMessage({ type: "success", text: "Email settings saved successfully!" });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: "error", text: result.error || "Failed to save email settings" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "Failed to save email settings" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -183,8 +233,22 @@ export default function EmailCustomizationPage() {
           </div>
         </div>
 
+        {message && (
+          <div
+            className={`rounded-lg p-4 ${
+              message.type === "success"
+                ? "bg-green-50 text-green-800 dark:bg-green-500/15 dark:text-green-300"
+                : "bg-red-50 text-red-800 dark:bg-red-500/15 dark:text-red-300"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
         <div className="flex justify-end">
-          <Button>Save Email Settings</Button>
+          <Button onClick={handleSave} disabled={saving || loading}>
+            {saving ? "Saving..." : "Save Email Settings"}
+          </Button>
         </div>
       </div>
     </div>

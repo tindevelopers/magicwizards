@@ -61,7 +61,7 @@ export async function isPlatformAdmin(): Promise<boolean> {
 }
 
 /**
- * Get all Organization Admins (Workspace Admins) across all tenants
+ * Get all Organization Admins (Organization Admins) across all tenants
  * Only accessible by Platform Admins
  */
 export async function getAllOrganizationAdmins() {
@@ -73,7 +73,7 @@ export async function getAllOrganizationAdmins() {
     throw new Error("Only Platform Admins can view all Organization Admins");
   }
 
-  // Get all Workspace Admins with tenant info
+  // Get all Organization Admins with tenant info
   // Use admin client to bypass RLS for this query
   let adminClient;
   try {
@@ -84,18 +84,18 @@ export async function getAllOrganizationAdmins() {
     throw new Error(`Configuration error: ${errorMessage}. Please check your environment variables.`);
   }
   
-  // First get the Workspace Admin role ID
+  // First get the Organization Admin role ID
   const { data: workspaceAdminRole } = await adminClient
     .from("roles")
     .select("id")
-    .eq("name", "Workspace Admin")
+    .eq("name", "Organization Admin")
     .single();
 
   if (!workspaceAdminRole) {
-    throw new Error("Workspace Admin role not found");
+    throw new Error("Organization Admin role not found");
   }
 
-  // Get all Workspace Admins (tenant-scoped users only)
+  // Get all Organization Admins (tenant-scoped users only)
   const { data, error } = await adminClient
     .from("users")
     .select(`
@@ -114,7 +114,7 @@ export async function getAllOrganizationAdmins() {
       )
     `)
     .not("tenant_id", "is", null)  // Only tenant-scoped users
-    .eq("role_id", workspaceAdminRole.id)  // Workspace Admin role
+    .eq("role_id", workspaceAdminRole.id)  // Organization Admin role
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -132,15 +132,15 @@ export async function getAllOrganizationAdmins() {
 export async function getTenantOrganizationAdmins(tenantId: string) {
   const supabase = createClient();
   
-  // Get Workspace Admin role ID
+  // Get Organization Admin role ID
   const { data: workspaceAdminRole } = await supabase
     .from("roles")
     .select("id")
-    .eq("name", "Workspace Admin")
+    .eq("name", "Organization Admin")
     .single();
 
   if (!workspaceAdminRole) {
-    throw new Error("Workspace Admin role not found");
+    throw new Error("Organization Admin role not found");
   }
 
   const { data, error } = await supabase
@@ -183,15 +183,15 @@ export async function getOrganizationAdminsByTenant() {
 
   const adminClient = createAdminClient();
   
-  // Get Workspace Admin role ID
+  // Get Organization Admin role ID
   const { data: workspaceAdminRole } = await adminClient
     .from("roles")
     .select("id")
-    .eq("name", "Workspace Admin")
+    .eq("name", "Organization Admin")
     .single();
 
   if (!workspaceAdminRole) {
-    throw new Error("Workspace Admin role not found");
+    throw new Error("Organization Admin role not found");
   }
 
   const { data, error } = await adminClient

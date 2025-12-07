@@ -4,13 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:local": "supabase start && npm run dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "audit": "npm audit --audit-level=moderate",
     "deps:check": "npx npm-check-updates",
-    "deps:update": "npx npm-check-updates -u"
+    "deps:update": "npx npm-check-updates -u",
+    "supabase:start": "supabase start",
+    "supabase:stop": "supabase stop",
+    "supabase:status": "supabase status",
+    "supabase:reset": "supabase db reset"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
@@ -23,6 +28,7 @@
     "@popperjs/core": "^2.11.8",
     "@react-jvectormap/core": "^1.0.4",
     "@react-jvectormap/world": "^1.1.2",
+    "@stripe/stripe-js": "^8.5.3",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.86.2",
     "@tailwindcss/forms": "^0.5.9",
@@ -40,6 +46,7 @@
     "react-dom": "^19.0.1",
     "react-dropzone": "^14.3.5",
     "simplebar-react": "^3.3.0",
+    "stripe": "^20.0.0",
     "swiper": "^11.2.0",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.0.0"

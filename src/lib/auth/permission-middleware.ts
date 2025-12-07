@@ -5,9 +5,10 @@
  */
 
 import { createClient } from "@/lib/supabase/server";
-import { hasPermission, hasAnyPermission, hasAllPermissions, type Permission } from "./permissions";
+import { getUserPermissions, hasPermission, hasAnyPermission, hasAllPermissions, type Permission } from "./permissions";
 import { hasTenantPermission } from "./tenant-permissions";
 import { getCurrentUserTenantId } from "@/lib/tenant/validation";
+import { logPermissionCheckWithContext } from "./audit-log";
 
 export interface PermissionCheckResult {
   allowed: boolean;
@@ -42,7 +43,16 @@ export async function checkPermission(
     }
 
     // Otherwise, check role permission
-    const hasAccess = await hasPermission(user.id, permission);
+    // Get user permissions to check Platform Admin status
+    const userPermissions = await getUserPermissions(user.id);
+    
+    // Debug logging
+    if (!userPermissions.isPlatformAdmin && !userPermissions.permissions.includes(permission)) {
+      console.log(`[Permission Check] User ${user.id} (${user.email}) - Role: ${userPermissions.role}, IsPlatformAdmin: ${userPermissions.isPlatformAdmin}, Permissions: ${userPermissions.permissions.join(", ")}, Required: ${permission}`);
+    }
+    
+    // Platform Admins have all permissions
+    const hasAccess = userPermissions.isPlatformAdmin || userPermissions.permissions.includes(permission);
     
     // Log permission check
     const tenantId = options?.tenantId || await getCurrentUserTenantId();

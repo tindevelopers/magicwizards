@@ -6,6 +6,7 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { TenantProvider } from "@/lib/tenant/context";
 import { WorkspaceProvider } from "@/lib/workspace/context";
+import { WhiteLabelProvider } from "@/context/WhiteLabelContext";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -25,7 +26,9 @@ export default function RootLayout({
         <ThemeProvider>
           <TenantProvider>
             <WorkspaceProvider>
-              <SidebarProvider>{children}</SidebarProvider>
+              <WhiteLabelProvider>
+                <SidebarProvider>{children}</SidebarProvider>
+              </WhiteLabelProvider>
             </WorkspaceProvider>
           </TenantProvider>
         </ThemeProvider>

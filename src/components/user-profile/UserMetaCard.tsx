@@ -45,7 +45,7 @@ export default function UserMetaCard() {
     
     const roleMap: Record<string, string> = {
       "Platform Admin": "Platform Admin",
-      "Workspace Admin": "Organization Admin",
+      "Organization Admin": "Organization Admin",
       "Billing Owner": "Billing Owner",
       "Developer": "Developer",
       "Viewer": "Viewer",
@@ -60,7 +60,7 @@ export default function UserMetaCard() {
     
     const roleColorMap: Record<string, "primary" | "success" | "info" | "warning" | "dark"> = {
       "Platform Admin": "primary",
-      "Workspace Admin": "success",
+      "Organization Admin": "success",
       "Organization Admin": "success",
       "Billing Owner": "warning",
       "Developer": "info",

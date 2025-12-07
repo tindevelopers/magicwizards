@@ -3,7 +3,8 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import Label from "@/components/form/Label";
 import { CodeBracketIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getCustomCSS, saveCustomCSS } from "@/app/actions/white-label";
 
 const defaultCSS = `/* Custom CSS for white-label customization */
 
@@ -23,6 +24,46 @@ const defaultCSS = `/* Custom CSS for white-label customization */
 export default function CustomCSSPage() {
   const [customCSS, setCustomCSS] = useState(defaultCSS);
   const [isPreview, setIsPreview] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    loadCSS();
+  }, []);
+
+  const loadCSS = async () => {
+    try {
+      setLoading(true);
+      const css = await getCustomCSS();
+      if (css) {
+        setCustomCSS(css);
+      }
+    } catch (error) {
+      console.error("Error loading custom CSS:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      setMessage(null);
+      const result = await saveCustomCSS(customCSS);
+      
+      if (result.success) {
+        setMessage({ type: "success", text: "Custom CSS saved successfully!" });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({ type: "error", text: result.error || "Failed to save custom CSS" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: error instanceof Error ? error.message : "Failed to save custom CSS" });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div>
@@ -36,12 +77,26 @@ export default function CustomCSSPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setIsPreview(!isPreview)}>
+            <Button variant="outline" onClick={() => setIsPreview(!isPreview)} disabled={loading}>
               {isPreview ? "Edit" : "Preview"}
             </Button>
-            <Button>Save CSS</Button>
+            <Button onClick={handleSave} disabled={saving || loading}>
+              {saving ? "Saving..." : "Save CSS"}
+            </Button>
           </div>
         </div>
+
+        {message && (
+          <div
+            className={`rounded-lg p-4 ${
+              message.type === "success"
+                ? "bg-green-50 text-green-800 dark:bg-green-500/15 dark:text-green-300"
+                : "bg-red-50 text-red-800 dark:bg-red-500/15 dark:text-red-300"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
 
         {/* CSS Editor */}
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">

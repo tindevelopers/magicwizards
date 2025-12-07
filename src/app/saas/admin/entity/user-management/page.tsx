@@ -17,11 +17,22 @@ import {
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { getAllUsers } from "@/app/actions/users";
+import { getUserTenantRolesAction } from "@/app/actions/tenant-roles";
 import type { Database } from "@/lib/supabase/types";
+import { PermissionGate } from "@/lib/auth/permission-gates";
+import { Permission } from "@/lib/auth/permissions";
+import AssignTenantRoleModal from "@/components/admin/AssignTenantRoleModal";
+import { useModal } from "@/hooks/useModal";
+import { Cog6ToothIcon } from "@heroicons/react/24/outline";
 
 type User = Database["public"]["Tables"]["users"]["Row"] & {
   roles?: { name: string } | null;
   tenants?: { name: string } | null;
+  tenantRoles?: Array<{
+    tenant_id: string;
+    tenants?: { name: string } | null;
+    roles?: { name: string } | null;
+  }>;
 };
 
 const StatusBadge = ({ status }: { status: string }) => {
@@ -68,10 +79,38 @@ export default function UserManagementPage() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const assignRoleModal = useModal();
 
   useEffect(() => {
     loadUsers();
   }, []);
+
+  useEffect(() => {
+    // Load tenant roles for Platform Admins
+    const loadTenantRoles = async () => {
+      const platformAdmins = users.filter(
+        (u) => u.roles?.name === "Platform Admin"
+      );
+      
+      for (const user of platformAdmins) {
+        try {
+          const tenantRoles = await getUserTenantRolesAction(user.id);
+          setUsers((prev) =>
+            prev.map((u) =>
+              u.id === user.id ? { ...u, tenantRoles } : u
+            )
+          );
+        } catch (err) {
+          console.error(`Error loading tenant roles for ${user.id}:`, err);
+        }
+      }
+    };
+
+    if (users.length > 0) {
+      loadTenantRoles();
+    }
+  }, [users.length]);
 
   const loadUsers = async () => {
     try {
@@ -259,11 +298,39 @@ export default function UserManagementPage() {
                     </TableCell>
                     <TableCell className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
                       <div>
-                        <p className="font-medium">{user.roles?.name || "No role"}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{user.roles?.name || "No role"}</p>
+                          {user.roles?.name === "Platform Admin" && (
+                            <PermissionGate permission="users.write">
+                              <button
+                                onClick={() => {
+                                  setSelectedUser(user);
+                                  assignRoleModal.openModal();
+                                }}
+                                className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                title="Assign tenant role"
+                              >
+                                <Cog6ToothIcon className="h-4 w-4" />
+                              </button>
+                            </PermissionGate>
+                          )}
+                        </div>
                         {user.tenants && (
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             {user.tenants.name}
                           </p>
+                        )}
+                        {user.tenantRoles && user.tenantRoles.length > 0 && (
+                          <div className="mt-1 space-y-0.5">
+                            {user.tenantRoles.map((tr, idx) => (
+                              <p
+                                key={idx}
+                                className="text-xs text-indigo-600 dark:text-indigo-400"
+                              >
+                                {(tr.tenants as any)?.name}: {(tr.roles as any)?.name}
+                              </p>
+                            ))}
+                          </div>
                         )}
                       </div>
                     </TableCell>
@@ -283,6 +350,23 @@ export default function UserManagementPage() {
           </div>
         )}
       </section>
+
+      {/* Assign Tenant Role Modal */}
+      {selectedUser && (
+        <AssignTenantRoleModal
+          isOpen={assignRoleModal.isOpen}
+          onClose={() => {
+            assignRoleModal.closeModal();
+            setSelectedUser(null);
+          }}
+          userId={selectedUser.id}
+          userEmail={selectedUser.email}
+          userName={selectedUser.full_name}
+          onSuccess={() => {
+            loadUsers();
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -43,7 +43,7 @@ export default function UserInfoCard() {
     
     const roleMap: Record<string, string> = {
       "Platform Admin": "Platform Admin",
-      "Workspace Admin": "Organization Admin",
+      "Organization Admin": "Organization Admin",
       "Billing Owner": "Billing Owner",
       "Developer": "Developer",
       "Viewer": "Viewer",

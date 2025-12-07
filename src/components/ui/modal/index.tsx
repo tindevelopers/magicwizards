@@ -52,29 +52,26 @@ export const Modal: React.FC<ModalProps> = ({
 
   const contentClasses = isFullscreen
     ? "w-full h-full"
-    : "relative w-full rounded-3xl bg-white  dark:bg-gray-900";
+    : "relative w-full rounded-3xl bg-white dark:bg-gray-900 m-auto";
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999">
+    <div className="fixed inset-0 flex items-center justify-center overflow-y-auto modal z-99999 p-4">
       {!isFullscreen && (
         <div
           className="fixed inset-0 h-full w-full bg-gray-400/50 backdrop-blur-[32px]"
           onClick={onClose}
         ></div>
       )}
-      <div
-        ref={modalRef}
-        className={`${contentClasses}  ${className}`}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="relative">
         {showCloseButton && (
           <button
             onClick={onClose}
-            className="absolute right-3 top-3 z-999 flex h-9.5 w-9.5 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white sm:right-6 sm:top-6 sm:h-11 sm:w-11"
+            className="absolute -right-2 -top-2 z-[100000] flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-lg text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white border-2 border-gray-200 dark:border-gray-700"
+            aria-label="Close modal"
           >
             <svg
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -88,7 +85,13 @@ export const Modal: React.FC<ModalProps> = ({
             </svg>
           </button>
         )}
-        <div>{children}</div>
+        <div
+          ref={modalRef}
+          className={`${contentClasses} ${className} relative max-h-[90vh] max-w-[95vw] overflow-hidden flex flex-col shadow-2xl`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div className="overflow-y-auto flex-1">{children}</div>
+        </div>
       </div>
     </div>
   );
