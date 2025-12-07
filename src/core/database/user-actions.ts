@@ -1,8 +1,6 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin-client";
-import type { Database } from "@/lib/supabase/types";
+import { createClient, createAdminClient, type Database } from "@/core/database";
 
 type User = Database["public"]["Tables"]["users"]["Row"] & {
   roles?: { name: string } | null;

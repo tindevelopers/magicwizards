@@ -1,7 +1,7 @@
 "use server";
 
-import { stripe } from "@/lib/stripe/config";
-import { createAdminClient } from "@/lib/supabase/admin-client";
+import { stripe } from "@/core/billing/config";
+import { createAdminClient } from "@/core/database";
 import type Stripe from "stripe";
 
 /**

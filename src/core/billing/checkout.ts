@@ -1,9 +1,8 @@
 "use server";
 
-import { stripe, formatAmountForStripe } from "@/lib/stripe/config";
-import { createAdminClient } from "@/lib/supabase/admin-client";
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentTenant } from "@/lib/tenant/server";
+import { stripe, formatAmountForStripe } from "@/core/billing/config";
+import { createAdminClient, createClient } from "@/core/database";
+import { getCurrentTenant } from "@/core/multi-tenancy/server";
 
 /**
  * Create a Stripe Checkout session for subscription

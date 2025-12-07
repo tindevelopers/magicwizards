@@ -1,9 +1,7 @@
 "use server";
 
-import { stripe } from "@/lib/stripe/config";
-import { createAdminClient } from "@/lib/supabase/admin-client";
-import { createClient } from "@/lib/supabase/server";
-import type { Database } from "@/lib/supabase/types";
+import { stripe } from "@/core/billing/config";
+import { createAdminClient, createClient, type Database } from "@/core/database";
 
 type StripeCustomer = Database["public"]["Tables"]["stripe_customers"]["Insert"];
 
