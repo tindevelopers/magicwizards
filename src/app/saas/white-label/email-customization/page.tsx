@@ -126,13 +126,19 @@ export default function EmailCustomizationPage() {
               <Label>Header Logo</Label>
               <div className="mt-2 flex items-center gap-4">
                 <div className="h-16 w-48 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-800">
-                  <Image
-                    src={emailSettings.headerLogo}
-                    alt="Header Logo"
-                    width={192}
-                    height={64}
-                    className="h-full w-full object-contain"
-                  />
+                  {emailSettings.headerLogo ? (
+                    <Image
+                      src={emailSettings.headerLogo}
+                      alt="Header Logo"
+                      width={192}
+                      height={64}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-gray-400">
+                      No logo
+                    </div>
+                  )}
                 </div>
                 <Button variant="outline" size="sm">
                   <ArrowUpTrayIcon className="h-4 w-4" />
@@ -211,13 +217,19 @@ export default function EmailCustomizationPage() {
               className="mb-4 p-4 text-white"
               style={{ backgroundColor: emailSettings.headerColor }}
             >
-              <Image
-                src={emailSettings.headerLogo}
-                alt="Logo"
-                width={120}
-                height={40}
-                className="h-10 object-contain"
-              />
+              {emailSettings.headerLogo ? (
+                <Image
+                  src={emailSettings.headerLogo}
+                  alt="Logo"
+                  width={120}
+                  height={40}
+                  className="h-10 object-contain"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-gray-400">
+                  No logo
+                </div>
+              )}
             </div>
             <div className="mb-4 p-4">
               <p className="text-gray-700 dark:text-gray-300">

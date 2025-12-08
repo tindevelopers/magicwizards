@@ -152,13 +152,19 @@ export default function WhiteLabelBrandingPage() {
               <Label>Favicon</Label>
               <div className="mt-2 flex items-center gap-4">
                 <div className="h-16 w-16 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-800">
-                  <Image
-                    src={branding.favicon}
-                    alt="Favicon"
-                    width={64}
-                    height={64}
-                    className="h-full w-full object-contain"
-                  />
+                  {branding.favicon ? (
+                    <Image
+                      src={branding.favicon}
+                      alt="Favicon"
+                      width={64}
+                      height={64}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-gray-400">
+                      No favicon
+                    </div>
+                  )}
                 </div>
                 <Button variant="outline" size="sm">
                   <ArrowUpTrayIcon className="h-4 w-4" />

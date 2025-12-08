@@ -32,8 +32,8 @@ export default function ThemeSettingsPage() {
         setTheme({
           themeMode: settings.themeMode || "light",
           fontFamily: settings.fontFamily || "Inter",
-          fontSize: settings.fontSize || "medium",
-          borderRadius: settings.borderRadius || "medium",
+          fontSize: (settings.fontSize as "small" | "medium" | "large") || "medium",
+          borderRadius: (settings.borderRadius as "none" | "small" | "medium" | "large") || "medium",
           enableAnimations: settings.enableAnimations ?? true,
           enableRipple: settings.enableRipple ?? true,
         });
