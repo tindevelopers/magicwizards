@@ -23,12 +23,15 @@ export async function getPaymentMethods(): Promise<{
 
     const adminClient = createAdminClient();
 
-    const { data: paymentMethods, error } = await adminClient
+    const paymentMethodsResult: { data: any[] | null; error: any } = await adminClient
       .from("stripe_payment_methods")
       .select("*")
       .eq("tenant_id", tenantId)
       .order("is_default", { ascending: false })
       .order("created_at", { ascending: false });
+
+    const paymentMethods = paymentMethodsResult.data;
+    const error = paymentMethodsResult.error;
 
     if (error) {
       return { success: false, error: error.message };
@@ -62,24 +65,26 @@ export async function setDefaultPaymentMethod(paymentMethodId: string): Promise<
     const adminClient = createAdminClient();
 
     // Get customer
-    const { data: customer } = await adminClient
+    const customerResult: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const customer = customerResult.data;
     if (!customer) {
       return { success: false, error: "Customer not found" };
     }
 
     // Get payment method from database
-    const { data: paymentMethod } = await adminClient
+    const paymentMethodResult: { data: { stripe_payment_method_id: string } | null; error: any } = await adminClient
       .from("stripe_payment_methods")
       .select("stripe_payment_method_id")
       .eq("id", paymentMethodId)
       .eq("tenant_id", tenantId)
       .single();
 
+    const paymentMethod = paymentMethodResult.data;
     if (!paymentMethod) {
       return { success: false, error: "Payment method not found" };
     }
@@ -94,12 +99,14 @@ export async function setDefaultPaymentMethod(paymentMethodId: string): Promise<
     // Update in database - set all to false first
     await adminClient
       .from("stripe_payment_methods")
+      // @ts-expect-error - Supabase type inference issue with Database types
       .update({ is_default: false })
       .eq("tenant_id", tenantId);
 
     // Then set the selected one to true
     await adminClient
       .from("stripe_payment_methods")
+      // @ts-expect-error - Supabase type inference issue with Database types
       .update({ is_default: true })
       .eq("id", paymentMethodId);
 
@@ -131,13 +138,14 @@ export async function deletePaymentMethod(paymentMethodId: string): Promise<{
     const adminClient = createAdminClient();
 
     // Get payment method from database
-    const { data: paymentMethod } = await adminClient
+    const paymentMethodResult: { data: { stripe_payment_method_id: string } | null; error: any } = await adminClient
       .from("stripe_payment_methods")
       .select("stripe_payment_method_id")
       .eq("id", paymentMethodId)
       .eq("tenant_id", tenantId)
       .single();
 
+    const paymentMethod = paymentMethodResult.data;
     if (!paymentMethod) {
       return { success: false, error: "Payment method not found" };
     }
@@ -180,12 +188,13 @@ export async function createSetupIntent(): Promise<{
     const adminClient = createAdminClient();
 
     // Get customer
-    const { data: customer } = await adminClient
+    const customerResult1: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const customer = customerResult1.data;
     if (!customer) {
       return { success: false, error: "Customer not found" };
     }
@@ -227,12 +236,13 @@ export async function attachPaymentMethod(
     const adminClient = createAdminClient();
 
     // Get customer
-    const { data: customer } = await adminClient
+    const customerResult2: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const customer = customerResult2.data;
     if (!customer) {
       return { success: false, error: "Customer not found" };
     }
@@ -249,8 +259,9 @@ export async function attachPaymentMethod(
     const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
 
     // Save to database
-    const { error: insertError } = await adminClient
+    const insertResult: { error: any } = await adminClient
       .from("stripe_payment_methods")
+      // @ts-expect-error - Supabase type inference issue with Database types
       .insert({
         tenant_id: tenantId,
         stripe_customer_id: customer.stripe_customer_id,
@@ -264,6 +275,7 @@ export async function attachPaymentMethod(
         billing_details: paymentMethod.billing_details as unknown as Record<string, unknown>,
       });
 
+    const insertError = insertResult.error;
     if (insertError) {
       console.error("Error saving payment method to database:", insertError);
       // Don't fail the request if DB insert fails, as the payment method is already attached in Stripe
@@ -280,11 +292,13 @@ export async function attachPaymentMethod(
       // Update in database
       await adminClient
         .from("stripe_payment_methods")
+        // @ts-expect-error - Supabase type inference issue with Database types
         .update({ is_default: false })
         .eq("tenant_id", tenantId);
 
       await adminClient
         .from("stripe_payment_methods")
+        // @ts-expect-error - Supabase type inference issue with Database types
         .update({ is_default: true })
         .eq("stripe_payment_method_id", paymentMethodId);
     }
