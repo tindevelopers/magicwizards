@@ -9,6 +9,21 @@ type TenantInsert = Database["public"]["Tables"]["tenants"]["Insert"];
 type TenantRow = Database["public"]["Tables"]["tenants"]["Row"];
 type UserRow = Database["public"]["Tables"]["users"]["Row"];
 
+type UserWithRelations = UserRow & {
+  roles: {
+    id: string;
+    name: string;
+    description: string;
+    coverage: string;
+    permissions: string[];
+  } | null;
+  tenants: {
+    id: string;
+    name: string;
+    domain: string;
+  } | null;
+};
+
 export interface SignUpData {
   email: string;
   password: string;
@@ -33,7 +48,7 @@ export async function signUp(data: SignUpData) {
 
   try {
     // 1. Check if tenant already exists, if so use it
-    let tenant;
+    let tenant: TenantRow | null = null;
     let isNewTenant = false;
     
     // Use admin client to bypass RLS when checking for existing tenant
@@ -270,7 +285,7 @@ export async function signIn(data: SignInData) {
       )
     `)
     .eq("id", authData.user.id)
-    .single();
+    .single() as { data: UserWithRelations | null; error: any };
 
   if (userError || !user) {
     console.error("[signIn] Error fetching user:", userError);
