@@ -125,13 +125,19 @@ export default function WhiteLabelBrandingPage() {
               <Label>Company Logo</Label>
               <div className="mt-2 flex items-center gap-4">
                 <div className="h-24 w-24 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-800">
-                  <Image
-                    src={branding.logo}
-                    alt="Logo"
-                    width={96}
-                    height={96}
-                    className="h-full w-full object-contain"
-                  />
+                  {branding.logo ? (
+                    <Image
+                      src={branding.logo}
+                      alt="Logo"
+                      width={96}
+                      height={96}
+                      className="h-full w-full object-contain"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-gray-400">
+                      No logo
+                    </div>
+                  )}
                 </div>
                 <Button variant="outline" size="sm">
                   <ArrowUpTrayIcon className="h-4 w-4" />

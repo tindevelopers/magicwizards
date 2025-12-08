@@ -249,7 +249,7 @@ export default function TenantManagementPage() {
                         </div>
                         {tenant.features && tenant.features.length > 0 && (
                           <div className="flex flex-wrap gap-2">
-                            {tenant.features.slice(0, 3).map((feature) => (
+                            {tenant.features.slice(0, 3).map((feature: string) => (
                               <span
                                 key={feature}
                                 className="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300"

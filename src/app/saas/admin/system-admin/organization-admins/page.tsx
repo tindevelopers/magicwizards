@@ -311,7 +311,7 @@ export default function OrganizationAdminsPage() {
             </p>
           </div>
           <div className="space-y-4">
-            {Object.entries(adminsByTenant).map(([tenantName, { tenant, admins: tenantAdmins }]) => (
+            {Object.entries(adminsByTenant).map(([tenantName, { tenant, admins: tenantAdmins }]: [string, any]) => (
               <div key={tenantName} className="rounded-lg border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
@@ -325,7 +325,7 @@ export default function OrganizationAdminsPage() {
                   <StatusBadge status={(tenant as any)?.status || "active"} />
                 </div>
                 <div className="space-y-2">
-                  {tenantAdmins.map((admin) => (
+                  {tenantAdmins.map((admin: any) => (
                     <div key={admin.id} className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded">
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">

@@ -72,12 +72,12 @@ export default function UpgradeToProPage() {
       const { createCheckoutSession } = await import("@/app/actions/stripe/checkout");
 
       const plansResult = await getProducts();
-      if (!plansResult.success || !plansResult.plans) {
+      if (!plansResult.success || !plansResult.products) {
         alert("Unable to load plans. Please try again.");
         return;
       }
 
-      const proPlanFromStripe = plansResult.plans.find((p: any) => 
+      const proPlanFromStripe = plansResult.products.find((p: any) =>
         p.name.toLowerCase().includes("pro")
       );
 
@@ -97,12 +97,11 @@ export default function UpgradeToProPage() {
       }
 
       // Create checkout session
-      const result = await createCheckoutSession(
-        userData.tenant_id,
-        price.id,
-        `${window.location.origin}/saas/billing/dashboard?success=true`,
-        `${window.location.origin}/saas/billing/upgrade-to-pro?canceled=true`
-      );
+      const result = await createCheckoutSession({
+        priceId: price.id,
+        successUrl: `${window.location.origin}/saas/billing/dashboard?success=true`,
+        cancelUrl: `${window.location.origin}/saas/billing/upgrade-to-pro?canceled=true`
+      });
 
       if (result.success && result.url) {
         window.location.href = result.url;

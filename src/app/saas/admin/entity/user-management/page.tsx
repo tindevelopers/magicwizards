@@ -322,7 +322,7 @@ export default function UserManagementPage() {
                         )}
                         {user.tenantRoles && user.tenantRoles.length > 0 && (
                           <div className="mt-1 space-y-0.5">
-                            {user.tenantRoles.map((tr, idx) => (
+                            {user.tenantRoles.map((tr: any, idx: number) => (
                               <p
                                 key={idx}
                                 className="text-xs text-indigo-600 dark:text-indigo-400"
