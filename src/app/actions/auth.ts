@@ -6,6 +6,8 @@ import type { Database } from "@/core/database";
 
 type UserInsert = Database["public"]["Tables"]["users"]["Insert"];
 type TenantInsert = Database["public"]["Tables"]["tenants"]["Insert"];
+type TenantRow = Database["public"]["Tables"]["tenants"]["Row"];
+type UserRow = Database["public"]["Tables"]["users"]["Row"];
 
 export interface SignUpData {
   email: string;
@@ -61,7 +63,7 @@ export async function signUp(data: SignUpData) {
       try {
         const { data: allTenants, error: altError } = await adminClient
           .from("tenants")
-          .select("*");
+          .select("*") as { data: TenantRow[] | null; error: any };
         
         if (!altError && allTenants) {
           existingTenant = allTenants.find(t => t.domain === data.tenantDomain) || null;
@@ -92,7 +94,7 @@ export async function signUp(data: SignUpData) {
         .from("tenants")
         .insert(tenantData)
         .select()
-        .single();
+        .single() as { data: TenantRow | null; error: any };
 
       if (tenantError || !newTenant) {
         // Handle unique constraint violation (domain already exists)
@@ -102,7 +104,7 @@ export async function signUp(data: SignUpData) {
             .from("tenants")
             .select("*")
             .eq("domain", data.tenantDomain)
-            .single();
+            .single() as { data: TenantRow | null; error: any };
           
           if (existing) {
             tenant = existing;
@@ -181,7 +183,7 @@ export async function signUp(data: SignUpData) {
       .from("users")
       .insert(userData)
       .select()
-      .single();
+      .single() as { data: UserRow | null; error: any };
 
     if (userError || !user) {
       // If user creation fails, clean up ONLY if we created a new tenant
