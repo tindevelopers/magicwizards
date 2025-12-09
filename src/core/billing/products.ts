@@ -25,8 +25,8 @@ export async function syncProducts(): Promise<{
 
     for (const product of products.data) {
       // Upsert product
-      const { error } = await adminClient
-        .from("stripe_products")
+      const productResult: { error: any } = await ((adminClient
+        .from("stripe_products") as any)
         .upsert(
           {
             stripe_product_id: product.id,
@@ -34,11 +34,12 @@ export async function syncProducts(): Promise<{
             description: product.description || null,
             active: product.active,
             metadata: product.metadata as any,
-          },
+          } as any,
           {
             onConflict: "stripe_product_id",
           }
-        );
+        ));
+      const error = productResult.error;
 
       if (error) {
         console.error(`Error syncing product ${product.id}:`, error);
@@ -53,8 +54,8 @@ export async function syncProducts(): Promise<{
       });
 
       for (const price of prices.data) {
-        await adminClient
-          .from("stripe_prices")
+        await ((adminClient
+          .from("stripe_prices") as any)
           .upsert(
             {
               stripe_price_id: price.id,
@@ -66,11 +67,11 @@ export async function syncProducts(): Promise<{
               interval: price.recurring?.interval || null,
               interval_count: price.recurring?.interval_count || null,
               metadata: price.metadata as any,
-            },
+            } as any,
             {
               onConflict: "stripe_price_id",
             }
-          );
+          ));
       }
 
       syncedCount++;

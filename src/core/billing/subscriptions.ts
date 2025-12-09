@@ -103,13 +103,14 @@ export async function cancelSubscription(subscriptionId: string, cancelAtPeriodE
     const adminClient = createAdminClient();
 
     // Verify subscription belongs to tenant
-    const { data: dbSubscription } = await adminClient
+    const subscriptionResult: { data: { stripe_subscription_id: string } | null; error: any } = await adminClient
       .from("stripe_subscriptions")
       .select("stripe_subscription_id")
       .eq("tenant_id", tenantId)
       .eq("id", subscriptionId)
       .single();
 
+    const dbSubscription = subscriptionResult.data;
     if (!dbSubscription) {
       return { success: false, error: "Subscription not found" };
     }
@@ -120,13 +121,13 @@ export async function cancelSubscription(subscriptionId: string, cancelAtPeriodE
     });
 
     // Update in database
-    await adminClient
-      .from("stripe_subscriptions")
+    await ((adminClient
+      .from("stripe_subscriptions") as any)
       .update({
         cancel_at_period_end: cancelAtPeriodEnd,
         canceled_at: cancelAtPeriodEnd ? new Date().toISOString() : null,
-      })
-      .eq("id", subscriptionId);
+      } as any)
+      .eq("id", subscriptionId));
 
     return { success: true, subscription };
   } catch (error) {
@@ -157,13 +158,14 @@ export async function resumeSubscription(subscriptionId: string): Promise<{
     const adminClient = createAdminClient();
 
     // Verify subscription belongs to tenant
-    const { data: dbSubscription } = await adminClient
+    const subscriptionResult2: { data: { stripe_subscription_id: string } | null; error: any } = await adminClient
       .from("stripe_subscriptions")
       .select("stripe_subscription_id")
       .eq("tenant_id", tenantId)
       .eq("id", subscriptionId)
       .single();
 
+    const dbSubscription = subscriptionResult2.data;
     if (!dbSubscription) {
       return { success: false, error: "Subscription not found" };
     }
@@ -174,13 +176,13 @@ export async function resumeSubscription(subscriptionId: string): Promise<{
     });
 
     // Update in database
-    await adminClient
-      .from("stripe_subscriptions")
+    await ((adminClient
+      .from("stripe_subscriptions") as any)
       .update({
         cancel_at_period_end: false,
         canceled_at: null,
-      })
-      .eq("id", subscriptionId);
+      } as any)
+      .eq("id", subscriptionId));
 
     return { success: true, subscription };
   } catch (error) {
@@ -214,13 +216,14 @@ export async function updateSubscription(
     const adminClient = createAdminClient();
 
     // Verify subscription belongs to tenant
-    const { data: dbSubscription } = await adminClient
+    const subscriptionResult3: { data: { stripe_subscription_id: string } | null; error: any } = await adminClient
       .from("stripe_subscriptions")
       .select("stripe_subscription_id")
       .eq("tenant_id", tenantId)
       .eq("id", subscriptionId)
       .single();
 
+    const dbSubscription = subscriptionResult3.data;
     if (!dbSubscription) {
       return { success: false, error: "Subscription not found" };
     }
@@ -240,13 +243,13 @@ export async function updateSubscription(
     });
 
     // Update in database
-    await adminClient
-      .from("stripe_subscriptions")
+    await ((adminClient
+      .from("stripe_subscriptions") as any)
       .update({
         stripe_price_id: newPriceId,
         status: subscription.status,
-      })
-      .eq("id", subscriptionId);
+      } as any)
+      .eq("id", subscriptionId));
 
     return { success: true, subscription };
   } catch (error) {
@@ -277,13 +280,14 @@ export async function getSubscriptionDetails(subscriptionId: string): Promise<{
     const adminClient = createAdminClient();
 
     // Verify subscription belongs to tenant
-    const { data: dbSubscription } = await adminClient
+    const subscriptionResult4: { data: { stripe_subscription_id: string } | null; error: any } = await adminClient
       .from("stripe_subscriptions")
       .select("stripe_subscription_id")
       .eq("tenant_id", tenantId)
       .eq("id", subscriptionId)
       .single();
 
+    const dbSubscription = subscriptionResult4.data;
     if (!dbSubscription) {
       return { success: false, error: "Subscription not found" };
     }
@@ -322,18 +326,19 @@ export async function getUpcomingInvoice(): Promise<{
     const adminClient = createAdminClient();
 
     // Get customer
-    const { data: customer } = await adminClient
+    const customerResult: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const customer = customerResult.data;
     if (!customer) {
       return { success: false, error: "Customer not found" };
     }
 
     // Get upcoming invoice
-    const invoice = await stripe.invoices.retrieveUpcoming({
+    const invoice = await (stripe.invoices as any).retrieveUpcoming({
       customer: customer.stripe_customer_id,
     });
 

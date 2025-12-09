@@ -63,24 +63,26 @@ export async function setDefaultPaymentMethod(paymentMethodId: string): Promise<
     const adminClient = createAdminClient();
 
     // Get customer
-    const { data: customer } = await adminClient
+    const customerResult: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const customer = customerResult.data;
     if (!customer) {
       return { success: false, error: "Customer not found" };
     }
 
     // Get payment method from database
-    const { data: paymentMethod } = await adminClient
+    const paymentMethodResult: { data: { stripe_payment_method_id: string } | null; error: any } = await adminClient
       .from("stripe_payment_methods")
       .select("stripe_payment_method_id")
       .eq("id", paymentMethodId)
       .eq("tenant_id", tenantId)
       .single();
 
+    const paymentMethod = paymentMethodResult.data;
     if (!paymentMethod) {
       return { success: false, error: "Payment method not found" };
     }
@@ -93,16 +95,16 @@ export async function setDefaultPaymentMethod(paymentMethodId: string): Promise<
     });
 
     // Update in database - set all to false first
-    await adminClient
-      .from("stripe_payment_methods")
-      .update({ is_default: false })
-      .eq("tenant_id", tenantId);
+    await ((adminClient
+      .from("stripe_payment_methods") as any)
+      .update({ is_default: false } as any)
+      .eq("tenant_id", tenantId));
 
     // Then set the selected one to true
-    await adminClient
-      .from("stripe_payment_methods")
-      .update({ is_default: true })
-      .eq("id", paymentMethodId);
+    await ((adminClient
+      .from("stripe_payment_methods") as any)
+      .update({ is_default: true } as any)
+      .eq("id", paymentMethodId));
 
     return { success: true };
   } catch (error) {
@@ -132,13 +134,14 @@ export async function deletePaymentMethod(paymentMethodId: string): Promise<{
     const adminClient = createAdminClient();
 
     // Get payment method from database
-    const { data: paymentMethod } = await adminClient
+    const paymentMethodResult2: { data: { stripe_payment_method_id: string } | null; error: any } = await adminClient
       .from("stripe_payment_methods")
       .select("stripe_payment_method_id")
       .eq("id", paymentMethodId)
       .eq("tenant_id", tenantId)
       .single();
 
+    const paymentMethod = paymentMethodResult2.data;
     if (!paymentMethod) {
       return { success: false, error: "Payment method not found" };
     }
@@ -181,12 +184,13 @@ export async function createSetupIntent(): Promise<{
     const adminClient = createAdminClient();
 
     // Get customer
-    const { data: customer } = await adminClient
+    const customerResult2: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const customer = customerResult2.data;
     if (!customer) {
       return { success: false, error: "Customer not found" };
     }
