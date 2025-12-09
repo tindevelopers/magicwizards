@@ -2,7 +2,7 @@
 
 import { stripe } from "@/core/billing/config";
 import { createAdminClient } from "@/core/database/admin-client";
-import { getCurrentTenant } from "@/core/multi-tenancy";
+import { getCurrentTenant } from "@/core/multi-tenancy/server";
 import { requirePermission } from "@/core/permissions/middleware";
 
 /**

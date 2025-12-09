@@ -1,6 +1,6 @@
 import { createAdminClient } from "@/core/database/admin-client";
 import type { Database } from "@/core/database";
-import { getEffectiveRole } from "@/core/database";
+import { getEffectiveRole } from "@/core/database/user-tenant-roles";
 
 type Role = Database["public"]["Tables"]["roles"]["Row"];
 

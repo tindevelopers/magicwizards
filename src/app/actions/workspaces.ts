@@ -3,15 +3,15 @@
 import { 
   getWorkspaces, 
   getWorkspace, 
-  createWorkspace, 
-  updateWorkspace, 
+  createWorkspace,
+  updateWorkspace,
   deleteWorkspace,
   addUserToWorkspace,
   removeUserFromWorkspace,
   updateWorkspaceUser,
   getUserWorkspaces,
   getWorkspaceMembers
-} from "@/core/database";
+} from "@/core/database/workspaces";
 import { requirePermission } from "@/core/permissions/middleware";
 import type { Database } from "@/core/database";
 

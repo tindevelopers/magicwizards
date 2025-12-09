@@ -1,7 +1,7 @@
 "use server";
 
 import { requirePermission } from "@/core/permissions/middleware";
-import { assignTenantRole, removeTenantRole, getUserTenantRoles } from "@/core/database";
+import { assignTenantRole, removeTenantRole, getUserTenantRoles } from "@/core/database/user-tenant-roles";
 import type { Database } from "@/core/database";
 
 type UserTenantRole = Database["public"]["Tables"]["user_tenant_roles"]["Row"] & {

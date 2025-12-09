@@ -2,7 +2,7 @@
 
 import { createClient } from "@/core/database/server";
 import { createAdminClient } from "@/core/database/admin-client";
-import { isPlatformAdmin } from "@/core/database";
+import { isPlatformAdmin } from "@/core/database/organization-admins";
 import type { Database } from "@/core/database";
 import { requirePermission } from "@/core/permissions/middleware";
 

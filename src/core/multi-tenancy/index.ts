@@ -51,11 +51,15 @@ export {
 // ============================================================================
 // SERVER UTILITIES (Server-side)
 // ============================================================================
-export {
-  getCurrentTenant,
-  getCurrentTenantDetails,
-  validateTenantAccess,
-} from './server';
+// ⚠️ SERVER-ONLY: Import directly from './server' in server-side code:
+//   import { getCurrentTenant, getCurrentTenantDetails, validateTenantAccess } from '@/core/multi-tenancy/server';
+// 
+// These functions use createClient from '@/core/database/server' and should only be used in:
+// - Server Components
+// - Server Actions
+// - API Routes
+// - Middleware
+// Note: Not exported from index to prevent client bundling
 
 // ============================================================================
 // ACTIONS (Server Actions - Import directly when needed)
@@ -75,18 +79,14 @@ export {
 // ============================================================================
 // WHITE-LABEL SETTINGS
 // ============================================================================
-export {
-  getBrandingSettings,
-  saveBrandingSettings,
-  getThemeSettings,
-  saveThemeSettings,
-  getEmailSettings,
-  saveEmailSettings,
-  getCustomCSS,
-  saveCustomCSS,
-  getCustomDomains,
-  saveCustomDomains,
-} from './white-label';
+// ⚠️ SERVER-ONLY: These are server actions - import directly from './white-label' in server-side code:
+//   import { getBrandingSettings, saveBrandingSettings, getThemeSettings, saveThemeSettings, getEmailSettings, saveEmailSettings, getCustomCSS, saveCustomCSS, getCustomDomains, saveCustomDomains } from '@/core/multi-tenancy/white-label';
+// 
+// These functions use createClient from '@/core/database/server' and should only be used in:
+// - Server Components
+// - Server Actions
+// - API Routes
+// Note: Not exported from index to prevent client bundling
 
 // ============================================================================
 // UTILITIES

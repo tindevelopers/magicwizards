@@ -11,7 +11,7 @@ import {
   updateWorkspaceUser,
   getUserWorkspaces,
   getWorkspaceMembers
-} from "@/core/database";
+} from "@/core/database/workspaces";
 import { requirePermission } from "@/core/permissions/middleware";
 import type { Database } from "@/core/database";
 

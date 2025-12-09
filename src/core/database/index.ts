@@ -70,20 +70,26 @@ export { createClient as createBrowserClient } from './client';
 // ============================================================================
 // USER MANAGEMENT
 // ============================================================================
-export {
-  getAllUsers,
-} from './users';
+// ⚠️ SERVER-ONLY: Import directly from './users' in server-side code:
+//   import { getAllUsers } from '@/core/database/users';
+// 
+// These functions use createClient from '@/core/database/server' and should only be used in:
+// - Server Components
+// - Server Actions
+// - API Routes
+// Note: Not exported from index to prevent client bundling
 
 // ============================================================================
 // TENANT MANAGEMENT
 // ============================================================================
-export {
-  getTenant,
-  getTenants,
-  createTenant,
-  updateTenant,
-  deleteTenant,
-} from './tenants';
+// ⚠️ SERVER-ONLY: These are server actions - import directly from './tenants' in server-side code:
+//   import { getTenant, getTenants, createTenant, updateTenant, deleteTenant } from '@/core/database/tenants';
+// 
+// These functions should only be used in:
+// - Server Components
+// - Server Actions
+// - API Routes
+// Note: Not exported from index to prevent client bundling
 
 // ============================================================================
 // ROLE MANAGEMENT
@@ -99,36 +105,39 @@ export {
 // ============================================================================
 // WORKSPACE MANAGEMENT
 // ============================================================================
-export {
-  getWorkspace,
-  getWorkspaces,
-  createWorkspace,
-  updateWorkspace,
-  deleteWorkspace,
-  addUserToWorkspace,
-  removeUserFromWorkspace,
-  updateWorkspaceUser,
-  getUserWorkspaces,
-  getWorkspaceMembers,
-} from './workspaces';
+// ⚠️ SERVER-ONLY: These are server actions - import directly from './workspaces' in server-side code:
+//   import { getWorkspace, getWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace, addUserToWorkspace, removeUserFromWorkspace, updateWorkspaceUser, getUserWorkspaces, getWorkspaceMembers } from '@/core/database/workspaces';
+// 
+// These functions should only be used in:
+// - Server Components
+// - Server Actions
+// - API Routes
+// Note: Not exported from index to prevent client bundling
 
 // ============================================================================
 // USER-TENANT ROLES (Multi-Role System)
 // ============================================================================
-export {
-  assignTenantRole,
-  removeTenantRole,
-  getUserTenantRoles,
-  getEffectiveRole,
-} from './user-tenant-roles';
+// ⚠️ SERVER-ONLY: Import directly from './user-tenant-roles' in server-side code:
+//   import { assignTenantRole, removeTenantRole, getUserTenantRoles, getEffectiveRole } from '@/core/database/user-tenant-roles';
+// 
+// These functions use createAdminClient and should only be used in:
+// - Server Components
+// - Server Actions
+// - API Routes
+// - Middleware
+// Note: Not exported from index to prevent client bundling
 
 // ============================================================================
 // ORGANIZATION ADMINS
 // ============================================================================
-export {
-  getAllOrganizationAdmins,
-  isPlatformAdmin,
-} from './organization-admins';
+// ⚠️ SERVER-ONLY: Import directly from './organization-admins' in server-side code:
+//   import { getAllOrganizationAdmins, isPlatformAdmin } from '@/core/database/organization-admins';
+// 
+// These functions use createClient from '@/core/database/server' and should only be used in:
+// - Server Components
+// - Server Actions
+// - API Routes
+// Note: Not exported from index to prevent client bundling
 
 // ============================================================================
 // UTILITIES
