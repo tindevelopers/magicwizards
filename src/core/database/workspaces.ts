@@ -8,7 +8,7 @@ import { createClient } from "./client";
 import { createAdminClient } from "./admin-client";
 import type { Database } from "./types";
 import { ensureTenantId, validateTenantAccess } from "../multi-tenancy/validation";
-import { requirePermission } from "../permissions";
+import { requirePermission } from "../permissions/middleware";
 
 type Workspace = Database["public"]["Tables"]["workspaces"]["Row"];
 type WorkspaceInsert = Database["public"]["Tables"]["workspaces"]["Insert"];
@@ -26,7 +26,7 @@ export async function getWorkspaces(tenantId?: string) {
   const effectiveTenantId = tenantId || await ensureTenantId();
   await validateTenantAccess(effectiveTenantId!);
 
-  const { data, error } = await supabase
+  const result: { data: Array<Workspace & { tenant_id: string }> | null; error: any } = await supabase
     .from("workspaces")
     .select(`
       *,
@@ -55,8 +55,8 @@ export async function getWorkspaces(tenantId?: string) {
     .eq("tenant_id", effectiveTenantId!)
     .order("created_at", { ascending: false });
 
-  if (error) throw error;
-  return data || [];
+  if (result.error) throw result.error;
+  return result.data || [];
 }
 
 /**
@@ -65,7 +65,7 @@ export async function getWorkspaces(tenantId?: string) {
 export async function getWorkspace(id: string) {
   const supabase = createClient();
   
-  const { data, error } = await supabase
+  const workspaceResult: { data: (Workspace & { tenant_id: string | null }) | null; error: any } = await supabase
     .from("workspaces")
     .select(`
       *,
@@ -98,8 +98,9 @@ export async function getWorkspace(id: string) {
     .eq("id", id)
     .single();
 
-  if (error) throw error;
+  if (workspaceResult.error) throw workspaceResult.error;
   
+  const data = workspaceResult.data;
   // Validate tenant access
   if (data?.tenant_id) {
     await validateTenantAccess(data.tenant_id);
@@ -117,11 +118,13 @@ export async function createWorkspace(workspace: WorkspaceInsert) {
   await ensureTenantId(workspace.tenant_id);
   await validateTenantAccess(workspace.tenant_id);
 
-  const { data, error } = await supabase
-    .from("workspaces")
-    .insert(workspace)
+  const insertResult: { data: Workspace | null; error: any } = await ((supabase
+    .from("workspaces") as any)
+    .insert(workspace as any)
     .select()
-    .single();
+    .single());
+  const data = insertResult.data;
+  const error = insertResult.error;
 
   if (error) {
     // Handle unique constraint violation (slug already exists for tenant)
@@ -146,12 +149,14 @@ export async function updateWorkspace(id: string, updates: WorkspaceUpdate) {
     await validateTenantAccess(existing.tenant_id);
   }
 
-  const { data, error } = await supabase
-    .from("workspaces")
-    .update(updates)
+  const updateResult: { data: Workspace | null; error: any } = await ((supabase
+    .from("workspaces") as any)
+    .update(updates as any)
     .eq("id", id)
     .select()
-    .single();
+    .single());
+  const data = updateResult.data;
+  const error = updateResult.error;
 
   if (error) throw error;
   return data;
@@ -202,11 +207,13 @@ export async function addUserToWorkspace(
     permissions: permissions || [],
   };
 
-  const { data, error } = await supabase
-    .from("workspace_users")
-    .insert(workspaceUser)
+  const insertUserResult: { data: WorkspaceUser | null; error: any } = await ((supabase
+    .from("workspace_users") as any)
+    .insert(workspaceUser as any)
     .select()
-    .single();
+    .single());
+  const data = insertUserResult.data;
+  const error = insertUserResult.error;
 
   if (error) {
     // Handle unique constraint violation (user already in workspace)
@@ -260,13 +267,15 @@ export async function updateWorkspaceUser(
     await validateTenantAccess(workspace.tenant_id);
   }
 
-  const { data, error } = await supabase
-    .from("workspace_users")
-    .update(updates)
+  const updateUserResult: { data: WorkspaceUser | null; error: any } = await ((supabase
+    .from("workspace_users") as any)
+    .update(updates as any)
     .eq("workspace_id", workspaceId)
     .eq("user_id", userId)
     .select()
-    .single();
+    .single());
+  const data = updateUserResult.data;
+  const error = updateUserResult.error;
 
   if (error) throw error;
   return data;

@@ -82,14 +82,15 @@ export async function getAllUsers(): Promise<User[]> {
       
       // Get tenants this Platform Admin is a member of
       // (Platform Admins can be added to tenants as Tenant Admin/Org Admin)
-      const { data: tenantMemberships, error: membershipError } = await adminClient
+      const membershipResult: { data: Array<{ tenant_id: string }> | null; error: any } = await adminClient
         .from("users")
         .select("tenant_id")
         .eq("id", authUser.id)
         .not("tenant_id", "is", null);
       
-      if (membershipError) {
-        console.error("[getAllUsers] Error fetching tenant memberships:", membershipError);
+      const tenantMemberships = membershipResult.data;
+      if (membershipResult.error) {
+        console.error("[getAllUsers] Error fetching tenant memberships:", membershipResult.error);
         // Continue anyway - might not be a member of any tenant
       }
       
