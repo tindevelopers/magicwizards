@@ -36,7 +36,7 @@ export async function getEffectiveRole(
   const supabase = await getSupabaseClient();
 
   // First, get user's platform role
-  const { data: user, error: userError } = await supabase
+  const userResult: { data: { role_id: string | null; roles: { id: string; name: string } | null } | null; error: any } = await supabase
     .from("users")
     .select(`
       role_id,
@@ -48,7 +48,8 @@ export async function getEffectiveRole(
     .eq("id", userId)
     .single();
 
-  if (userError || !user) {
+  const user = userResult.data;
+  if (userResult.error || !user) {
     return null;
   }
 
@@ -56,7 +57,7 @@ export async function getEffectiveRole(
 
   // If tenant context provided, check for tenant-specific role
   if (tenantId && platformRole?.name === "Platform Admin") {
-    const { data: tenantRole, error: tenantRoleError } = await supabase
+    const tenantRoleResult: { data: { role_id: string; roles: { id: string; name: string } | null } | null; error: any } = await supabase
       .from("user_tenant_roles")
       .select(`
         role_id,
@@ -69,7 +70,8 @@ export async function getEffectiveRole(
       .eq("tenant_id", tenantId)
       .maybeSingle();
 
-    if (!tenantRoleError && tenantRole) {
+    const tenantRole = tenantRoleResult.data;
+    if (!tenantRoleResult.error && tenantRole) {
       const role = tenantRole.roles as { id: string; name: string } | null;
       if (role) {
         return {
@@ -132,18 +134,19 @@ export async function assignTenantRole(
   const adminClient = createAdminClient();
 
   // Get role ID
-  const { data: role, error: roleError } = await adminClient
+  const roleResult: { data: { id: string } | null; error: any } = await adminClient
     .from("roles")
-    .select("id")
-    .eq("name", roleName)
-    .single();
+      .select("id")
+      .eq("name", roleName)
+      .single();
 
-  if (roleError || !role) {
+  const role = roleResult.data;
+  if (roleResult.error || !role) {
     throw new Error(`Role "${roleName}" not found`);
   }
 
   // Check if assignment already exists
-  const { data: existing } = await adminClient
+  const existingResult: { data: { id: string } | null; error: any } = await adminClient
     .from("user_tenant_roles")
     .select("id")
     .eq("user_id", userId)
@@ -151,20 +154,23 @@ export async function assignTenantRole(
     .eq("role_id", role.id)
     .maybeSingle();
 
+  const existing = existingResult.data;
   if (existing) {
     return existing; // Already assigned
   }
 
   // Create assignment
-  const { data, error } = await adminClient
-    .from("user_tenant_roles")
+  const insertResult: { data: UserTenantRole | null; error: any } = await ((adminClient
+    .from("user_tenant_roles") as any)
     .insert({
       user_id: userId,
       tenant_id: tenantId,
       role_id: role.id,
-    })
+    } as any)
     .select()
-    .single();
+    .single());
+  const data = insertResult.data;
+  const error = insertResult.error;
 
   if (error) throw error;
   return data;
@@ -181,22 +187,24 @@ export async function removeTenantRole(
   const adminClient = createAdminClient();
 
   // Get role ID
-  const { data: role, error: roleError } = await adminClient
+  const roleResult2: { data: { id: string } | null; error: any } = await adminClient
     .from("roles")
     .select("id")
     .eq("name", roleName)
     .single();
 
-  if (roleError || !role) {
+  const role = roleResult2.data;
+  if (roleResult2.error || !role) {
     throw new Error(`Role "${roleName}" not found`);
   }
 
-  const { error } = await adminClient
+  const deleteResult: { error: any } = await adminClient
     .from("user_tenant_roles")
     .delete()
     .eq("user_id", userId)
     .eq("tenant_id", tenantId)
     .eq("role_id", role.id);
+  const error = deleteResult.error;
 
   if (error) throw error;
   return true;
@@ -212,7 +220,7 @@ export async function hasTenantRole(
 ): Promise<boolean> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
+  const roleResult3: { data: { roles: { name: string } | null } | null; error: any } = await supabase
     .from("user_tenant_roles")
     .select(`
       roles:role_id (
@@ -223,7 +231,8 @@ export async function hasTenantRole(
     .eq("tenant_id", tenantId)
     .maybeSingle();
 
-  if (error || !data) return false;
+  const data = roleResult3.data;
+  if (roleResult3.error || !data) return false;
 
   const role = (data.roles as { name: string } | null);
   return role?.name === roleName;

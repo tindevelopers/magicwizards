@@ -45,7 +45,7 @@ export async function getCurrentUser(): Promise<User | null> {
       console.error("[getCurrentUser] Failed to create admin client:", clientError);
       // Fallback: try with regular client (might work for some users)
       const regularClient = await createClient();
-      const { data: userData, error: userError } = await regularClient
+      const fallbackResult: { data: User | null; error: any } = await regularClient
         .from("users")
         .select(`
           *,
@@ -56,15 +56,16 @@ export async function getCurrentUser(): Promise<User | null> {
         .eq("id", authUser.id)
         .single();
       
-      if (userError || !userData) {
-        console.error("[getCurrentUser] Fallback query also failed:", userError);
+      const userData = fallbackResult.data;
+      if (fallbackResult.error || !userData) {
+        console.error("[getCurrentUser] Fallback query also failed:", fallbackResult.error);
         return null;
       }
       
       return userData as User;
     }
     
-    const { data: userData, error: userError } = await adminClient
+    const userResult: { data: { email: string; full_name: string | null; tenant_id: string | null; roles: { name: string } | null } | null; error: any } = await adminClient
       .from("users")
       .select(`
         *,
@@ -75,12 +76,13 @@ export async function getCurrentUser(): Promise<User | null> {
       .eq("id", authUser.id)
       .single();
 
-    if (userError) {
+    const userData = userResult.data;
+    if (userResult.error) {
       console.error("[getCurrentUser] Error fetching user:", {
-        code: userError.code,
-        message: userError.message,
-        details: userError.details,
-        hint: userError.hint,
+        code: userResult.error.code,
+        message: userResult.error.message,
+        details: userResult.error.details,
+        hint: userResult.error.hint,
         userId: authUser.id,
       });
       // Return null instead of throwing to avoid serialization issues
