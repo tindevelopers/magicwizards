@@ -31,13 +31,14 @@ async function isPlatformAdminServer(): Promise<boolean> {
     if (userError || !user) return false;
 
     const adminClient = createAdminClient();
-    const { data: currentUser, error: queryError } = await adminClient
+    const userResult: { data: { role_id: string | null; tenant_id: string | null; roles: { name: string } | null } | null; error: any } = await adminClient
       .from("users")
       .select("role_id, tenant_id, roles:role_id(name)")
       .eq("id", user.id)
       .single();
 
-    if (queryError || !currentUser) return false;
+    const currentUser = userResult.data;
+    if (userResult.error || !currentUser) return false;
 
     const roleName = (currentUser.roles as any)?.name;
     const tenantId = currentUser.tenant_id;
@@ -69,12 +70,13 @@ export async function getAllOrganizationAdmins(): Promise<OrganizationAdmin[]> {
     const adminClient = createAdminClient();
     
     // First get the Organization Admin role ID
-    const { data: workspaceAdminRole } = await adminClient
+    const roleResult: { data: { id: string } | null; error: any } = await adminClient
       .from("roles")
       .select("id")
       .eq("name", "Organization Admin")
       .single();
 
+    const workspaceAdminRole = roleResult.data;
     if (!workspaceAdminRole) {
       throw new Error("Organization Admin role not found");
     }

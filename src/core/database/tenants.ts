@@ -30,16 +30,17 @@ export async function getTenants() {
 
   // If we have a user, check their role
   if (user) {
-    const { data: userData, error: roleError } = await supabase
+    const userResult: { data: { role_id: string | null; roles: { name: string } | null } | null; error: any } = await supabase
       .from("users")
       .select("role_id, roles:role_id(name)")
       .eq("id", user.id)
       .single();
     
+    const userData = userResult.data;
     console.log("[getTenants] User role check:", {
       roleId: userData?.role_id,
       roleName: (userData?.roles as any)?.name,
-      roleError: roleError?.message,
+      roleError: userResult.error?.message,
     });
   }
 
@@ -103,13 +104,14 @@ export async function createTenant(tenant: TenantInsert) {
     }
   }
 
-  const { data, error } = await supabase
-    .from("tenants")
-    .insert(tenant)
+  const result: { data: Tenant | null; error: any } = await ((supabase
+    .from("tenants") as any)
+    .insert(tenant as any)
     .select()
-    .single();
+    .single());
 
-  if (error) throw error;
+  const data = result.data;
+  if (result.error) throw result.error;
   return data;
 }
 
@@ -118,14 +120,15 @@ export async function createTenant(tenant: TenantInsert) {
  */
 export async function updateTenant(id: string, tenant: TenantUpdate) {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from("tenants")
-    .update(tenant)
+  const result: { data: Tenant | null; error: any } = await ((supabase
+    .from("tenants") as any)
+    .update(tenant as any)
     .eq("id", id)
     .select()
-    .single();
+    .single());
 
-  if (error) throw error;
+  const data = result.data;
+  if (result.error) throw result.error;
   return data;
 }
 
