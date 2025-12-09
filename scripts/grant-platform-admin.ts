@@ -10,7 +10,7 @@
  */
 
 import { createClient } from "@supabase/supabase-js";
-import type { Database } from "../src/lib/supabase/types";
+import type { Database } from "../src/core/database/types";
 import * as dotenv from "dotenv";
 import * as path from "path";
 import * as fs from "fs";
