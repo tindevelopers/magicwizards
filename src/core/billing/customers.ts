@@ -20,35 +20,46 @@ export async function createOrRetrieveCustomer(tenantId: string): Promise<{
     const adminClient = createAdminClient();
 
     // Get tenant information
-    const { data: tenant, error: tenantError } = await adminClient
+    const tenantResult: { data: { id: string; name: string; domain: string; [key: string]: any } | null; error: any } = await adminClient
       .from("tenants")
       .select("*")
       .eq("id", tenantId)
       .single();
 
-    if (tenantError || !tenant) {
+    const tenant = tenantResult.data;
+    if (tenantResult.error || !tenant) {
       return { success: false, error: "Tenant not found" };
     }
 
     // Check if customer already exists
-    const { data: existingCustomer } = await adminClient
+    const customerResult: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const existingCustomer = customerResult.data;
     if (existingCustomer) {
       return { success: true, customerId: existingCustomer.stripe_customer_id };
     }
 
+    // Get Organization Admin role ID
+    const roleResult: { data: { id: string } | null; error: any } = await adminClient
+      .from("roles")
+      .select("id")
+      .eq("name", "Organization Admin")
+      .single();
+
     // Get primary user for tenant (for email)
-    const { data: primaryUser } = await adminClient
+    const userResult: { data: { email: string; full_name: string | null; id: string } | null; error: any } = await adminClient
       .from("users")
-      .select("email, full_name")
+      .select("email, full_name, id")
       .eq("tenant_id", tenantId)
-      .eq("role_id", (await adminClient.from("roles").select("id").eq("name", "Organization Admin").single()).data?.id)
+      .eq("role_id", roleResult.data?.id || "")
       .limit(1)
       .single();
+
+    const primaryUser = userResult.data;
 
     // Create Stripe customer
     const customer = await stripe.customers.create({
@@ -61,19 +72,26 @@ export async function createOrRetrieveCustomer(tenantId: string): Promise<{
       },
     });
 
+    // Get user ID if primaryUser exists
+    let userId: string | null = null;
+    if (primaryUser) {
+      userId = primaryUser.id;
+    }
+
     // Save customer to database
     const customerData: StripeCustomer = {
       tenant_id: tenantId,
-      user_id: primaryUser ? (await adminClient.from("users").select("id").eq("email", primaryUser.email).single()).data?.id : null,
+      user_id: userId,
       stripe_customer_id: customer.id,
       email: customer.email || primaryUser?.email || "",
       name: customer.name || tenant.name,
       metadata: customer.metadata as any,
     };
 
-    const { error: insertError } = await adminClient
-      .from("stripe_customers")
-      .insert(customerData);
+    const insertResult: { error: any } = await ((adminClient
+      .from("stripe_customers") as any)
+      .insert(customerData as any));
+    const insertError = insertResult.error;
 
     if (insertError) {
       // If insert fails, try to delete the Stripe customer
@@ -102,13 +120,14 @@ export async function getCustomer(tenantId: string): Promise<{
   try {
     const adminClient = createAdminClient();
 
-    const { data: customer, error } = await adminClient
+    const customerResult2: { data: { stripe_customer_id: string; [key: string]: any } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("*")
       .eq("tenant_id", tenantId)
       .single();
 
-    if (error || !customer) {
+    const customer = customerResult2.data;
+    if (customerResult2.error || !customer) {
       return { success: false, error: "Customer not found" };
     }
 
@@ -140,12 +159,13 @@ export async function updateCustomer(
   try {
     const adminClient = createAdminClient();
 
-    const { data: customer } = await adminClient
+    const customerResult3: { data: { stripe_customer_id: string } | null; error: any } = await adminClient
       .from("stripe_customers")
       .select("stripe_customer_id")
       .eq("tenant_id", tenantId)
       .single();
 
+    const customer = customerResult3.data;
     if (!customer) {
       return { success: false, error: "Customer not found" };
     }
@@ -159,15 +179,16 @@ export async function updateCustomer(
     });
 
     // Update in database
-    const { error } = await adminClient
-      .from("stripe_customers")
+    const updateResult: { error: any } = await ((adminClient
+      .from("stripe_customers") as any)
       .update({
         email: updates.email,
         name: updates.name,
         phone: updates.phone,
         address: updates.address,
-      })
-      .eq("tenant_id", tenantId);
+      } as any)
+      .eq("tenant_id", tenantId));
+    const error = updateResult.error;
 
     if (error) {
       return { success: false, error: error.message };
