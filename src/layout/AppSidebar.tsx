@@ -45,6 +45,17 @@ const navItems: NavItem[] = [
     path: "/saas/dashboard",
   },
   {
+    name: "CRM",
+    icon: <UserCircleIcon />,
+    new: true,
+    subItems: [
+      { name: "Contacts", path: "/crm/contacts" },
+      { name: "Companies", path: "/crm/companies" },
+      { name: "Deals", path: "/crm/deals" },
+      { name: "Tasks", path: "/crm/tasks" },
+    ],
+  },
+  {
     name: "AI Assistant",
     icon: <AiIcon />,
     new: true,

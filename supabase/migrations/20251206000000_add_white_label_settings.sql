@@ -21,3 +21,4 @@ COMMENT ON COLUMN tenants.custom_domains IS 'Array of custom domains: [{domain, 
 
 
 
+

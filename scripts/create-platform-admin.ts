@@ -1,175 +1,147 @@
 /**
  * Script to create a Platform Admin user
- * Usage: npx tsx scripts/create-platform-admin.ts <email> <password> <full-name>
+ * Run with: npx tsx scripts/create-platform-admin.ts
  */
-
-import { config } from "dotenv";
-import { resolve } from "path";
-
-// Load .env.local file
-config({ path: resolve(process.cwd(), ".env.local") });
 
 import { createAdminClient } from "../src/core/database/admin-client";
 
-async function createPlatformAdmin(email: string, password: string, fullName: string) {
+async function createPlatformAdmin() {
+  const email = "systemadmin@tin.info";
+  const password = "88888888";
+  const fullName = "System Admin";
+
+  console.log(`Creating Platform Admin user: ${email}`);
+
   const adminClient = createAdminClient();
 
-  console.log(`\n🔍 Creating Platform Admin user...`);
-
-  // 1. Sign up user with Supabase Auth
-  console.log(`\n1️⃣ Creating auth user...`);
-  const { data: authData, error: authError } = await adminClient.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName,
-      },
-    },
-  });
-
-  if (authError || !authData.user) {
-    if (authError?.message?.includes("already registered")) {
-      console.log(`⚠️  User ${email} already exists in auth. Continuing...`);
-      // Get existing user
-      const { data: existingUser } = await adminClient.auth.admin.getUserByEmail(email);
-      if (!existingUser?.user) {
-        throw new Error("User exists but could not retrieve");
-      }
-      authData.user = existingUser.user;
-    } else {
-      throw authError || new Error("Failed to create auth user");
-    }
-  }
-
-  console.log(`✅ Auth user created: ${authData.user.id}`);
-
-  // 2. Get Platform Admin role
-  console.log(`\n2️⃣ Getting Platform Admin role...`);
-  const { data: platformAdminRole, error: roleError } = await adminClient
-    .from("roles")
-    .select("id, name")
-    .eq("name", "Platform Admin")
-    .single();
-
-  if (roleError || !platformAdminRole) {
-    throw new Error("Platform Admin role not found. Make sure roles are seeded.");
-  }
-
-  console.log(`✅ Found role: ${platformAdminRole.name} (${platformAdminRole.id})`);
-
-  // 3. Check if user already exists in users table
-  console.log(`\n3️⃣ Checking if user exists in users table...`);
-  const { data: existingUser } = await adminClient
-    .from("users")
-    .select("id, email, role_id, tenant_id")
-    .eq("id", authData.user.id)
-    .maybeSingle();
-
-  if (existingUser) {
-    console.log(`⚠️  User already exists in users table. Updating to Platform Admin...`);
-    const { data: updatedUser, error: updateError } = await adminClient
-      .from("users")
-      .update({
-        role_id: platformAdminRole.id,
-        tenant_id: null, // Platform Admins have null tenant_id
-        email,
-        full_name: fullName,
-      })
-      .eq("id", authData.user.id)
-      .select(`
-        *,
-        roles:role_id(name)
-      `)
+  try {
+    // 1. Get Platform Admin role ID
+    const { data: roleData, error: roleError } = await adminClient
+      .from("roles")
+      .select("id")
+      .eq("name", "Platform Admin")
       .single();
 
-    if (updateError) throw updateError;
-    console.log(`\n✅ Updated user to Platform Admin!`);
-    console.log(`\n📋 User details:`);
-    console.log(`   ID: ${updatedUser.id}`);
-    console.log(`   Email: ${updatedUser.email}`);
-    console.log(`   Name: ${updatedUser.full_name}`);
-    console.log(`   Role: ${(updatedUser.roles as any)?.name}`);
-    console.log(`   Tenant ID: ${updatedUser.tenant_id || "None (Platform Admin)"}`);
-    return updatedUser;
-  }
-
-  // 4. Create user record in users table
-  console.log(`\n4️⃣ Creating user record...`);
-  const { data: user, error: userError } = await adminClient
-    .from("users")
-    .insert({
-      id: authData.user.id,
-      email,
-      full_name: fullName,
-      role_id: platformAdminRole.id,
-      tenant_id: null, // Platform Admins have null tenant_id
-      plan: "enterprise",
-      status: "active",
-    })
-    .select(`
-      *,
-      roles:role_id(name)
-    `)
-    .single();
-
-  if (userError) {
-    // If user already exists, try to update
-    if (userError.code === "23505") {
-      console.log(`⚠️  User already exists. Updating...`);
-      const { data: updatedUser, error: updateError } = await adminClient
-        .from("users")
-        .update({
-          role_id: platformAdminRole.id,
-          tenant_id: null,
-        })
-        .eq("id", authData.user.id)
-        .select(`
-          *,
-          roles:role_id(name)
-        `)
-        .single();
-
-      if (updateError) throw updateError;
-      console.log(`\n✅ Updated user to Platform Admin!`);
-      console.log(`\n📋 User details:`);
-      console.log(`   ID: ${updatedUser.id}`);
-      console.log(`   Email: ${updatedUser.email}`);
-      console.log(`   Name: ${updatedUser.full_name}`);
-      console.log(`   Role: ${(updatedUser.roles as any)?.name}`);
-      console.log(`   Tenant ID: ${updatedUser.tenant_id || "None (Platform Admin)"}`);
-      return updatedUser;
+    if (roleError || !roleData) {
+      throw new Error(`Failed to find Platform Admin role: ${roleError?.message || "Role not found"}`);
     }
-    throw userError;
+
+    console.log(`Found Platform Admin role: ${roleData.id}`);
+
+    // 2. Create user in Supabase Auth
+    const { data: authData, error: authError } = await adminClient.auth.admin.createUser({
+      email,
+      password,
+      email_confirm: true, // Auto-confirm email
+      user_metadata: {
+        full_name: fullName,
+      },
+    });
+
+    if (authError || !authData.user) {
+      // If user already exists, try to get it
+      if (authError?.message?.includes("already exists") || authError?.message?.includes("already registered")) {
+        console.log("User already exists in Auth, fetching existing user...");
+        const { data: existingUsers } = await adminClient.auth.admin.listUsers();
+        const existingUser = existingUsers?.users?.find((u) => u.email === email);
+        
+        if (!existingUser) {
+          throw new Error("User exists but could not be retrieved");
+        }
+        
+        console.log(`Using existing Auth user: ${existingUser.id}`);
+        
+        // 3. Create or update user record in users table
+        const { data: userData, error: userError } = await adminClient
+          .from("users")
+          .upsert({
+            id: existingUser.id,
+            email,
+            full_name: fullName,
+            tenant_id: null, // Platform Admins have NULL tenant_id
+            role_id: roleData.id,
+            plan: "enterprise",
+            status: "active",
+          }, {
+            onConflict: "id",
+          })
+          .select()
+          .single();
+
+        if (userError) {
+          throw new Error(`Failed to create user record: ${userError.message}`);
+        }
+
+        console.log(`✅ Platform Admin user created/updated successfully!`);
+        console.log(`   User ID: ${userData.id}`);
+        console.log(`   Email: ${userData.email}`);
+        console.log(`   Role: Platform Admin`);
+        console.log(`   Tenant ID: NULL (Platform Admin)`);
+        return;
+      }
+      
+      throw authError || new Error("Failed to create user in Auth");
+    }
+
+    console.log(`Created Auth user: ${authData.user.id}`);
+
+    // 3. Create user record in users table
+    const { data: userData, error: userError } = await adminClient
+      .from("users")
+      .insert({
+        id: authData.user.id,
+        email,
+        full_name: fullName,
+        tenant_id: null, // Platform Admins have NULL tenant_id
+        role_id: roleData.id,
+        plan: "enterprise",
+        status: "active",
+      })
+      .select()
+      .single();
+
+    if (userError) {
+      // If user record already exists, try to update it
+      if (userError.code === "23505") {
+        console.log("User record already exists, updating...");
+        const { data: updatedUser, error: updateError } = await adminClient
+          .from("users")
+          .update({
+            tenant_id: null,
+            role_id: roleData.id,
+            status: "active",
+          })
+          .eq("id", authData.user.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          throw new Error(`Failed to update user record: ${updateError.message}`);
+        }
+
+        console.log(`✅ Platform Admin user updated successfully!`);
+        console.log(`   User ID: ${updatedUser.id}`);
+        console.log(`   Email: ${updatedUser.email}`);
+        console.log(`   Role: Platform Admin`);
+        console.log(`   Tenant ID: NULL (Platform Admin)`);
+        return;
+      }
+      
+      throw new Error(`Failed to create user record: ${userError.message}`);
+    }
+
+    console.log(`✅ Platform Admin user created successfully!`);
+    console.log(`   User ID: ${userData.id}`);
+    console.log(`   Email: ${userData.email}`);
+    console.log(`   Role: Platform Admin`);
+    console.log(`   Tenant ID: NULL (Platform Admin)`);
+    console.log(`\n📧 Login credentials:`);
+    console.log(`   Email: ${email}`);
+    console.log(`   Password: ${password}`);
+  } catch (error: any) {
+    console.error("❌ Error creating Platform Admin user:", error.message);
+    process.exit(1);
   }
-
-  console.log(`\n✅ Platform Admin created successfully!`);
-  console.log(`\n📋 User details:`);
-  console.log(`   ID: ${user.id}`);
-  console.log(`   Email: ${user.email}`);
-  console.log(`   Name: ${user.full_name}`);
-  console.log(`   Role: ${(user.roles as any)?.name}`);
-  console.log(`   Tenant ID: ${user.tenant_id || "None (Platform Admin)"}`);
-  console.log(`\n🎉 User can now sign in and has Platform Admin access!`);
-
-  return user;
 }
 
-// Get command line arguments
-const email = process.argv[2];
-const password = process.argv[3];
-const fullName = process.argv[4] || "Platform Admin";
-
-if (!email || !password) {
-  console.error("Usage: npx tsx scripts/create-platform-admin.ts <email> <password> [full-name]");
-  console.error("\nExample:");
-  console.error('  npx tsx scripts/create-platform-admin.ts systemadmin@tin.info "SecurePassword123!" "Jane Doe"');
-  process.exit(1);
-}
-
-createPlatformAdmin(email, password, fullName).catch((error) => {
-  console.error("❌ Unexpected error:", error);
-  process.exit(1);
-});
-
-
+createPlatformAdmin();

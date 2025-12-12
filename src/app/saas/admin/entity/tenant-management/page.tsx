@@ -10,10 +10,11 @@ import {
   PlusIcon,
   CheckCircleIcon,
   MagnifyingGlassIcon,
+  XMarkIcon,
 } from "@heroicons/react/24/outline";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import { getAllTenants } from "@/app/actions/tenants";
+import { getAllTenants, createTenant, type CreateTenantData } from "@/app/actions/tenants";
 import { PermissionGate } from "@/core/permissions";
 import type { Database } from "@/core/database";
 
@@ -54,6 +55,15 @@ export default function TenantManagementPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [formData, setFormData] = useState<CreateTenantData>({
+    name: "",
+    domain: "",
+    plan: "free",
+    region: "us-east-1",
+    status: "active",
+  });
 
   useEffect(() => {
     loadTenants();
@@ -110,6 +120,46 @@ export default function TenantManagementPage() {
       tenant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       tenant.domain.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleCreateTenant = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setCreating(true);
+
+    try {
+      // Validate domain format
+      const domainRegex = /^[a-z0-9-]+$/;
+      if (!domainRegex.test(formData.domain)) {
+        throw new Error("Domain must contain only lowercase letters, numbers, and hyphens");
+      }
+
+      await createTenant({
+        name: formData.name,
+        domain: formData.domain,
+        plan: formData.plan,
+        region: formData.region,
+        status: formData.status,
+      });
+
+      // Reset form and close modal
+      setFormData({
+        name: "",
+        domain: "",
+        plan: "free",
+        region: "us-east-1",
+        status: "active",
+      });
+      setShowCreateModal(false);
+      
+      // Reload tenants list
+      await loadTenants();
+    } catch (err: any) {
+      console.error("Error creating tenant:", err);
+      setError(err.message || "Failed to create tenant. Please try again.");
+    } finally {
+      setCreating(false);
+    }
+  };
 
   const activeTenants = tenants.filter((t) => t.status === "active").length;
   const totalUsers = tenants.reduce((sum, t) => sum + (t.userCount || 0), 0);
@@ -188,12 +238,10 @@ export default function TenantManagementPage() {
                   className="h-10 rounded-full border border-gray-200 bg-white/70 pl-10 pr-4 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
                 />
               </div>
-              <PermissionGate permission="tenants.write" fallback={null}>
-                <Button size="sm">
-                  <PlusIcon className="h-4 w-4" />
-                  Add Tenant
-                </Button>
-              </PermissionGate>
+              <Button size="sm" onClick={() => setShowCreateModal(true)}>
+                <PlusIcon className="h-4 w-4" />
+                Add Tenant
+              </Button>
             </div>
           </div>
 
@@ -202,8 +250,16 @@ export default function TenantManagementPage() {
               Loading tenants...
             </div>
           ) : filteredTenants.length === 0 ? (
-            <div className="py-12 text-center text-gray-500 dark:text-gray-400">
-              {searchQuery ? "No tenants found matching your search." : "No tenants found. Create your first tenant to get started."}
+            <div className="py-12 text-center space-y-4">
+              <p className="text-gray-500 dark:text-gray-400">
+                {searchQuery ? "No tenants found matching your search." : "No tenants found. Create your first tenant to get started."}
+              </p>
+              {!searchQuery && (
+                <Button onClick={() => setShowCreateModal(true)}>
+                  <PlusIcon className="h-4 w-4 mr-2" />
+                  Create Your First Tenant
+                </Button>
+              )}
             </div>
           ) : (
             <div className="grid gap-4">
@@ -338,6 +394,133 @@ export default function TenantManagementPage() {
           </div>
         </div>
       </section>
+
+      {/* Create Tenant Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl border border-gray-200 bg-white shadow-xl dark:border-gray-800 dark:bg-gray-900">
+            <div className="flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-800">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                Create New Tenant
+              </h2>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  setError(null);
+                }}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTenant} className="p-6 space-y-4">
+              {error && (
+                <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tenant Name *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="Acme Corporation"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Domain *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.domain}
+                  onChange={(e) => setFormData({ ...formData, domain: e.target.value.toLowerCase() })}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  placeholder="acme-corp"
+                />
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  Unique identifier for the tenant (lowercase, no spaces)
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Plan
+                  </label>
+                  <select
+                    value={formData.plan}
+                    onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="free">Free</option>
+                    <option value="basic">Basic</option>
+                    <option value="professional">Professional</option>
+                    <option value="enterprise">Enterprise</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Region
+                  </label>
+                  <select
+                    value={formData.region}
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="us-east-1">US East</option>
+                    <option value="us-west-1">US West</option>
+                    <option value="eu-west-1">EU West</option>
+                    <option value="ap-southeast-1">Asia Pacific</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Status
+                </label>
+                <select
+                  value={formData.status}
+                  onChange={(e) => setFormData({ ...formData, status: e.target.value as "active" | "pending" | "suspended" })}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                >
+                  <option value="active">Active</option>
+                  <option value="pending">Pending</option>
+                  <option value="suspended">Suspended</option>
+                </select>
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setError(null);
+                  }}
+                  disabled={creating}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={creating}>
+                  {creating ? "Creating..." : "Create Tenant"}
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

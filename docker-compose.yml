@@ -1,0 +1,59 @@
+# Docker Compose for Database
+# 
+# Option 1: Use Supabase CLI (Recommended)
+#   Run: supabase start
+#   This manages all Supabase services automatically
+#
+# Option 2: Use this docker-compose.yml for PostgreSQL only
+#   Run: docker-compose up -d
+#   Note: This only provides PostgreSQL, not the full Supabase stack
+
+services:
+  # PostgreSQL Database (Standalone)
+  # Use this if you want just PostgreSQL without Supabase services
+  postgres:
+    image: postgres:17-alpine
+    container_name: tinadmin-postgres-standalone
+    ports:
+      - "54320:5432"  # Using different port to avoid conflict with Supabase
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - tinadmin-network
+
+  # pgAdmin (Database Management UI)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: tinadmin-pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - tinadmin-network
+
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  tinadmin-network:
+    driver: bridge

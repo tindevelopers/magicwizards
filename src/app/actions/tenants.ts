@@ -132,3 +132,143 @@ export async function getAllTenants(): Promise<Tenant[]> {
   }
 }
 
+export interface CreateTenantData {
+  name: string;
+  domain: string;
+  plan?: string;
+  region?: string;
+  status?: "active" | "pending" | "suspended";
+}
+
+/**
+ * Create a new tenant
+ * Only Platform Admins can create tenants
+ */
+export async function createTenant(data: CreateTenantData): Promise<Tenant> {
+  // Get current user first for debugging
+  const supabase = await createClient();
+  const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !authUser) {
+    throw new Error("You must be logged in to create tenants");
+  }
+
+  console.log(`[createTenant] Attempting to create tenant by user: ${authUser.email} (${authUser.id})`);
+
+  // Check if user is Platform Admin first (more reliable check)
+  const isAdmin = await isPlatformAdmin();
+  console.log(`[createTenant] Platform Admin check result: ${isAdmin}`);
+
+  if (!isAdmin) {
+    // Get user details for better error message
+    const adminClient = createAdminClient();
+    const { data: userData } = await (adminClient.from("users") as any)
+      .select("role_id, tenant_id, roles:role_id(name)")
+      .eq("id", authUser.id)
+      .single();
+
+    const roleName = (userData?.roles as any)?.name;
+    const tenantId = userData?.tenant_id;
+
+    console.error(`[createTenant] User is not Platform Admin:`, {
+      userId: authUser.id,
+      email: authUser.email,
+      roleName: roleName || "No role",
+      tenantId: tenantId || "NULL",
+      expected: "Platform Admin with tenant_id = NULL",
+    });
+
+    throw new Error(
+      `Only Platform Administrators can create tenants. ` +
+      `Your current role: ${roleName || "None"}, Tenant ID: ${tenantId || "NULL"}. ` +
+      `Please ensure you are logged in as a Platform Admin user.`
+    );
+  }
+
+  // Platform Admins bypass permission check (they have all permissions)
+  // But we'll still try it for logging purposes
+  try {
+    await requirePermission("tenants.write");
+  } catch (permissionError: any) {
+    // If Platform Admin check passed but permission check failed, log it but continue
+    console.warn(`[createTenant] Permission check failed but user is Platform Admin, continuing anyway:`, permissionError.message);
+  }
+  
+  try {
+
+    const adminClient = createAdminClient();
+
+    // Check if domain already exists
+    const existingTenant = await adminClient
+      .from("tenants")
+      .select("id")
+      .eq("domain", data.domain)
+      .maybeSingle();
+
+    if (existingTenant.data) {
+      throw new Error(`A tenant with domain "${data.domain}" already exists`);
+    }
+
+    if (existingTenant.error) {
+      console.error("[createTenant] Error checking existing tenant:", existingTenant.error);
+      throw new Error(`Failed to check if tenant exists: ${existingTenant.error.message}`);
+    }
+
+    // Create tenant
+    const { data: tenant, error } = await (adminClient.from("tenants") as any)
+      .insert({
+        name: data.name,
+        domain: data.domain,
+        plan: data.plan || "free",
+        region: data.region || "us-east-1",
+        status: data.status || "active",
+        features: [],
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("[createTenant] Database error creating tenant:", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+      
+      // Provide more specific error messages
+      if (error.code === "23505") {
+        throw new Error(`A tenant with domain "${data.domain}" already exists`);
+      }
+      if (error.code === "23503") {
+        throw new Error(`Invalid reference: ${error.message}`);
+      }
+      if (error.code === "23514") {
+        throw new Error(`Validation error: ${error.message}`);
+      }
+      
+      throw new Error(`Database error: ${error.message || "Failed to create tenant"}`);
+    }
+
+    if (!tenant) {
+      throw new Error("Tenant was not created but no error was returned");
+    }
+
+    console.log(`[createTenant] Created tenant: ${tenant.id} (${data.domain})`);
+    return { ...tenant, userCount: 0 } as Tenant;
+  } catch (error) {
+    console.error("[createTenant] Unexpected error:", error);
+    
+    // Re-throw if it's already an Error with a message
+    if (error instanceof Error) {
+      throw error;
+    }
+    
+    // Handle Supabase errors
+    if (error && typeof error === "object" && "message" in error) {
+      throw new Error(`Failed to create tenant: ${String(error.message)}`);
+    }
+    
+    throw new Error("Failed to create tenant: Unknown error occurred");
+  }
+}
+
