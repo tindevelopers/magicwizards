@@ -1,0 +1,75 @@
+{
+  "name": "@tinadmin/core",
+  "version": "1.0.0",
+  "description": "Core SaaS platform modules: auth, billing, database, multi-tenancy, permissions",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./auth": {
+      "import": "./dist/auth/index.js",
+      "types": "./dist/auth/index.d.ts"
+    },
+    "./billing": {
+      "import": "./dist/billing/index.js",
+      "types": "./dist/billing/index.d.ts"
+    },
+    "./database": {
+      "import": "./dist/database/index.js",
+      "types": "./dist/database/index.d.ts"
+    },
+    "./multi-tenancy": {
+      "import": "./dist/multi-tenancy/index.js",
+      "types": "./dist/multi-tenancy/index.d.ts"
+    },
+    "./permissions": {
+      "import": "./dist/permissions/index.js",
+      "types": "./dist/permissions/index.d.ts"
+    },
+    "./email": {
+      "import": "./dist/email/index.js",
+      "types": "./dist/email/index.d.ts"
+    },
+    "./shared": {
+      "import": "./dist/shared/index.js",
+      "types": "./dist/shared/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "saas",
+    "multi-tenant",
+    "auth",
+    "billing",
+    "database",
+    "permissions"
+  ],
+  "author": "Tin Developers",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.86.2",
+    "stripe": "^20.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  }
+}

@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import path from "path";
 
 const nextConfig: NextConfig = {
   // ESLint configuration - don't fail build on warnings
@@ -28,6 +29,7 @@ const nextConfig: NextConfig = {
   // Bundle optimization
   experimental: {
     optimizePackageImports: [
+      "@tinadmin/core",
       "@heroicons/react",
       "apexcharts",
       "react-apexcharts",
@@ -48,6 +50,12 @@ const nextConfig: NextConfig = {
       test: /\.svg$/,
       use: ["@svgr/webpack"],
     });
+    
+    // Optimize bundle size with aliases for better tree-shaking
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@tinadmin/core': path.resolve(__dirname, 'packages/@tinadmin/core/src'),
+    };
     
     // Optimize bundle size
     if (!isServer) {

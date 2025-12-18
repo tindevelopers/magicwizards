@@ -12,6 +12,8 @@
 // ============================================================================
 // Database types are re-exported from database domain
 export type { Database } from './types';
+// Dual-mode types
+export type { SystemMode, TenantContext } from './types';
 
 // ============================================================================
 // TENANT CONTEXT
@@ -28,10 +30,23 @@ export {
   useWorkspace,
 } from './workspace-context';
 
+// Organization context (client-side) - for dual-mode support
+export {
+  OrganizationProvider,
+  useOrganization,
+} from './organization-context';
+
 // ============================================================================
 // TENANT RESOLUTION (Server-side - Import directly from files when needed)
 // ============================================================================
 // These are server-side functions - import directly from resolver.ts when needed
+// Dual-mode context resolution (can be used in middleware)
+export {
+  resolveContext,
+  getSystemMode,
+  getPlatformTenantId,
+  resolveOrganizationFromRequest,
+} from './resolver';
 
 // ============================================================================
 // TENANT VALIDATION (Server-side - Import directly from files when needed)

@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import type { Database } from "@/core/database";
-import { resolveTenant } from "@/core/multi-tenancy/resolver";
+import { resolveTenant, resolveContext } from "@/core/multi-tenancy/resolver";
 import { getSubdomainFromRequest, getTenantIdFromSubdomain } from "@/core/multi-tenancy/subdomain-routing";
 
 export async function middleware(request: NextRequest) {
@@ -100,14 +100,31 @@ export async function middleware(request: NextRequest) {
     });
   }
 
+  // Resolve context (supports both multi-tenant and organization-only modes)
+  const context = await resolveContext({
+    headers: request.headers,
+    url: request.url,
+    hostname,
+  });
+
   // Set tenant_id in request headers for downstream use
-  if (tenantResult.tenantId) {
-    request.headers.set("x-tenant-id", tenantResult.tenantId);
-    response.headers.set("x-tenant-id", tenantResult.tenantId);
+  if (context.tenantId) {
+    request.headers.set("x-tenant-id", context.tenantId);
+    response.headers.set("x-tenant-id", context.tenantId);
   }
 
+  // Set organization_id in request headers when available
+  if (context.organizationId) {
+    request.headers.set("x-organization-id", context.organizationId);
+    response.headers.set("x-organization-id", context.organizationId);
+  }
+
+  // Set system mode header
+  request.headers.set("x-system-mode", context.mode);
+  response.headers.set("x-system-mode", context.mode);
+
   // If user is authenticated but no tenant from resolution, try session
-  if (user && !tenantResult.tenantId) {
+  if (user && !context.tenantId) {
     const userDataResult: { data: { tenant_id: string | null; roles: { name: string } | null } | null; error: any } = await supabase
       .from("users")
       .select("tenant_id, roles:role_id(name)")

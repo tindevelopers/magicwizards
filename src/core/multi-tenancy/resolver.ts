@@ -8,8 +8,10 @@ import { createClient as createServerClient } from "@/core/database/server";
 import { createAdminClient } from "@/core/database/admin-client";
 import type { Database } from "@/core/database";
 import { extractTenantFromSubdomain, extractTenantIdFromRequest } from "./query-builder";
+import type { SystemMode, TenantContext } from "./types";
 
 type Tenant = Database["public"]["Tables"]["tenants"]["Row"];
+type Workspace = Database["public"]["Tables"]["workspaces"]["Row"];
 
 export interface TenantResolutionResult {
   tenant: Tenant | null;
@@ -258,5 +260,132 @@ export async function resolveTenant(options: {
 
   // Fall back to session
   return resolveTenantFromSession();
+}
+
+/**
+ * Get system mode from environment or tenant settings
+ */
+export async function getSystemMode(tenantId?: string | null): Promise<SystemMode> {
+  // Check environment variable first
+  const envMode = process.env.NEXT_PUBLIC_SYSTEM_MODE as SystemMode | undefined;
+  if (envMode && (envMode === 'multi-tenant' || envMode === 'organization-only')) {
+    return envMode;
+  }
+
+  // If tenantId provided, check tenant's mode setting
+  if (tenantId) {
+    try {
+      const adminClient = createAdminClient();
+      const tenantResult: { data: { mode?: string } | null; error: any } = await adminClient
+        .from("tenants")
+        .select("mode")
+        .eq("id", tenantId)
+        .single();
+
+      if (tenantResult.data?.mode) {
+        return tenantResult.data.mode as SystemMode;
+      }
+    } catch {
+      // Fall through to default
+    }
+  }
+
+  // Default to multi-tenant
+  return 'multi-tenant';
+}
+
+/**
+ * Get platform tenant ID for organization-only mode
+ */
+export async function getPlatformTenantId(): Promise<string | null> {
+  try {
+    const adminClient = createAdminClient();
+    const platformResult: { data: { id: string } | null; error: any } = await adminClient
+      .from("tenants")
+      .select("id")
+      .eq("domain", "platform")
+      .eq("mode", "organization-only")
+      .single();
+
+    return platformResult.data?.id || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Resolve organization from request (for organization-only mode)
+ */
+export async function resolveOrganizationFromRequest(
+  headers: Headers | Record<string, string>,
+  tenantId?: string | null
+): Promise<Workspace | null> {
+  // Try to get organization ID from header
+  const orgIdHeader = headers instanceof Headers 
+    ? headers.get("x-organization-id")
+    : headers["x-organization-id"];
+
+  if (!orgIdHeader) {
+    return null;
+  }
+
+  try {
+    const adminClient = createAdminClient();
+    let query = adminClient
+      .from("workspaces")
+      .select("*")
+      .eq("id", orgIdHeader);
+
+    if (tenantId) {
+      query = query.eq("tenant_id", tenantId);
+    }
+
+    const orgResult: { data: Workspace | null; error: any } = await query.single();
+    return orgResult.data;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Resolve context based on system mode
+ * Handles both multi-tenant and organization-only modes
+ */
+export async function resolveContext(request: {
+  headers: Headers | Record<string, string>;
+  url?: string;
+  hostname?: string;
+}): Promise<TenantContext> {
+  // First, resolve tenant to determine mode
+  const tenantResult = await resolveTenant({
+    hostname: request.hostname,
+    url: request.url,
+    headers: request.headers,
+  });
+
+  const mode = await getSystemMode(tenantResult.tenantId);
+
+  if (mode === 'organization-only') {
+    // Organization-only mode: Use platform tenant, focus on organizations
+    const platformTenantId = tenantResult.tenantId || await getPlatformTenantId();
+    const organization = await resolveOrganizationFromRequest(request.headers, platformTenantId);
+
+    return {
+      tenantId: platformTenantId,
+      organizationId: organization?.id || null,
+      mode: 'organization-only',
+      effectiveScope: 'organization',
+    };
+  } else {
+    // Multi-tenant mode: Standard tenant → organization hierarchy
+    const organization = await resolveOrganizationFromRequest(request.headers, tenantResult.tenantId);
+
+    return {
+      tenantId: tenantResult.tenantId,
+      organizationId: organization?.id || null,
+      mode: 'multi-tenant',
+      effectiveScope: tenantResult.tenantId ? 'tenant' : 'organization',
+    };
+  }
 }
 

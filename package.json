@@ -58,7 +58,10 @@
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
     "docker:ps": "docker ps | grep supabase",
-    "docker:logs": "supabase logs"
+    "docker:logs": "supabase logs",
+    "turbo:dev": "turbo run dev",
+    "turbo:build": "turbo run build",
+    "turbo:lint": "turbo run lint"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
