@@ -117,7 +117,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
     "postcss": "^8",
-    "turbo": "^2.3.3",
+    "turbo": "^2.7.1",
     "typescript": "5.9.3",
     "vitest": "^2.1.2"
   }
