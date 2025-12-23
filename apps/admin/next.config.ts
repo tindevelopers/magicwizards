@@ -1,11 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // ESLint configuration - don't fail build on warnings
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-  
   // TypeScript configuration - don't fail build on type errors during dev
   typescript: {
     ignoreBuildErrors: false,
@@ -39,6 +34,12 @@ const nextConfig: NextConfig = {
       "simplebar-react",
       "swiper",
     ],
+  },
+  
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {
+    // Empty config to allow webpack config to work
+    // Webpack config will be used when --webpack flag is passed
   },
   
   // Webpack configuration

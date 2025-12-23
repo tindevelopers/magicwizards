@@ -4,7 +4,7 @@
   "private": true,
   "description": "Admin dashboard application for multi-tenant SaaS platform",
   "scripts": {
-    "dev": "next dev --port 3001",
+    "dev": "next dev --port 3001 --webpack",
     "build": "next build",
     "start": "next start --port 3001",
     "lint": "next lint",
@@ -32,7 +32,7 @@
     "autoprefixer": "^10.4.20",
     "clsx": "^2.1.1",
     "flatpickr": "^4.6.13",
-    "next": "^15.4.8",
+    "next": "^16.1.1",
     "prismjs": "^1.30.0",
     "react": "^19.2.3",
     "react-apexcharts": "^1.7.0",
