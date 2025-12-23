@@ -1,11 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // ESLint configuration
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
-  
   // TypeScript configuration
   typescript: {
     ignoreBuildErrors: false,
@@ -29,6 +24,12 @@ const nextConfig: NextConfig = {
       "@tinadmin/ui-consumer",
       "@heroicons/react",
     ],
+  },
+  
+  // Turbopack configuration (Next.js 16+)
+  turbopack: {
+    // Empty config to allow webpack config to work
+    // Webpack config will be used when --webpack flag is passed
   },
   
   // Webpack configuration
