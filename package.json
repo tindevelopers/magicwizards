@@ -1,6 +1,6 @@
 {
   "name": "@your-org/your-saas-platform",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": false,
   "description": "Enterprise-ready SaaS admin dashboard with CRM, multi-tenancy, Stripe billing, and role-based access control",
   "keywords": [
