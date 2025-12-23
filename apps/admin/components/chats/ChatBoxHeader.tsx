@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "@/icons";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 
 export default function ChatBoxHeader() {
@@ -73,7 +73,7 @@ export default function ChatBoxHeader() {
 
         <div className="relative -mb-1.5">
           <button onClick={toggleDropdown} className="dropdown-toggle">
-            <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
+            <EllipsisVerticalIcon className="h-5 w-5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
           </button>
           <Dropdown
             isOpen={isOpen}

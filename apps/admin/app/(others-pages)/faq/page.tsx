@@ -5,6 +5,8 @@ import FaqsTwo from "@/components/faqs/FaqsTwo";
 import { Metadata } from "next";
 import React from "react";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Next.js FAQ Page | TailAdmin - Next.js Dashboard Template",
   description:
