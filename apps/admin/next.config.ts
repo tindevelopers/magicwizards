@@ -4,25 +4,6 @@ const nextConfig: NextConfig = {
   output: 'standalone',
   experimental: {
     serverComponentsExternalPackages: ['openai'],
-  },
-  // TypeScript configuration - don't fail build on type errors during dev
-  typescript: {
-    ignoreBuildErrors: false,
-  },
-  
-  // Optimize images
-  images: {
-    formats: ["image/avif", "image/webp"],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60,
-  },
-  
-  // Enable compression
-  compress: true,
-  
-  // Bundle optimization
-  experimental: {
     optimizePackageImports: [
       "@tinadmin/core",
       "@tinadmin/ui-admin",
@@ -39,6 +20,26 @@ const nextConfig: NextConfig = {
       "swiper",
     ],
   },
+  
+  // Skip static optimization for problematic pages during build
+  generateBuildId: async () => {
+    return 'build-' + Date.now();
+  },
+  // TypeScript configuration - don't fail build on type errors during dev
+  typescript: {
+    ignoreBuildErrors: false,
+  },
+  
+  // Optimize images
+  images: {
+    formats: ["image/avif", "image/webp"],
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 60,
+  },
+  
+  // Enable compression
+  compress: true,
   
   // Turbopack configuration (Next.js 16+)
   turbopack: {

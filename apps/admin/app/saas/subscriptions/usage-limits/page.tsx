@@ -1,4 +1,7 @@
 "use client";
+
+export const dynamic = 'force-dynamic';
+
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Input from "@/components/form/input/InputField";
 import Button from "@/components/ui/button/Button";
