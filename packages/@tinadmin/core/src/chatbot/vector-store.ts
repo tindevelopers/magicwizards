@@ -44,8 +44,8 @@ export async function storeEmbeddings(
     metadata: emb.metadata || {},
   }));
 
-  const { error } = await supabase
-    .from('chatbot_embeddings')
+  const { error } = await (supabase
+    .from('chatbot_embeddings') as any)
     .insert(records);
 
   if (error) {
@@ -71,7 +71,7 @@ export async function searchSimilar(
   const supabase = tenantClient.getClient();
 
   // Use pgvector cosine similarity search
-  const { data, error } = await supabase.rpc('match_embeddings', {
+  const { data, error } = await (supabase.rpc as any)('match_embeddings', {
     query_embedding: JSON.stringify(queryEmbedding),
     match_threshold: threshold,
     match_count: limit,
@@ -96,8 +96,8 @@ export async function searchSimilar(
   }
 
   // Fetch chunks
-  const { data: chunks, error: chunksError } = await supabase
-    .from('chatbot_document_chunks')
+  const { data: chunks, error: chunksError } = await (supabase
+    .from('chatbot_document_chunks') as any)
     .select('*')
     .in('id', chunkIds)
     .eq('tenant_id', tenantId);
@@ -110,8 +110,8 @@ export async function searchSimilar(
   // Fetch documents
   const documentIds = [...new Set(chunks?.map((c: any) => c.document_id) || [])];
   
-  const { data: documents, error: docsError } = await supabase
-    .from('chatbot_documents')
+  const { data: documents, error: docsError } = await (supabase
+    .from('chatbot_documents') as any)
     .select('*')
     .in('id', documentIds)
     .eq('tenant_id', tenantId);
@@ -122,8 +122,8 @@ export async function searchSimilar(
   }
 
   // Map results
-  const chunkMap = new Map(chunks?.map((c: any) => [c.id, c]) || []);
-  const docMap = new Map(documents?.map((d: any) => [d.id, d]) || []);
+  const chunkMap = new Map((chunks as any[])?.map((c: any) => [c.id, c]) || []);
+  const docMap = new Map((documents as any[])?.map((d: any) => [d.id, d]) || []);
 
   const resultChunks: DocumentChunk[] = chunkIds
     .map((chunkId: string, index: number) => {
@@ -137,9 +137,9 @@ export async function searchSimilar(
         metadata: chunk.metadata,
       };
     })
-    .filter((c): c is DocumentChunk => c !== null);
+    .filter((c: DocumentChunk | null): c is DocumentChunk => c !== null);
 
-  const resultDocuments = documentIds
+  const resultDocuments = (documentIds as string[])
     .map((docId: string) => docMap.get(docId))
     .filter((d): d is any => d !== undefined)
     .map((d: any) => ({
@@ -172,8 +172,8 @@ export async function deleteDocumentEmbeddings(
   const tenantClient = await createTenantAwareServerClient(tenantId);
   const supabase = tenantClient.getClient();
 
-  const { error } = await supabase
-    .from('chatbot_embeddings')
+  const { error } = await (supabase
+    .from('chatbot_embeddings') as any)
     .delete()
     .eq('document_id', documentId)
     .eq('tenant_id', tenantId);
@@ -194,8 +194,8 @@ export async function deleteKnowledgeBaseEmbeddings(
   const tenantClient = await createTenantAwareServerClient(tenantId);
   const supabase = tenantClient.getClient();
 
-  const { error } = await supabase
-    .from('chatbot_embeddings')
+  const { error } = await (supabase
+    .from('chatbot_embeddings') as any)
     .delete()
     .eq('knowledge_base_id', knowledgeBaseId)
     .eq('tenant_id', tenantId);

@@ -37,8 +37,8 @@ export async function createKnowledgeBase(
   const tenantClient = await createTenantAwareServerClient(input.tenantId);
   const supabase = tenantClient.getClient();
 
-  const { data, error } = await supabase
-    .from('chatbot_knowledge_bases')
+  const { data, error } = await (supabase
+    .from('chatbot_knowledge_bases') as any)
     .insert({
       tenant_id: input.tenantId,
       name: input.name,
@@ -76,8 +76,8 @@ export async function getKnowledgeBase(
   const tenantClient = await createTenantAwareServerClient(tenantId);
   const supabase = tenantClient.getClient();
 
-  const { data, error } = await supabase
-    .from('chatbot_knowledge_bases')
+  const { data, error } = await (supabase
+    .from('chatbot_knowledge_bases') as any)
     .select('*')
     .eq('id', knowledgeBaseId)
     .eq('tenant_id', tenantId)
@@ -155,8 +155,8 @@ export async function createDocument(
   const supabase = tenantClient.getClient();
 
   // Create document
-  const { data: docData, error: docError } = await supabase
-    .from('chatbot_documents')
+  const { data: docData, error: docError } = await (supabase
+    .from('chatbot_documents') as any)
     .insert({
       knowledge_base_id: input.knowledgeBaseId,
       tenant_id: input.tenantId,
@@ -175,16 +175,16 @@ export async function createDocument(
   }
 
   const document: Document = {
-    id: docData.id,
-    knowledgeBaseId: docData.knowledge_base_id,
-    tenantId: docData.tenant_id,
-    title: docData.title,
-    content: docData.content,
-    source: docData.source,
-    sourceType: docData.source_type,
-    metadata: docData.metadata,
-    createdAt: new Date(docData.created_at),
-    updatedAt: new Date(docData.updated_at),
+    id: (docData as any).id,
+    knowledgeBaseId: (docData as any).knowledge_base_id,
+    tenantId: (docData as any).tenant_id,
+    title: (docData as any).title,
+    content: (docData as any).content,
+    source: (docData as any).source,
+    sourceType: (docData as any).source_type,
+    metadata: (docData as any).metadata,
+    createdAt: new Date((docData as any).created_at),
+    updatedAt: new Date((docData as any).updated_at),
   };
 
   // Index the document
@@ -217,8 +217,8 @@ export async function indexDocument(document: Document): Promise<void> {
     },
   }));
 
-  const { data: insertedChunks, error: chunksError } = await supabase
-    .from('chatbot_document_chunks')
+  const { data: insertedChunks, error: chunksError } = await (supabase
+    .from('chatbot_document_chunks') as any)
     .insert(chunkRecords)
     .select();
 
@@ -260,15 +260,15 @@ export async function deleteDocument(
   await deleteDocumentEmbeddings(documentId, tenantId);
 
   // Delete chunks
-  await supabase
-    .from('chatbot_document_chunks')
+  await (supabase
+    .from('chatbot_document_chunks') as any)
     .delete()
     .eq('document_id', documentId)
     .eq('tenant_id', tenantId);
 
   // Delete document
-  const { error } = await supabase
-    .from('chatbot_documents')
+  const { error } = await (supabase
+    .from('chatbot_documents') as any)
     .delete()
     .eq('id', documentId)
     .eq('tenant_id', tenantId);
@@ -291,8 +291,8 @@ export async function updateDocument(
   const supabase = tenantClient.getClient();
 
   // Update document
-  const { data, error } = await supabase
-    .from('chatbot_documents')
+  const { data, error } = await (supabase
+    .from('chatbot_documents') as any)
     .update({
       ...(updates.title && { title: updates.title }),
       ...(updates.content && { content: updates.content }),

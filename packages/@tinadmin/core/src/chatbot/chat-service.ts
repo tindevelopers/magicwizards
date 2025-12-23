@@ -68,7 +68,7 @@ export async function processChatMessage(
 
   // Generate response using Vercel AI SDK
   const result = await generateText({
-    model: openai(model),
+    model: openai(model) as any,
     messages,
     temperature,
     maxTokens,
@@ -131,8 +131,8 @@ async function createConversation(input: {
   const tenantClient = await createTenantAwareServerClient(input.tenantId);
   const supabase = tenantClient.getClient();
 
-  const { data, error } = await supabase
-    .from('chatbot_conversations')
+  const { data, error } = await (supabase
+    .from('chatbot_conversations') as any)
     .insert({
       tenant_id: input.tenantId,
       user_id: input.userId,
@@ -159,8 +159,8 @@ async function getConversationHistory(
   const tenantClient = await createTenantAwareServerClient(tenantId);
   const supabase = tenantClient.getClient();
 
-  const { data, error } = await supabase
-    .from('chatbot_messages')
+  const { data, error } = await (supabase
+    .from('chatbot_messages') as any)
     .select('*')
     .eq('conversation_id', conversationId)
     .eq('tenant_id', tenantId)
@@ -194,8 +194,8 @@ async function saveMessage(input: {
   const tenantClient = await createTenantAwareServerClient(input.tenantId);
   const supabase = tenantClient.getClient();
 
-  const { data, error } = await supabase
-    .from('chatbot_messages')
+  const { data, error } = await (supabase
+    .from('chatbot_messages') as any)
     .insert({
       conversation_id: input.conversationId,
       tenant_id: input.tenantId,
@@ -233,8 +233,8 @@ export async function getConversation(
   const tenantClient = await createTenantAwareServerClient(tenantId);
   const supabase = tenantClient.getClient();
 
-  const { data, error } = await supabase
-    .from('chatbot_conversations')
+  const { data, error } = await (supabase
+    .from('chatbot_conversations') as any)
     .select('*')
     .eq('id', conversationId)
     .eq('tenant_id', tenantId)
@@ -269,8 +269,8 @@ export async function listConversations(
   const tenantClient = await createTenantAwareServerClient(tenantId);
   const supabase = tenantClient.getClient();
 
-  let query = supabase
-    .from('chatbot_conversations')
+  let query = (supabase
+    .from('chatbot_conversations') as any)
     .select('*')
     .eq('tenant_id', tenantId)
     .order('updated_at', { ascending: false })

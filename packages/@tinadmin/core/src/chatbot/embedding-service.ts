@@ -32,7 +32,7 @@ export async function generateEmbedding(
 
   try {
     const response = await openai.embeddings.create({
-      model,
+      model: model as any,
       input: text,
       dimensions: model === 'text-embedding-3-small' || model === 'text-embedding-3-large' 
         ? dimensions 
@@ -60,14 +60,14 @@ export async function generateEmbeddings(
 
   try {
     const response = await openai.embeddings.create({
-      model,
+      model: model as any,
       input: texts,
       dimensions: model === 'text-embedding-3-small' || model === 'text-embedding-3-large' 
         ? dimensions 
         : undefined,
     });
 
-    return response.data.map(item => item.embedding);
+    return response.data.map((item: any) => item.embedding);
   } catch (error) {
     console.error('Error generating embeddings:', error);
     throw new Error('Failed to generate embeddings');

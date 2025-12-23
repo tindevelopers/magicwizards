@@ -649,6 +649,195 @@ export interface Database {
         user_agent?: string | null;
         created_at?: string;
       };
+      chatbot_conversations: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          user_id: string | null;
+          title: string | null;
+          metadata: Record<string, any>;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          user_id?: string | null;
+          title?: string | null;
+          metadata?: Record<string, any>;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          tenant_id?: string;
+          user_id?: string | null;
+          title?: string | null;
+          metadata?: Record<string, any>;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      chatbot_messages: {
+        Row: {
+          id: string;
+          conversation_id: string;
+          tenant_id: string;
+          role: 'user' | 'assistant' | 'system';
+          content: string;
+          metadata: Record<string, any>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          conversation_id: string;
+          tenant_id: string;
+          role: 'user' | 'assistant' | 'system';
+          content: string;
+          metadata?: Record<string, any>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          conversation_id?: string;
+          tenant_id?: string;
+          role?: 'user' | 'assistant' | 'system';
+          content?: string;
+          metadata?: Record<string, any>;
+          created_at?: string;
+        };
+      };
+      chatbot_knowledge_bases: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          name: string;
+          description: string | null;
+          type: 'platform' | 'tenant' | 'domain';
+          domain: 'auth' | 'multi-tenancy' | 'billing' | 'permissions' | 'database' | 'shared' | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          name: string;
+          description?: string | null;
+          type: 'platform' | 'tenant' | 'domain';
+          domain?: 'auth' | 'multi-tenancy' | 'billing' | 'permissions' | 'database' | 'shared' | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          tenant_id?: string;
+          name?: string;
+          description?: string | null;
+          type?: 'platform' | 'tenant' | 'domain';
+          domain?: 'auth' | 'multi-tenancy' | 'billing' | 'permissions' | 'database' | 'shared' | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      chatbot_documents: {
+        Row: {
+          id: string;
+          knowledge_base_id: string;
+          tenant_id: string;
+          title: string;
+          content: string;
+          source: string;
+          source_type: 'file' | 'url' | 'manual' | 'code';
+          metadata: Record<string, any>;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          knowledge_base_id: string;
+          tenant_id: string;
+          title: string;
+          content: string;
+          source: string;
+          source_type: 'file' | 'url' | 'manual' | 'code';
+          metadata?: Record<string, any>;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          knowledge_base_id?: string;
+          tenant_id?: string;
+          title?: string;
+          content?: string;
+          source?: string;
+          source_type?: 'file' | 'url' | 'manual' | 'code';
+          metadata?: Record<string, any>;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      chatbot_document_chunks: {
+        Row: {
+          id: string;
+          document_id: string;
+          tenant_id: string;
+          content: string;
+          chunk_index: number;
+          metadata: Record<string, any>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          document_id: string;
+          tenant_id: string;
+          content: string;
+          chunk_index: number;
+          metadata?: Record<string, any>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          document_id?: string;
+          tenant_id?: string;
+          content?: string;
+          chunk_index?: number;
+          metadata?: Record<string, any>;
+          created_at?: string;
+        };
+      };
+      chatbot_embeddings: {
+        Row: {
+          id: string;
+          chunk_id: string;
+          document_id: string;
+          knowledge_base_id: string;
+          tenant_id: string;
+          embedding: string; // JSON string of vector
+          metadata: Record<string, any>;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          chunk_id: string;
+          document_id: string;
+          knowledge_base_id: string;
+          tenant_id: string;
+          embedding: string; // JSON string of vector
+          metadata?: Record<string, any>;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          chunk_id?: string;
+          document_id?: string;
+          knowledge_base_id?: string;
+          tenant_id?: string;
+          embedding?: string;
+          metadata?: Record<string, any>;
+          created_at?: string;
+        };
+      };
     };
   };
 }
