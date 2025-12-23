@@ -7,10 +7,9 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 });
 import { ApexOptions } from "apexcharts";
 import { useState } from "react";
-import {EllipsisVerticalIcon} from "@/icons";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { EllipsisVerticalIcon as MoreDotIcon } from "@heroicons/react/24/outline";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 export default function ChurnRateChart() {
   const churnSeries = [

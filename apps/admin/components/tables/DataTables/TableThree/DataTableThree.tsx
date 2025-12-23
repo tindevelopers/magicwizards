@@ -11,8 +11,8 @@ import {
   AngleDownIcon,
   AngleUpIcon,
   PencilIcon,
-  TrashBinIcon,
 } from "../../../../icons";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import Checkbox from "../../../form/input/Checkbox";
 import Badge from "../../../ui/badge/Badge";
 import Pagination from "./Pagination";

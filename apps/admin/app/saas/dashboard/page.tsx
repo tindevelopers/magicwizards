@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import TenantBreadcrumbs from "@/components/tenant/TenantBreadcrumbs";
 import { useTenant } from "@/core/multi-tenancy";
 import React from "react";

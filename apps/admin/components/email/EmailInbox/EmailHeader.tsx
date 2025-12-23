@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import Checkbox from "../../form/input/Checkbox";
 import { Dropdown } from "../../ui/dropdown/Dropdown";
 import { DropdownItem } from "../../ui/dropdown/DropdownItem";
-import {EllipsisVerticalIcon} from "@/icons";
-import { EllipsisVerticalIcon as MoreDotIcon } from "@heroicons/react/24/outline";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 interface EmailHeaderProps {
   isChecked: boolean;

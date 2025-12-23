@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { MoreDotIcon } from "../../icons";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import NewUserChart from "./NewUserChart";

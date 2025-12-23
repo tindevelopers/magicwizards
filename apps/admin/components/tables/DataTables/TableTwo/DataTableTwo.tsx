@@ -12,8 +12,8 @@ import {
   AngleDownIcon,
   AngleUpIcon,
   PencilIcon,
-  TrashBinIcon,
 } from "../../../../icons";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import PaginationWithButton from "./PaginationWithButton";
 
 const tableRowData = [

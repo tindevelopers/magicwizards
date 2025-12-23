@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "../../ui/table";
-import { TrashBinIcon } from "../../../icons";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import AvatarText from "../../ui/avatar/AvatarText";
 
 import Checkbox from "../../form/input/Checkbox";

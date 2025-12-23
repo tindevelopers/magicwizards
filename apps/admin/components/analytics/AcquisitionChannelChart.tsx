@@ -3,10 +3,9 @@
 import { ApexOptions } from "apexcharts";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import {EllipsisVerticalIcon} from "@/icons";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { EllipsisVerticalIcon as MoreDotIcon } from "@heroicons/react/24/outline";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,

@@ -31,9 +31,11 @@ function cleanupImports(filePath) {
   let modified = false;
   const changes = [];
   
-  // Check if file has both Heroicons TrashIcon and @/icons TrashIcon
+  // Check if file has both Heroicons icons and @/icons icons
   const hasHeroiconsTrash = /import.*TrashIcon.*from.*@heroicons/.test(content);
   const hasIconsTrash = /import.*TrashIcon.*from.*@\/icons/.test(content);
+  const hasHeroiconsEllipsis = /import.*EllipsisVerticalIcon.*from.*@heroicons/.test(content);
+  const hasIconsEllipsis = /import.*EllipsisVerticalIcon.*from.*@\/icons/.test(content);
   
   if (hasHeroiconsTrash && hasIconsTrash) {
     // Remove @/icons TrashIcon import
@@ -58,12 +60,41 @@ function cleanupImports(filePath) {
     }
   }
   
+  // Remove @/icons EllipsisVerticalIcon if Heroicons version exists
+  if (hasHeroiconsEllipsis && hasIconsEllipsis) {
+    const iconsImportRegex = /import\s+{([^}]*EllipsisVerticalIcon[^}]*)}\s+from\s+["']@\/icons["'];?\n?/g;
+    const match = content.match(iconsImportRegex);
+    if (match) {
+      match.forEach(m => {
+        const importList = m.match(/{([^}]+)}/)[1];
+        const icons = importList.split(',').map(i => i.trim()).filter(i => !i.includes('EllipsisVerticalIcon'));
+        
+        if (icons.length === 0) {
+          content = content.replace(m, '');
+          changes.push('Removed duplicate @/icons EllipsisVerticalIcon import');
+        } else {
+          content = content.replace(m, `import { ${icons.join(', ')} } from "@/icons";\n`);
+          changes.push('Removed EllipsisVerticalIcon from @/icons import');
+        }
+        modified = true;
+      });
+    }
+  }
+  
   // Also fix TrashIcon as TrashBinIcon - change to just TrashIcon
   if (/TrashIcon\s+as\s+TrashBinIcon/.test(content)) {
     content = content.replace(/TrashIcon\s+as\s+TrashBinIcon/g, 'TrashIcon');
     content = content.replace(/<TrashBinIcon/g, '<TrashIcon');
     modified = true;
     changes.push('Fixed TrashIcon alias');
+  }
+  
+  // Fix EllipsisVerticalIcon as MoreDotIcon - change to just EllipsisVerticalIcon
+  if (/EllipsisVerticalIcon\s+as\s+MoreDotIcon/.test(content)) {
+    content = content.replace(/EllipsisVerticalIcon\s+as\s+MoreDotIcon/g, 'EllipsisVerticalIcon');
+    content = content.replace(/<MoreDotIcon/g, '<EllipsisVerticalIcon');
+    modified = true;
+    changes.push('Fixed EllipsisVerticalIcon alias');
   }
   
   if (modified) {
