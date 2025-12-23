@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  experimental: {
+    serverComponentsExternalPackages: ['openai'],
+  },
   // TypeScript configuration - don't fail build on type errors during dev
   typescript: {
     ignoreBuildErrors: false,

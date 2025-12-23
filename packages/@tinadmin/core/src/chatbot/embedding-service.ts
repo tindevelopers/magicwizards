@@ -6,9 +6,20 @@
 
 import OpenAI from 'openai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+let openaiInstance: OpenAI | null = null;
+
+function getOpenAI(): OpenAI {
+  if (!openaiInstance) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY environment variable is required');
+    }
+    openaiInstance = new OpenAI({
+      apiKey,
+    });
+  }
+  return openaiInstance;
+}
 
 export interface EmbeddingOptions {
   model?: 'text-embedding-3-small' | 'text-embedding-3-large' | 'text-embedding-ada-002';
@@ -31,6 +42,7 @@ export async function generateEmbedding(
   } = options;
 
   try {
+    const openai = getOpenAI();
     const response = await openai.embeddings.create({
       model: model as any,
       input: text,
@@ -59,6 +71,7 @@ export async function generateEmbeddings(
   } = options;
 
   try {
+    const openai = getOpenAI();
     const response = await openai.embeddings.create({
       model: model as any,
       input: texts,

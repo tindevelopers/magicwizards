@@ -8,6 +8,9 @@ import {
   createDocument,
 } from "@/core/chatbot";
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function OPTIONS() {
   return new NextResponse(null, {
     status: 200,

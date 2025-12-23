@@ -40,7 +40,7 @@ export async function queryCRMData(query: CRMQuery): Promise<unknown[]> {
   // Apply filters
   if (query.filters) {
     for (const [key, value] of Object.entries(query.filters)) {
-      dbQuery = dbQuery.eq(key, value);
+      dbQuery = dbQuery.eq(key, value as any);
     }
   }
 
