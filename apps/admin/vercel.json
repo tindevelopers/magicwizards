@@ -5,6 +5,7 @@
   "outputDirectory": ".next",
   "installCommand": "cd ../.. && pnpm install",
   "framework": "nextjs",
-  "regions": ["iad1"]
+  "regions": ["iad1"],
+  "rootDirectory": "apps/admin"
 }
 
