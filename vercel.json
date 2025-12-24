@@ -1,9 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
-  "installCommand": "pnpm install",
-  "buildCommand": "pnpm turbo run build --filter=@tinadmin/admin",
-  "outputDirectory": "apps/admin/.next",
+  "installCommand": "cd ../.. && pnpm install",
+  "buildCommand": "cd ../.. && pnpm install && pnpm turbo run build --filter=@tinadmin/admin",
+  "outputDirectory": ".next",
   "framework": "nextjs",
   "regions": ["iad1"],
   "rootDirectory": "apps/admin"
