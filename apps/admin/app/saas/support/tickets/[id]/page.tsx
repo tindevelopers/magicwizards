@@ -7,9 +7,10 @@ import { notFound } from "next/navigation";
 export default async function TicketDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const ticket = await getSupportTicket(params.id);
+  const { id } = await params;
+  const ticket = await getSupportTicket(id);
   
   if (!ticket) {
     notFound();

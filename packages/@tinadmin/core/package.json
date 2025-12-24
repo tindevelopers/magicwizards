@@ -77,7 +77,8 @@
     "stripe": "^20.0.0",
     "ai": "^3.0.0",
     "@ai-sdk/openai": "^1.0.0",
-    "openai": "^4.0.0"
+    "openai": "^4.0.0",
+    "resend": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^20",
