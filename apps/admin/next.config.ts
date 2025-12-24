@@ -60,28 +60,11 @@ const nextConfig: NextConfig = {
       fileLoaderRule.exclude = /\.svg$/i;
     }
     
-    // Add SVGR loader for SVG files
+    // Add SVGR loader for SVG files - simple configuration
     config.module.rules.push({
       test: /\.svg$/i,
       issuer: fileLoaderRule?.issuer,
-      use: [
-        {
-          loader: "@svgr/webpack",
-          options: {
-            typescript: true,
-            ref: true,
-            exportType: 'default',
-            svgoConfig: {
-              plugins: [
-                {
-                  name: "removeViewBox",
-                  active: false,
-                },
-              ],
-            },
-          },
-        },
-      ],
+      use: ['@svgr/webpack'],
     });
     
     // Optimize bundle size with aliases for better tree-shaking
