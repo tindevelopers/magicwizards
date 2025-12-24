@@ -1,7 +1,7 @@
 "use server";
 
 import { createClient } from "@/core/database/server";
-import { createTenantAwareClient } from "@/core/database/tenant-client";
+import { createTenantAwareClient, getSupabaseClient } from "@/core/database/tenant-client";
 import type { SupportTicketThread, CreateThreadInput } from "./types";
 
 /**
@@ -14,9 +14,10 @@ export async function getSupportTicketThreads(
   },
   tenantId?: string
 ): Promise<SupportTicketThread[]> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   let query = supabase
     .from("support_ticket_threads")
@@ -48,9 +49,10 @@ export async function getSupportTicketThreadById(
   threadId: string,
   tenantId?: string
 ): Promise<SupportTicketThread | null> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data, error } = await supabase
     .from("support_ticket_threads")
@@ -79,9 +81,10 @@ export async function createSupportTicketThread(
   input: CreateThreadInput,
   tenantId?: string
 ): Promise<SupportTicketThread> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -131,9 +134,10 @@ export async function updateSupportTicketThread(
   input: { message?: string; is_internal?: boolean },
   tenantId?: string
 ): Promise<SupportTicketThread> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const updateData: any = {};
   if (input.message !== undefined) updateData.message = input.message;
@@ -163,9 +167,10 @@ export async function deleteSupportTicketThread(
   threadId: string,
   tenantId?: string
 ): Promise<void> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { error } = await supabase
     .from("support_ticket_threads")

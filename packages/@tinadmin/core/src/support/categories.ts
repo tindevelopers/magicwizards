@@ -1,16 +1,17 @@
 "use server";
 
 import { createClient } from "@/core/database/server";
-import { createTenantAwareClient } from "@/core/database/tenant-client";
+import { createTenantAwareClient, getSupabaseClient } from "@/core/database/tenant-client";
 import type { SupportCategory, CreateCategoryInput } from "./types";
 
 /**
  * Get all support categories for the current tenant
  */
 export async function getSupportCategories(tenantId?: string): Promise<SupportCategory[]> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data, error } = await supabase
     .from("support_categories")
@@ -32,9 +33,10 @@ export async function getSupportCategoryById(
   categoryId: string,
   tenantId?: string
 ): Promise<SupportCategory | null> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data, error } = await supabase
     .from("support_categories")
@@ -59,9 +61,10 @@ export async function createSupportCategory(
   input: CreateCategoryInput,
   tenantId?: string
 ): Promise<SupportCategory> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -109,9 +112,10 @@ export async function updateSupportCategory(
   input: Partial<CreateCategoryInput>,
   tenantId?: string
 ): Promise<SupportCategory> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const updateData: any = {};
   if (input.name !== undefined) updateData.name = input.name;

@@ -1,7 +1,9 @@
 "use server";
 
 import { createClient } from "@/core/database/server";
-import { createTenantAwareClient } from "@/core/database/tenant-client";
+import { createTenantAwareClient, getSupabaseClient, type TenantAwareClient } from "@/core/database/tenant-client";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/core/database";
 import type { SupportTicketAttachment } from "./types";
 
 /**
@@ -12,9 +14,10 @@ export async function getSupportTicketAttachments(
   threadId?: string,
   tenantId?: string
 ): Promise<SupportTicketAttachment[]> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   let query = supabase
     .from("support_ticket_attachments")
@@ -45,9 +48,10 @@ export async function getSupportTicketAttachmentById(
   attachmentId: string,
   tenantId?: string
 ): Promise<SupportTicketAttachment | null> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data, error } = await supabase
     .from("support_ticket_attachments")
@@ -82,9 +86,10 @@ export async function createSupportTicketAttachment(
   },
   tenantId?: string
 ): Promise<SupportTicketAttachment> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -136,9 +141,10 @@ export async function deleteSupportTicketAttachment(
   attachmentId: string,
   tenantId?: string
 ): Promise<void> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   // Get attachment info to delete file from storage
   const { data: attachment } = await supabase
@@ -179,9 +185,10 @@ export async function getAttachmentDownloadUrl(
   expiresIn: number = 3600,
   tenantId?: string
 ): Promise<string | null> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data: attachment } = await supabase
     .from("support_ticket_attachments")

@@ -1,7 +1,8 @@
 "use server";
 
 import { createClient } from "@/core/database/server";
-import { createTenantAwareClient } from "@/core/database/tenant-client";
+import { createTenantAwareClient, getSupabaseClient } from "@/core/database/tenant-client";
+import type { Database } from "@/core/database";
 import type {
   SupportTicket,
   CreateTicketInput,
@@ -23,9 +24,10 @@ export async function getSupportTickets(
   },
   tenantId?: string
 ): Promise<SupportTicket[]> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   let query = supabase
     .from("support_tickets")
@@ -69,9 +71,10 @@ export async function getSupportTicketById(
   ticketId: string,
   tenantId?: string
 ): Promise<SupportTicket | null> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data, error } = await supabase
     .from("support_tickets")
@@ -101,9 +104,10 @@ export async function getSupportTicketByNumber(
   ticketNumber: string,
   tenantId?: string
 ): Promise<SupportTicket | null> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data, error } = await supabase
     .from("support_tickets")
@@ -133,9 +137,10 @@ export async function createSupportTicket(
   input: CreateTicketInput,
   tenantId?: string
 ): Promise<SupportTicket> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -191,9 +196,10 @@ export async function updateSupportTicket(
   input: UpdateTicketInput,
   tenantId?: string
 ): Promise<SupportTicket> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const updateData: any = {};
   if (input.subject !== undefined) updateData.subject = input.subject;
@@ -229,9 +235,10 @@ export async function deleteSupportTicket(
   ticketId: string,
   tenantId?: string
 ): Promise<void> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { error } = await supabase
     .from("support_tickets")
@@ -257,9 +264,10 @@ export async function getSupportTicketStats(
   pending: number; // open + in_progress
   solved: number; // resolved + closed
 }> {
-  const supabase = tenantId 
+  const client = tenantId 
     ? await createTenantAwareClient(tenantId)
     : await createClient();
+  const supabase = getSupabaseClient(client);
   
   const { data, error } = await supabase
     .from("support_tickets")
@@ -271,10 +279,10 @@ export async function getSupportTicketStats(
   
   const stats = {
     total: data?.length || 0,
-    open: data?.filter((t) => t.status === "open").length || 0,
-    in_progress: data?.filter((t) => t.status === "in_progress").length || 0,
-    resolved: data?.filter((t) => t.status === "resolved").length || 0,
-    closed: data?.filter((t) => t.status === "closed").length || 0,
+    open: data?.filter((t: { status: string }) => t.status === "open").length || 0,
+    in_progress: data?.filter((t: { status: string }) => t.status === "in_progress").length || 0,
+    resolved: data?.filter((t: { status: string }) => t.status === "resolved").length || 0,
+    closed: data?.filter((t: { status: string }) => t.status === "closed").length || 0,
     pending: 0,
     solved: 0,
   };

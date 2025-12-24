@@ -34,17 +34,20 @@ export class TenantAwareClient {
   }
 
   /**
-   * Get tenant-scoped query builder
+   * Get tenant-scoped query builder (synchronous, like SupabaseClient)
+   * Note: Use getSupabaseClient() for proper type inference in support files
    */
-  async from<T extends TableName>(
-    table: T,
-    options?: { tenantId?: string | null; includePlatformAdmins?: boolean }
-  ) {
-    const effectiveTenantId = options?.tenantId ?? this.tenantId;
-    return buildTenantQuery(this.client, table, {
-      tenantId: effectiveTenantId,
-      includePlatformAdmins: options?.includePlatformAdmins,
-    });
+  from<T extends TableName>(table: T): any {
+    // Return a query builder that will filter by tenant_id when executed
+    // This matches the SupabaseClient interface
+    let query = this.client.from(table);
+    
+    // Apply tenant filter if tenantId is set
+    if (this.tenantId) {
+      query = query.eq("tenant_id", this.tenantId);
+    }
+    
+    return query;
   }
 
   /**
@@ -67,6 +70,20 @@ export class TenantAwareClient {
    */
   getClient(): SupabaseClient<Database> {
     return this.client;
+  }
+
+  /**
+   * Access auth methods (delegates to underlying client)
+   */
+  get auth(): any {
+    return this.client.auth;
+  }
+
+  /**
+   * Access storage methods (delegates to underlying client)
+   */
+  get storage(): any {
+    return this.client.storage;
   }
 
   /**
@@ -114,4 +131,17 @@ export function createTenantAwareAdminClient(
 ): TenantAwareClient {
   const client = createAdminClient();
   return new TenantAwareClient(client, tenantId);
+}
+
+/**
+ * Helper to get SupabaseClient from either TenantAwareClient or SupabaseClient
+ * This resolves TypeScript union type issues
+ */
+export function getSupabaseClient(
+  client: TenantAwareClient | SupabaseClient<Database>
+): SupabaseClient<Database> {
+  if (client instanceof TenantAwareClient) {
+    return client.getClient();
+  }
+  return client;
 }
