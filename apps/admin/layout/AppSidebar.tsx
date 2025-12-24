@@ -56,6 +56,15 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    icon: <CallIcon />,
+    name: "Support",
+    new: true,
+    subItems: [
+      { name: "Support List", path: "/support-tickets" },
+      { name: "Support Reply", path: "/support-ticket-reply" },
+    ],
+  },
+  {
     name: "AI Assistant",
     icon: <AiIcon />,
     new: true,
@@ -380,15 +389,6 @@ const supportItems: NavItem[] = [
     icon: <ChatIcon />,
     name: "Chat",
     path: "/chat",
-  },
-  {
-    icon: <CallIcon />,
-    name: "Support",
-    new: true,
-    subItems: [
-      { name: "Support List", path: "/support-tickets" },
-      { name: "Support Reply", path: "/support-ticket-reply" },
-    ],
   },
   {
     icon: <MailIcon />,
