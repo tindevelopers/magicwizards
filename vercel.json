@@ -2,10 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "installCommand": "pnpm install",
-  "buildCommand": "pnpm build",
-  "outputDirectory": ".next",
+  "buildCommand": "cd apps/admin && pnpm build",
+  "outputDirectory": "apps/admin/.next",
   "framework": "nextjs",
-  "regions": ["iad1"],
-  "rootDirectory": "apps/admin"
+  "regions": ["iad1"]
 }
 
