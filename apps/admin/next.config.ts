@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Removed 'standalone' output for Vercel compatibility
+  // Server external packages (moved from experimental in Next.js 16)
+  serverExternalPackages: ['openai'],
+  
   experimental: {
-    serverComponentsExternalPackages: ['openai'],
     optimizePackageImports: [
       "@tinadmin/core",
       "@tinadmin/ui-admin",
