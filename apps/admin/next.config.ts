@@ -51,12 +51,26 @@ const nextConfig: NextConfig = {
   // Webpack configuration
   webpack(config, { isServer }) {
     // Handle SVG imports with SVGR - convert SVGs to React components
+    // Find existing rule that handles SVG files
+    const fileLoaderRule = config.module.rules.find((rule: any) =>
+      rule.test?.test?.('.svg')
+    );
+    
+    if (fileLoaderRule) {
+      fileLoaderRule.exclude = /\.svg$/i;
+    }
+    
+    // Add SVGR loader for SVG files
     config.module.rules.push({
-      test: /\.svg$/,
+      test: /\.svg$/i,
+      issuer: fileLoaderRule?.issuer,
       use: [
         {
           loader: "@svgr/webpack",
           options: {
+            typescript: true,
+            ref: true,
+            exportType: 'default',
             svgoConfig: {
               plugins: [
                 {
