@@ -30,7 +30,7 @@ export async function notifyTicketCreated(ticket: SupportTicket) {
       subject: `Support Ticket Created: ${ticket.ticket_number}`,
       html: `
         <h2>Your support ticket has been created</h2>
-        <p>Hello ${customer.full_name || "there"},</p>
+        <p>Hello ${(customer as { full_name?: string }).full_name || "there"},</p>
         <p>Your support ticket <strong>${ticket.ticket_number}</strong> has been created successfully.</p>
         <p><strong>Subject:</strong> ${ticket.subject}</p>
         <p><strong>Status:</strong> ${ticket.status}</p>
@@ -128,7 +128,7 @@ export async function notifyTicketUpdated(
       subject: `Support Ticket Updated: ${ticket.ticket_number}`,
       html: `
         <h2>Your support ticket has been updated</h2>
-        <p>Hello ${customer.full_name || "there"},</p>
+        <p>Hello ${(customer as { full_name?: string }).full_name || "there"},</p>
         <p>Your support ticket <strong>${ticket.ticket_number}</strong> has been updated:</p>
         <ul>
           ${changeMessages.map((msg) => `<li>${msg}</li>`).join("")}
@@ -176,7 +176,7 @@ export async function notifyTicketReply(
           subject: `New Reply on Support Ticket: ${ticket.ticket_number}`,
           html: `
             <h2>New reply on your support ticket</h2>
-            <p>Hello ${customer.full_name || "there"},</p>
+            <p>Hello ${(customer as { full_name?: string }).full_name || "there"},</p>
             <p>You have received a new reply on support ticket <strong>${ticket.ticket_number}</strong>.</p>
             <p><strong>Subject:</strong> ${ticket.subject}</p>
             <div style="background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
