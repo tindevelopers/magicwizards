@@ -5,109 +5,116 @@ Vercel builds are not automatically triggered when pushing to the `develop` bran
 
 ## Root Cause Analysis
 
-### Issue 1: Missing Deployment Job in GitHub Actions
-- The `ci-cd.yml` workflow was only building the application but not deploying to Vercel
-- No deployment step existed for the `develop` branch
+Vercel should deploy automatically via **GitHub Webhooks** when properly connected. If deployments aren't happening, the issue is likely:
 
-### Issue 2: Vercel Webhook Configuration
-Vercel can deploy automatically via two methods:
-1. **GitHub Webhooks** (automatic when Vercel is connected to GitHub)
-2. **GitHub Actions** (manual deployment via workflow)
+1. **Vercel project not connected to GitHub repository**
+   - Repository needs to be imported/connected in Vercel
+   - Git integration must be properly configured
 
-If webhooks aren't working, it's likely because:
-- Vercel project is not properly connected to GitHub repository
-- Vercel project settings don't have `develop` branch configured for automatic deployments
-- Webhook permissions or configuration issues
+2. **Branch configuration issues**
+   - `develop` branch may not be configured for automatic deployments
+   - Preview deployments may be disabled for non-production branches
 
-## Solution Applied
+3. **Webhook configuration problems**
+   - GitHub webhooks may not be properly set up
+   - Vercel may not have permission to receive webhooks from GitHub
 
-### ✅ Added Deployment Job to CI/CD Workflow
-Added a `deploy` job to `.github/workflows/ci-cd.yml` that:
-- Triggers on push to `develop` or `main` branches
-- Uses Vercel CLI to deploy
-- Deploys to production for `main` branch
-- Deploys to preview for `develop` branch
-- Requires GitHub secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+## Solution: Configure Vercel Webhook-Based Deployment
 
-## Additional Steps Required
+Vercel should handle deployments automatically via GitHub webhooks - no CLI or GitHub Actions deployment needed.
 
-### 1. Verify Vercel Project Connection
+### Step 1: Connect Repository to Vercel
+
 1. Go to [Vercel Dashboard](https://vercel.com)
-2. Select your project
-3. Go to **Settings → Git**
-4. Verify the repository is connected
-5. Check that **Production Branch** is set to `main`
-6. Ensure **Automatic deployments** are enabled
+2. Click **Add New** → **Project**
+3. Click **Import Git Repository**
+4. Select your GitHub repository: `tindevelopers/tinadmin-saas-base-turborepo`
+5. Configure project settings:
+   - **Framework Preset**: Next.js
+   - **Root Directory**: `apps/admin` (or leave as root if using monorepo config)
+   - **Build Command**: `pnpm turbo run build --filter=@tinadmin/admin` (or check `vercel.json`)
+   - **Output Directory**: `apps/admin/.next` (or check `vercel.json`)
+6. Click **Deploy**
 
-### 2. Configure Branch Deployments
-1. In Vercel project settings, go to **Git → Production Branch**
-2. Set production branch to `main`
-3. Enable **Preview Deployments** for all branches
-4. Ensure `develop` branch is included in preview deployments
+### Step 2: Configure Branch Settings
 
-### 3. Verify GitHub Secrets
-Ensure these secrets are set in GitHub repository:
-- `VERCEL_TOKEN` - Get from https://vercel.com/account/tokens
-- `VERCEL_ORG_ID` - Get from https://vercel.com/account/settings
-- `VERCEL_PROJECT_ID` - Get from project Settings → General
+1. In Vercel project, go to **Settings → Git**
+2. Set **Production Branch** to `main`
+3. Enable **Automatic deployments from Git**
+4. Configure **Preview Deployments**:
+   - Enable preview deployments for all branches
+   - Ensure `develop` branch is included
+   - Set preview deployment settings as needed
 
-### 4. Test Deployment
+### Step 3: Verify Webhook Configuration
+
+1. In Vercel project → **Settings → Git**
+2. Check that **Connected Git Repository** shows your GitHub repo
+3. Verify webhook status (should show as active)
+4. If webhook is missing or inactive:
+   - Click **Disconnect** and reconnect the repository
+   - Vercel will automatically set up the webhook
+
+### Step 4: Test Deployment
+
 After configuration, test with:
 ```bash
-git commit --allow-empty -m "test: Trigger Vercel deployment"
+git commit --allow-empty -m "test: Trigger Vercel webhook deployment"
 git push origin develop
 ```
 
 Then check:
-- GitHub Actions tab for workflow run
-- Vercel Dashboard for deployment status
+- **Vercel Dashboard** → **Deployments** tab
+- Should see a new deployment triggered automatically
+- Check build logs for any errors
 
-## Expected Behavior After Fix
+## Expected Behavior
 
 ### For `develop` branch:
-- Push triggers GitHub Actions workflow
-- Tests run → Build runs → Deploy to Vercel (preview)
-- Vercel preview deployment URL is generated
+- Push to `develop` → GitHub webhook triggers Vercel
+- Vercel automatically builds and deploys (preview)
+- Preview deployment URL is generated
+- No GitHub Actions deployment needed
 
 ### For `main` branch:
-- Push triggers GitHub Actions workflow
-- Tests run → Build runs → Deploy to Vercel (production)
-- Vercel production deployment is created
+- Push to `main` → GitHub webhook triggers Vercel
+- Vercel automatically builds and deploys (production)
+- Production deployment is created
 
 ## Troubleshooting
 
-### If deployment still fails:
+### If deployments still don't trigger:
 
-1. **Check GitHub Actions logs:**
-   - Go to repository → Actions tab
-   - Check for error messages in the deploy job
+1. **Check Vercel project connection:**
+   - Go to Vercel Dashboard → Project → Settings → Git
+   - Verify repository is connected
+   - Check webhook status
 
-2. **Verify Vercel credentials:**
-   ```bash
-   # Test Vercel CLI locally
-   vercel login
-   vercel projects ls
-   ```
+2. **Verify GitHub webhook:**
+   - Go to GitHub repository → Settings → Webhooks
+   - Look for Vercel webhook (should be automatically created)
+   - Check recent deliveries for errors
 
-3. **Check Vercel project settings:**
-   - Ensure project exists
-   - Verify project ID matches GitHub secret
-   - Check organization/team ID is correct
+3. **Check Vercel build settings:**
+   - Verify `vercel.json` configuration is correct
+   - Check build command and output directory
+   - Ensure framework is set to Next.js
 
-4. **Review Vercel build logs:**
+4. **Review Vercel deployment logs:**
    - Go to Vercel Dashboard → Deployments
-   - Check build logs for errors
+   - Click on a deployment to see build logs
+   - Check for configuration or build errors
 
-## Alternative: Enable Vercel Webhooks
+5. **Reconnect repository if needed:**
+   - In Vercel → Settings → Git
+   - Click **Disconnect**
+   - Then reconnect the repository
+   - This will refresh webhook configuration
 
-If you prefer automatic deployments via webhooks (without GitHub Actions):
+## Notes
 
-1. Go to Vercel project → Settings → Git
-2. Ensure repository is connected
-3. Enable "Automatic deployments from Git"
-4. Configure branch settings:
-   - Production: `main`
-   - Preview: All branches including `develop`
-
-This will trigger Vercel builds automatically on every push without needing GitHub Actions.
+- **GitHub Actions** (`ci-cd.yml`) handles testing and building only
+- **Vercel** handles deployment automatically via webhooks
+- No CLI deployment needed - Vercel's native integration handles everything
+- Webhook-based deployment is faster and more reliable than CLI-based
 
