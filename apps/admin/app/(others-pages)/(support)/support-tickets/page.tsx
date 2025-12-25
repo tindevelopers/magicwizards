@@ -4,6 +4,9 @@ import SupportMetrics from "@/components/support/SupportMetrics";
 import { Metadata } from "next";
 import React from "react";
 
+// Force dynamic rendering since this page uses cookies and server-side tenant resolution
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Next.js Support List | TailAdmin - Next.js Admin Dashboard Template",
   description:
