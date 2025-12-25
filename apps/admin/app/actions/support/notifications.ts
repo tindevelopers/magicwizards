@@ -56,8 +56,8 @@ export async function notifyTicketCreated(ticket: SupportTicket) {
         .eq("id", ticket.assigned_to)
         .single();
       
-      const agentEmail = (agent as { email?: string })?.email;
-      const agentName = (agent as { full_name?: string })?.full_name;
+      const agentEmail = agent ? (agent as { email?: string })?.email : undefined;
+      const agentName = agent ? (agent as { full_name?: string })?.full_name : undefined;
       if (agentEmail) {
         await sendEmail({
           to: agentEmail,
@@ -119,7 +119,8 @@ export async function notifyTicketUpdated(
         .select("full_name")
         .eq("id", changes.assigned_to)
         .single();
-      changeMessages.push(`Assigned to: ${(agent as { full_name?: string })?.full_name || "Agent"}`);
+      const agentName = agent ? (agent as { full_name?: string })?.full_name : undefined;
+      changeMessages.push(`Assigned to: ${agentName || "Agent"}`);
     }
     
     if (changeMessages.length === 0) return;

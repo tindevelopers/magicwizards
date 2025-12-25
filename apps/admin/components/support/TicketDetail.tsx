@@ -30,6 +30,7 @@ interface TicketDetailProps {
   ticket: SupportTicket;
   threads: SupportTicketThread[];
   attachments: SupportTicketAttachment[];
+  isCustomerView?: boolean;
 }
 
 export default function TicketDetail({ ticket, threads: initialThreads, attachments: initialAttachments, isCustomerView = false }: TicketDetailProps) {

@@ -78,6 +78,21 @@ const nextConfig: NextConfig = {
       '@tinadmin/config': path.resolve(__dirname, '../../packages/@tinadmin/config/src'),
     };
     
+    // Ignore optional dependencies that are loaded dynamically
+    // These are loaded with require() at runtime if available
+    config.plugins = config.plugins || [];
+    const webpack = require('webpack');
+    config.plugins.push(
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^@aws-sdk\/client-ses$/,
+        contextRegExp: /packages\/@tinadmin\/core\/src\/email\/providers/,
+      }),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^nodemailer$/,
+        contextRegExp: /packages\/@tinadmin\/core\/src\/email\/providers/,
+      })
+    );
+    
     // Optimize bundle size
     if (!isServer) {
       config.resolve.fallback = {

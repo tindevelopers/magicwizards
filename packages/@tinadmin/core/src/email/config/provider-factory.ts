@@ -7,10 +7,9 @@
 import { EmailProvider, ProviderConfig } from '../email-interface';
 import { validateProviderConfig } from './provider-config';
 
-// Import providers (will be implemented next)
+// Import providers dynamically to avoid bundling optional dependencies
+// Resend is always available, others are optional
 import { ResendProvider } from '../providers/resend-provider';
-import { AmazonSESProvider } from '../providers/amazon-ses-provider';
-import { InbucketProvider } from '../providers/inbucket-provider';
 
 /**
  * Create an email provider instance
@@ -35,6 +34,8 @@ export async function createProvider(config: ProviderConfig): Promise<EmailProvi
       throw new Error('SendGrid provider not yet implemented. Use Resend or Amazon SES.');
       
     case 'amazon_ses':
+      // Dynamic import to avoid bundling @aws-sdk/client-ses if not needed
+      const { AmazonSESProvider } = await import('../providers/amazon-ses-provider');
       provider = new AmazonSESProvider();
       break;
       
@@ -55,6 +56,8 @@ export async function createProvider(config: ProviderConfig): Promise<EmailProvi
       throw new Error('Mailgun provider not yet implemented. Use Resend or Amazon SES.');
       
     case 'inbucket':
+      // Dynamic import to avoid bundling nodemailer if not needed
+      const { InbucketProvider } = await import('../providers/inbucket-provider');
       provider = new InbucketProvider();
       break;
       
