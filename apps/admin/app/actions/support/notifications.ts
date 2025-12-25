@@ -63,7 +63,7 @@ export async function notifyTicketCreated(ticket: SupportTicket) {
           subject: `New Support Ticket Assigned: ${ticket.ticket_number}`,
           html: `
             <h2>New support ticket assigned to you</h2>
-            <p>Hello ${agent.full_name || "there"},</p>
+            <p>Hello ${(agent as { full_name?: string }).full_name || "there"},</p>
             <p>A new support ticket <strong>${ticket.ticket_number}</strong> has been assigned to you.</p>
             <p><strong>Subject:</strong> ${ticket.subject}</p>
             <p><strong>Customer:</strong> ${(customer as { full_name?: string; email: string }).full_name || (customer as { email: string }).email}</p>
