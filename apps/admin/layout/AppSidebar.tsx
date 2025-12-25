@@ -62,6 +62,10 @@ const navItems: NavItem[] = [
     subItems: [
       { name: "Support List", path: "/support-tickets" },
       { name: "Support Reply", path: "/support-ticket-reply" },
+      { name: "Tickets", path: "/saas/support/tickets" },
+      { name: "Categories", path: "/saas/support/categories" },
+      { name: "Knowledge Base", path: "/saas/support/knowledge-base" },
+      { name: "Settings", path: "/saas/support/settings" },
     ],
   },
   {
@@ -205,15 +209,6 @@ const navItems: NavItem[] = [
           { name: "IP Restrictions", path: "/saas/security/ip-restrictions" },
           { name: "Audit Logs", path: "/saas/security/audit-logs" },
           { name: "Compliance", path: "/saas/security/compliance" },
-        ],
-      },
-      {
-        name: "Support",
-        subItems: [
-          { name: "Tickets", path: "/saas/support/tickets" },
-          { name: "Categories", path: "/saas/support/categories" },
-          { name: "Knowledge Base", path: "/saas/support/knowledge-base" },
-          { name: "Settings", path: "/saas/support/settings" },
         ],
       },
       {

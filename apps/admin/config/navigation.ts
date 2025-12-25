@@ -196,15 +196,6 @@ export const mainNavItems: NavItem[] = [
         ],
       },
       {
-        name: "Support",
-        subItems: [
-          { name: "Tickets", path: "/saas/support/tickets" },
-          { name: "Categories", path: "/saas/support/categories" },
-          { name: "Knowledge Base", path: "/saas/support/knowledge-base" },
-          { name: "Settings", path: "/saas/support/settings" },
-        ],
-      },
-      {
         name: "Feature Flags",
         subItems: [
           { name: "Flags", path: "/saas/feature-flags/flags" },
@@ -335,6 +326,10 @@ export const supportNavItems: NavItem[] = [
     subItems: [
       { name: "Support List", path: "/support-tickets" },
       { name: "Support Reply", path: "/support-ticket-reply" },
+      { name: "Tickets", path: "/saas/support/tickets" },
+      { name: "Categories", path: "/saas/support/categories" },
+      { name: "Knowledge Base", path: "/saas/support/knowledge-base" },
+      { name: "Settings", path: "/saas/support/settings" },
     ],
   },
   {
