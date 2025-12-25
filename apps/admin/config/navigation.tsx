@@ -321,6 +321,7 @@ export const supportNavItems: NavItem[] = [
     path: "/chat",
   },
   {
+    // Support menu includes all support-related navigation items
     icon: <CallIcon />,
     name: "Support",
     new: true,
