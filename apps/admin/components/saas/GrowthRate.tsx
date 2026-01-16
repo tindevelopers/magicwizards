@@ -1,11 +1,11 @@
 "use client";
-import { MoreDotIcon } from "@/icons";
 import { ApexOptions } from "apexcharts";
 
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 // Dynamically import the ReactApexChart component
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
@@ -86,7 +86,7 @@ export default function GrowthChart() {
         </div>
         <div className="relative inline-block">
           <button className="dropdown-toggle" onClick={toggleDropdown}>
-            <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
+            <EllipsisVerticalIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
           </button>
           <Dropdown
             isOpen={isOpen}

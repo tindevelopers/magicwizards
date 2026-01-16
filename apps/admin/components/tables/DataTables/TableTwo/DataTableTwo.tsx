@@ -12,8 +12,8 @@ import {
   AngleDownIcon,
   AngleUpIcon,
   PencilIcon,
-  TrashBinIcon,
 } from "../../../../icons";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import PaginationWithButton from "./PaginationWithButton";
 
 const tableRowData = [
@@ -308,7 +308,7 @@ export default function DataTableTwo() {
                   <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap ">
                     <div className="flex items-center w-full gap-2">
                       <button className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
-                        <TrashBinIcon />
+                        <TrashIcon />
                       </button>
                       <button className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90">
                         <PencilIcon />

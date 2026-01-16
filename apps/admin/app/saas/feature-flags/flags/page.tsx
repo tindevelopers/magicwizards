@@ -6,8 +6,7 @@ import { useModal } from "@/hooks/useModal";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import Switch from "@/components/form/switch/Switch";
-import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
-import { TrashBinIcon as TrashIcon } from "@/icons";
+import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
 interface FeatureFlag {

@@ -1,6 +1,8 @@
-import React from "react";
+import { getTicketStats } from "@/app/actions/support/tickets";
 
-export default function SupportMetrics() {
+export default async function SupportMetrics() {
+  const stats = await getTicketStats();
+
   return (
     <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
       <article className="flex gap-5 rounded-xl border border-gray-200 bg-white p-4 shadow-xs dark:border-gray-800 dark:bg-white/[0.03]">
@@ -23,7 +25,7 @@ export default function SupportMetrics() {
         </div>
         <div className="flex-1">
           <h3 className="text-title-xs mb-1 font-semibold text-gray-800 dark:text-white/90">
-            5,347
+            {stats.total.toLocaleString()}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Total tickets
@@ -50,7 +52,7 @@ export default function SupportMetrics() {
         </div>
         <div className="flex-1">
           <h3 className="text-title-xs mb-1 font-semibold text-gray-800 dark:text-white/90">
-            1,230
+            {stats.pending.toLocaleString()}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Pending tickets
@@ -77,7 +79,7 @@ export default function SupportMetrics() {
         </div>
         <div className="flex-1">
           <h3 className="text-title-xs mb-1 font-semibold text-gray-800 dark:text-white/90">
-            4,117
+            {stats.solved.toLocaleString()}
           </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400">
             Solved tickets

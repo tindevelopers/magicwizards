@@ -55,6 +55,10 @@ export const mainNavItems: NavItem[] = [
     new: true,
     subItems: [
       {
+        name: "Chatbot",
+        path: "/saas/chatbot",
+      },
+      {
         name: "Text Generator",
         path: "/text-generator",
       },
@@ -193,15 +197,6 @@ export const mainNavItems: NavItem[] = [
         ],
       },
       {
-        name: "Support",
-        subItems: [
-          { name: "Tickets", path: "/saas/support/tickets" },
-          { name: "Categories", path: "/saas/support/categories" },
-          { name: "Knowledge Base", path: "/saas/support/knowledge-base" },
-          { name: "Settings", path: "/saas/support/settings" },
-        ],
-      },
-      {
         name: "Feature Flags",
         subItems: [
           { name: "Flags", path: "/saas/feature-flags/flags" },
@@ -326,12 +321,18 @@ export const supportNavItems: NavItem[] = [
     path: "/chat",
   },
   {
+    // Support menu includes all support-related navigation items
+    // Automatically deployed via Vercel webhooks on push to develop/main
     icon: <CallIcon />,
     name: "Support",
     new: true,
     subItems: [
       { name: "Support List", path: "/support-tickets" },
       { name: "Support Reply", path: "/support-ticket-reply" },
+      { name: "Tickets", path: "/saas/support/tickets" },
+      { name: "Categories", path: "/saas/support/categories" },
+      { name: "Knowledge Base", path: "/saas/support/knowledge-base" },
+      { name: "Settings", path: "/saas/support/settings" },
     ],
   },
   {

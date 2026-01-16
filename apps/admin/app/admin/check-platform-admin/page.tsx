@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/core/database/server";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 
 export default function CheckPlatformAdminPage() {

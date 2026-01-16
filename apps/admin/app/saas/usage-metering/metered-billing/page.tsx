@@ -3,8 +3,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
-import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
-import { TrashBinIcon } from "@/icons";
+import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
 interface MeteredFeature {
@@ -185,7 +184,7 @@ export default function MeteredBillingPage() {
                           <PencilIcon className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="sm">
-                          <TrashBinIcon className="h-4 w-4" />
+                          <TrashIcon className="h-4 w-4" />
                         </Button>
                       </div>
                     </td>

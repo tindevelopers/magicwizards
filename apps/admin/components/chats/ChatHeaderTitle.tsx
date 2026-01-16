@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "@/icons";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 export default function ChatHeaderTitle() {
   const [isOpen, setIsOpen] = useState(false);
@@ -23,7 +23,7 @@ export default function ChatHeaderTitle() {
       </div>
       <div className="relative">
         <button onClick={toggleDropdown} className="dropdown-toggle">
-          <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
+          <EllipsisVerticalIcon className="h-5 w-5 text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
         </button>
         <Dropdown isOpen={isOpen} onClose={closeDropdown} className="w-40 p-2">
           <DropdownItem

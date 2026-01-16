@@ -1,8 +1,11 @@
 "use client";
+
+export const dynamic = 'force-dynamic';
+
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import { PencilIcon, ArrowDownTrayIcon, EyeIcon } from "@heroicons/react/24/outline";
-import { TrashBinIcon as TrashIcon } from "@/icons";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import React from "react";
 
 interface SavedReport {

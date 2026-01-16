@@ -143,12 +143,12 @@ apps/portal/
 
 Before V1 release, complete:
 
-- [ ] Create `.env.example` with all required variables
-- [ ] Add unit tests for core modules
-- [ ] Security audit of RLS policies
-- [ ] Complete Stripe production checklist
-- [ ] Add global error handling
-- [ ] Create deployment documentation
+- [x] Create `.env.example` with all required variables
+- [x] Add unit tests for core modules
+- [x] Security audit of RLS policies
+- [x] Complete Stripe production checklist (see STRIPE_COMPLETE.md)
+- [x] Add global error handling
+- [x] Create deployment documentation
 
 ---
 

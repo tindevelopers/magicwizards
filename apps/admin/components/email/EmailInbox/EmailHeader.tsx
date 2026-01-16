@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Checkbox from "../../form/input/Checkbox";
 import { Dropdown } from "../../ui/dropdown/Dropdown";
 import { DropdownItem } from "../../ui/dropdown/DropdownItem";
-import { MoreDotIcon } from "@/icons";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 interface EmailHeaderProps {
   isChecked: boolean;
@@ -146,7 +146,7 @@ export default function EmailHeader({
             onClick={toggleDropdownTwo}
             className="flex items-center w-10 dropdown-toggle text-gray-500 justify-center  h-10 transition-colors border border-gray-200 rounded-lg max-w-10 dark:text-gray-400 hover:bg-gray-100 dark:border-white/[0.05] dark:hover:bg-gray-800"
           >
-            <MoreDotIcon className="text-gray-400 dropdown-toggle  hover:text-gray-700 dark:hover:text-gray-300" />
+            <EllipsisVerticalIcon className="text-gray-400 dropdown-toggle  hover:text-gray-700 dark:hover:text-gray-300" />
           </button>
           <Dropdown
             isOpen={isOpenTwo}

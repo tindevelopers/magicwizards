@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { MoreDotIcon } from "../../icons";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import NewUserChart from "./NewUserChart";
@@ -29,7 +29,7 @@ export default function ProductPerformanceTab() {
         </div>
         <div className="relative inline-block">
           <button className="dropdown-toggle" onClick={toggleDropdown}>
-            <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
+            <EllipsisVerticalIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
           </button>
           <Dropdown
             isOpen={isOpen}

@@ -138,6 +138,26 @@ export * from './database';
 export * from './shared';
 
 // ============================================================================
+// 🤖 CHATBOT DOMAIN
+// ============================================================================
+/**
+ * Multi-tenant RAG chatbot with domain intelligence.
+ * 
+ * @example
+ * ```typescript
+ * import { 
+ *   processChatMessage,
+ *   createKnowledgeBase,
+ *   detectDomain
+ * } from '@/core';
+ * 
+ * // Or import from domain:
+ * import { processChatMessage } from '@/core/chatbot';
+ * ```
+ */
+export * from './chatbot';
+
+// ============================================================================
 // 📋 CORE METADATA
 // ============================================================================
 
@@ -158,6 +178,7 @@ export const CORE_METADATA = {
     'permissions',
     'database',
     'shared',
+    'chatbot',
   ],
   name: '@yourcompany/saas-core',
   description: 'Central SaaS platform core module',

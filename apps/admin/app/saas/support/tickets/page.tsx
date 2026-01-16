@@ -1,59 +1,12 @@
 "use client";
+
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
 import { MagnifyingGlassIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
-import React, { useState } from "react";
-
-interface Ticket {
-  id: string;
-  ticketNumber: string;
-  subject: string;
-  customer: string;
-  category: string;
-  priority: "low" | "medium" | "high" | "urgent";
-  status: "open" | "in-progress" | "resolved" | "closed";
-  assignedTo?: string;
-  createdAt: string;
-  lastUpdated: string;
-}
-
-const tickets: Ticket[] = [
-  {
-    id: "1",
-    ticketNumber: "TKT-2025-001",
-    subject: "Unable to access dashboard",
-    customer: "Acme Corp",
-    category: "Technical Issue",
-    priority: "high",
-    status: "in-progress",
-    assignedTo: "Support Agent 1",
-    createdAt: "2025-01-16 10:00 AM",
-    lastUpdated: "2025-01-16 11:30 AM",
-  },
-  {
-    id: "2",
-    ticketNumber: "TKT-2025-002",
-    subject: "Billing question",
-    customer: "TechStart Inc",
-    category: "Billing",
-    priority: "medium",
-    status: "open",
-    createdAt: "2025-01-16 09:30 AM",
-    lastUpdated: "2025-01-16 09:30 AM",
-  },
-  {
-    id: "3",
-    ticketNumber: "TKT-2025-003",
-    subject: "Feature request: Export data",
-    customer: "Global Solutions",
-    category: "Feature Request",
-    priority: "low",
-    status: "resolved",
-    assignedTo: "Support Agent 2",
-    createdAt: "2025-01-15 02:00 PM",
-    lastUpdated: "2025-01-16 08:00 AM",
-  },
-];
+import React, { useState, useEffect } from "react";
+import { getAllSupportTickets } from "@/app/actions/support/tickets";
+import Link from "next/link";
+import type { SupportTicket } from "@tinadmin/core/support";
 
 const priorityColors = {
   low: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
@@ -64,25 +17,53 @@ const priorityColors = {
 
 const statusColors = {
   open: "bg-yellow-100 text-yellow-700 dark:bg-yellow-500/15 dark:text-yellow-500",
-  "in-progress": "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-500",
+  in_progress: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-500",
   resolved: "bg-green-100 text-green-700 dark:bg-green-500/15 dark:text-green-500",
   closed: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
 };
 
 export default function SupportTicketsPage() {
+  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [priorityFilter] = useState<string>("all");
+
+  useEffect(() => {
+    async function loadTickets() {
+      try {
+        setLoading(true);
+        const filters: any = {};
+        if (statusFilter !== "all") {
+          filters.status = statusFilter;
+        }
+        const data = await getAllSupportTickets(filters);
+        setTickets(data);
+      } catch (error) {
+        console.error("Failed to load tickets:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadTickets();
+  }, [statusFilter]);
 
   const filteredTickets = tickets.filter((ticket) => {
     const matchesSearch =
-      ticket.ticketNumber.toLowerCase().includes(search.toLowerCase()) ||
+      ticket.ticket_number.toLowerCase().includes(search.toLowerCase()) ||
       ticket.subject.toLowerCase().includes(search.toLowerCase()) ||
-      ticket.customer.toLowerCase().includes(search.toLowerCase());
-    const matchesStatus = statusFilter === "all" || ticket.status === statusFilter;
-    const matchesPriority = priorityFilter === "all" || ticket.priority === priorityFilter;
-    return matchesSearch && matchesStatus && matchesPriority;
+      ticket.created_by_user?.email?.toLowerCase().includes(search.toLowerCase()) ||
+      ticket.created_by_user?.full_name?.toLowerCase().includes(search.toLowerCase());
+    return matchesSearch;
   });
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   return (
     <div>
@@ -95,10 +76,12 @@ export default function SupportTicketsPage() {
               Manage and track customer support tickets
             </p>
           </div>
-          <Button>
-            <ChatBubbleLeftRightIcon className="h-4 w-4" />
-            New Ticket
-          </Button>
+          <Link href="/saas/support/tickets/new">
+            <Button>
+              <ChatBubbleLeftRightIcon className="h-4 w-4" />
+              New Ticket
+            </Button>
+          </Link>
         </div>
 
         {/* Filters */}
@@ -114,87 +97,105 @@ export default function SupportTicketsPage() {
             />
           </div>
           <div className="flex gap-2">
-            {["all", "open", "in-progress", "resolved", "closed"].map((status) => (
+            {["all", "open", "in_progress", "resolved", "closed"].map((status) => (
               <Button
                 key={status}
                 variant={statusFilter === status ? "primary" : "outline"}
                 size="sm"
                 onClick={() => setStatusFilter(status)}
               >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
+                {status === "in_progress" ? "In Progress" : status.charAt(0).toUpperCase() + status.slice(1)}
               </Button>
             ))}
           </div>
         </div>
 
         <div className="rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-          <div className="overflow-x-auto">
-            <table className="min-w-full">
-              <thead className="border-b border-gray-200 dark:border-gray-800">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Ticket #
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Subject
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Customer
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Category
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Priority
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Assigned To
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
-                    Last Updated
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
-                {filteredTickets.map((ticket) => (
-                  <tr key={ticket.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
-                      {ticket.ticketNumber}
-                    </td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{ticket.subject}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{ticket.customer}</td>
-                    <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{ticket.category}</td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColors[ticket.priority]}`}
-                      >
-                        {ticket.priority}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[ticket.status]}`}
-                      >
-                        {ticket.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {ticket.assignedTo || "Unassigned"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
-                      {ticket.lastUpdated}
-                    </td>
+          {loading ? (
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              Loading tickets...
+            </div>
+          ) : filteredTickets.length === 0 ? (
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+              No tickets found
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full">
+                <thead className="border-b border-gray-200 dark:border-gray-800">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Ticket #
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Subject
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Customer
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Category
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Priority
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Assigned To
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Created
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+                  {filteredTickets.map((ticket) => (
+                    <tr key={ticket.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                      <td className="px-6 py-4">
+                        <Link
+                          href={`/saas/support/tickets/${ticket.id}`}
+                          className="font-medium text-gray-900 hover:text-brand-500 dark:text-white dark:hover:text-brand-400"
+                        >
+                          {ticket.ticket_number}
+                        </Link>
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">{ticket.subject}</td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                        {ticket.created_by_user?.full_name || ticket.created_by_user?.email || "Unknown"}
+                      </td>
+                      <td className="px-6 py-4 text-gray-600 dark:text-gray-400">
+                        {ticket.category?.name || "Uncategorized"}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${priorityColors[ticket.priority]}`}
+                        >
+                          {ticket.priority}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[ticket.status]}`}
+                        >
+                          {ticket.status === "in_progress" ? "In Progress" : ticket.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        {ticket.assigned_to_user?.full_name || "Unassigned"}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
+                        {formatDate(ticket.created_at)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
-

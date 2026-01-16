@@ -5,8 +5,7 @@ import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
-import { PlusIcon, PencilIcon, CheckIcon } from "@heroicons/react/24/outline";
-import { TrashBinIcon } from "@/icons";
+import { PlusIcon, PencilIcon, CheckIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
 interface Plan {
@@ -138,7 +137,7 @@ export default function SubscriptionPlansPage() {
                   Edit
                 </Button>
                 <Button variant="outline" size="sm" className="flex-1">
-                  <TrashBinIcon className="h-4 w-4" />
+                  <TrashIcon className="h-4 w-4" />
                   Archive
                 </Button>
               </div>

@@ -5,8 +5,7 @@ import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
-import { PlusIcon, PlayIcon, PauseIcon } from "@heroicons/react/24/outline";
-import { TrashBinIcon as TrashIcon } from "@/icons";
+import { PlusIcon, PlayIcon, PauseIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
 interface Campaign {

@@ -1,0 +1,300 @@
+/**
+ * CHAT SERVICE
+ * 
+ * Main chat orchestration service.
+ */
+
+import { generateText } from 'ai';
+import { openai } from '@ai-sdk/openai';
+import { retrieveContext, buildContextString } from './rag-engine';
+import { buildSystemPrompt } from './prompts';
+import { createTenantAwareServerClient } from '../database/tenant-client';
+import type { ChatRequest, ChatResponse, ChatMessage, ChatConversation } from './types';
+
+export interface ChatOptions {
+  tenantId: string;
+  userId?: string;
+  conversationId?: string;
+  model?: 'gpt-4' | 'gpt-3.5-turbo' | 'gpt-4-turbo';
+  temperature?: number;
+  maxTokens?: number;
+}
+
+/**
+ * Process a chat message and generate response
+ */
+export async function processChatMessage(
+  request: ChatRequest,
+  options: ChatOptions = { tenantId: request.tenantId }
+): Promise<ChatResponse> {
+  const {
+    tenantId,
+    userId,
+    conversationId,
+    model = 'gpt-3.5-turbo',
+    temperature = 0.7,
+    maxTokens = 1000,
+  } = { ...options, tenantId: request.tenantId, userId: request.userId };
+
+  // Retrieve relevant context
+  const { chunks, citations, domainContext } = await retrieveContext(request.message, {
+    tenantId,
+    includeDomainContext: true,
+  });
+
+  // Build context string
+  const contextString = buildContextString(chunks);
+
+  // Build system prompt
+  const systemPrompt = buildSystemPrompt({
+    domain: domainContext.domain,
+    context: chunks.map(c => c.content),
+  });
+
+  // Get conversation history if conversationId exists
+  const conversationHistory = conversationId
+    ? await getConversationHistory(conversationId, tenantId)
+    : [];
+
+  // Build messages
+  const messages: Array<{ role: 'user' | 'assistant' | 'system'; content: string }> = [
+    { role: 'system', content: systemPrompt },
+    ...conversationHistory.map(msg => ({
+      role: msg.role,
+      content: msg.content,
+    })),
+    { role: 'user', content: request.message },
+  ];
+
+  // Generate response using Vercel AI SDK
+  const result = await generateText({
+    model: openai(model) as any,
+    messages,
+    temperature,
+    maxTokens,
+  });
+
+  // Get the response text
+  const responseText = result.text;
+
+  // Create or update conversation
+  const finalConversationId = conversationId || await createConversation({
+    tenantId,
+    userId,
+    title: extractTitle(request.message),
+  });
+
+  // Save messages
+  await saveMessage({
+    conversationId: finalConversationId,
+    tenantId,
+    role: 'user',
+    content: request.message,
+  });
+
+  const messageId = await saveMessage({
+    conversationId: finalConversationId,
+    tenantId,
+    role: 'assistant',
+    content: responseText,
+    metadata: {
+      citations: citations.map(c => ({
+        documentId: c.documentId,
+        title: c.title,
+        source: c.source,
+      })),
+      domain: domainContext.domain,
+      confidence: domainContext.confidence,
+    },
+  });
+
+  return {
+    message: responseText,
+    conversationId: finalConversationId,
+    messageId,
+    citations,
+    metadata: {
+      domain: domainContext.domain,
+      confidence: domainContext.confidence,
+    },
+  };
+}
+
+/**
+ * Create a new conversation
+ */
+async function createConversation(input: {
+  tenantId: string;
+  userId?: string;
+  title?: string;
+}): Promise<string> {
+  const tenantClient = await createTenantAwareServerClient(input.tenantId);
+  const supabase = tenantClient.getClient();
+
+  const { data, error } = await (supabase
+    .from('chatbot_conversations') as any)
+    .insert({
+      tenant_id: input.tenantId,
+      user_id: input.userId,
+      title: input.title,
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('Error creating conversation:', error);
+    throw new Error('Failed to create conversation');
+  }
+
+  return data.id;
+}
+
+/**
+ * Get conversation history
+ */
+async function getConversationHistory(
+  conversationId: string,
+  tenantId: string
+): Promise<ChatMessage[]> {
+  const tenantClient = await createTenantAwareServerClient(tenantId);
+  const supabase = tenantClient.getClient();
+
+  const { data, error } = await (supabase
+    .from('chatbot_messages') as any)
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .eq('tenant_id', tenantId)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching conversation history:', error);
+    return [];
+  }
+
+  return (data || []).map((msg: any) => ({
+    id: msg.id,
+    conversationId: msg.conversation_id,
+    role: msg.role,
+    content: msg.content,
+    createdAt: new Date(msg.created_at),
+    metadata: msg.metadata,
+  }));
+}
+
+/**
+ * Save a message
+ */
+async function saveMessage(input: {
+  conversationId: string;
+  tenantId: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  metadata?: Record<string, unknown>;
+}): Promise<string> {
+  const tenantClient = await createTenantAwareServerClient(input.tenantId);
+  const supabase = tenantClient.getClient();
+
+  const { data, error } = await (supabase
+    .from('chatbot_messages') as any)
+    .insert({
+      conversation_id: input.conversationId,
+      tenant_id: input.tenantId,
+      role: input.role,
+      content: input.content,
+      metadata: input.metadata || {},
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    console.error('Error saving message:', error);
+    throw new Error('Failed to save message');
+  }
+
+  return data.id;
+}
+
+/**
+ * Extract title from first message
+ */
+function extractTitle(message: string): string {
+  // Take first 50 characters
+  const title = message.slice(0, 50).trim();
+  return title.length < message.length ? `${title}...` : title;
+}
+
+/**
+ * Get conversation by ID
+ */
+export async function getConversation(
+  conversationId: string,
+  tenantId: string
+): Promise<ChatConversation | null> {
+  const tenantClient = await createTenantAwareServerClient(tenantId);
+  const supabase = tenantClient.getClient();
+
+  const { data, error } = await (supabase
+    .from('chatbot_conversations') as any)
+    .select('*')
+    .eq('id', conversationId)
+    .eq('tenant_id', tenantId)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') {
+      return null;
+    }
+    console.error('Error fetching conversation:', error);
+    throw new Error('Failed to fetch conversation');
+  }
+
+  return {
+    id: data.id,
+    tenantId: data.tenant_id,
+    userId: data.user_id,
+    title: data.title,
+    createdAt: new Date(data.created_at),
+    updatedAt: new Date(data.updated_at),
+    metadata: data.metadata,
+  };
+}
+
+/**
+ * List conversations for a user/tenant
+ */
+export async function listConversations(
+  tenantId: string,
+  options?: { userId?: string; limit?: number }
+): Promise<ChatConversation[]> {
+  const tenantClient = await createTenantAwareServerClient(tenantId);
+  const supabase = tenantClient.getClient();
+
+  let query = (supabase
+    .from('chatbot_conversations') as any)
+    .select('*')
+    .eq('tenant_id', tenantId)
+    .order('updated_at', { ascending: false })
+    .limit(options?.limit || 20);
+
+  if (options?.userId) {
+    query = query.eq('user_id', options.userId);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error listing conversations:', error);
+    throw new Error('Failed to list conversations');
+  }
+
+  return (data || []).map((conv: any) => ({
+    id: conv.id,
+    tenantId: conv.tenant_id,
+    userId: conv.user_id,
+    title: conv.title,
+    createdAt: new Date(conv.created_at),
+    updatedAt: new Date(conv.updated_at),
+    metadata: conv.metadata,
+  }));
+}
+

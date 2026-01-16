@@ -1,8 +1,7 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
-import { PlusIcon, PencilIcon } from "@heroicons/react/24/outline";
-import { TrashBinIcon } from "@/icons";
+import { PlusIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
 interface Feature {
@@ -126,7 +125,7 @@ export default function PlanFeaturesPage() {
                           <PencilIcon className="h-4 w-4" />
                         </Button>
                         <Button variant="outline" size="sm">
-                          <TrashBinIcon className="h-4 w-4" />
+                          <TrashIcon className="h-4 w-4" />
                         </Button>
                       </div>
                     </td>

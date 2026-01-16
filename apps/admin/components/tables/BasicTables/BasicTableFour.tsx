@@ -9,9 +9,9 @@ import {
 } from "../../ui/table";
 import Badge from "../../ui/badge/Badge";
 import Image from "next/image";
-import { MoreDotIcon } from "@/icons";
 import { Dropdown } from "../../ui/dropdown/Dropdown";
 import { DropdownItem } from "../../ui/dropdown/DropdownItem";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 
 interface Campaign {
   id: number;
@@ -129,7 +129,7 @@ export default function BasicTableFour() {
 
         <div className="relative inline-block">
           <button onClick={toggleDropdown} className="dropdown-toggle">
-            <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
+            <EllipsisVerticalIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" />
           </button>
           <Dropdown
             isOpen={isOpen}

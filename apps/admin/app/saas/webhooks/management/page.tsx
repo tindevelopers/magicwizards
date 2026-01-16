@@ -5,8 +5,7 @@ import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
 import { Modal } from "@/components/ui/modal";
 import { useModal } from "@/hooks/useModal";
-import { PlusIcon, PencilIcon, PlayIcon } from "@heroicons/react/24/outline";
-import { TrashBinIcon } from "@/icons";
+import { PlusIcon, PencilIcon, PlayIcon, TrashIcon } from "@heroicons/react/24/outline";
 import React, { useState } from "react";
 
 interface Webhook {
@@ -140,7 +139,7 @@ export default function WebhookManagementPage() {
                   Edit
                 </Button>
                 <Button variant="outline" size="sm" className="flex-1">
-                  <TrashBinIcon className="h-4 w-4" />
+                  <TrashIcon className="h-4 w-4" />
                   Delete
                 </Button>
               </div>

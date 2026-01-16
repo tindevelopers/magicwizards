@@ -1,8 +1,8 @@
 "use client";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import Button from "@/components/ui/button/Button";
-import { TrashBinIcon } from "@/icons";
 import React, { useState } from "react";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface Session {
   id: string;
@@ -135,7 +135,7 @@ export default function SessionManagementPage() {
                     <td className="px-6 py-4">
                       <div className="flex justify-end">
                         <Button variant="outline" size="sm">
-                          <TrashBinIcon className="h-4 w-4" />
+                          <TrashIcon className="h-4 w-4" />
                         </Button>
                       </div>
                     </td>

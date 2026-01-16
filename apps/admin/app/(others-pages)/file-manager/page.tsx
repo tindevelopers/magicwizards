@@ -6,6 +6,8 @@ import StorageDetailsChart from "@/components/file-manager/StorageDetailsChart";
 import { Metadata } from "next";
 import React from "react";
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "Next.js FileManager Page | TailAdmin - Next.js Dashboard Template",
   description:
