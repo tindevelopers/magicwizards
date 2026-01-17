@@ -18,12 +18,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/your-saas-platform.git"
+    "url": "git+https://github.com/the-info-network/tinadmin-saas-base-turborepo.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/your-saas-platform/issues"
+    "url": "https://github.com/the-info-network/tinadmin-saas-base-turborepo/issues"
   },
-  "homepage": "https://github.com/your-org/your-saas-platform#readme",
+  "homepage": "https://github.com/the-info-network/tinadmin-saas-base-turborepo#readme",
   "author": "Your Organization",
   "license": "MIT",
   "main": "./src/app/page.tsx",
