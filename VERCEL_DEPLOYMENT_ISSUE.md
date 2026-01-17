@@ -28,7 +28,7 @@ Vercel should handle deployments automatically via GitHub webhooks - no CLI or G
 1. Go to [Vercel Dashboard](https://vercel.com)
 2. Click **Add New** → **Project**
 3. Click **Import Git Repository**
-4. Select your GitHub repository: `tindevelopers/tinadmin-saas-base-turborepo`
+4. Select your GitHub repository: `the-info-network/tinadmin-saas-base-turborepo`
 5. Configure project settings:
    - **Framework Preset**: Next.js
    - **Root Directory**: `apps/admin` (or leave as root if using monorepo config)

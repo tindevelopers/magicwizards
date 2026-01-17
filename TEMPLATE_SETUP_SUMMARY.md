@@ -185,7 +185,7 @@ Verify your template is ready:
 When using this template, consider keeping attribution:
 
 ```
-Built with [SaaS Platform Template](https://github.com/tindevelopers/tinadmin-saas-base-turborepo)
+Built with [SaaS Platform Template](https://github.com/the-info-network/tinadmin-saas-base-turborepo)
 ```
 
 This helps others discover the template!
