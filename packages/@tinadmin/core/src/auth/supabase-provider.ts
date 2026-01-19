@@ -1,6 +1,7 @@
 import { createClient as createBrowserClient } from "@/core/database/client";
 import { createAdminClient } from "@/core/database/admin-client";
 import type { Database } from "@/core/database/types";
+import { getAuthRedirectBaseUrl } from "@/core/shared/utils";
 
 type UserInsert = Database["public"]["Tables"]["users"]["Insert"];
 type TenantInsert = Database["public"]["Tables"]["tenants"]["Insert"];
@@ -187,11 +188,14 @@ export async function getCurrentSession() {
 
 /**
  * Reset password
+ * Uses proper URL detection to ensure Vercel deployments work correctly
  */
 export async function resetPassword(email: string) {
   const supabase = createBrowserClient();
+  const baseUrl = getAuthRedirectBaseUrl();
+  
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/auth/reset-password`,
+    redirectTo: `${baseUrl}/auth/reset-password-confirm`,
   });
   
   if (error) throw error;
