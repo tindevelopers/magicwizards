@@ -1,6 +1,40 @@
 "use server";
 
 import { createClient } from "@/core/database/server";
+import { headers } from "next/headers";
+
+async function getResetRedirectBaseUrl(): Promise<string> {
+  // 1. Prefer explicit config (best for production deployments)
+  const configured =
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+    process.env.SITE_URL?.trim() ||
+    "";
+  if (configured) return configured.replace(/\/$/, "");
+
+  // 2. Vercel environment variables (automatically set by Vercel)
+  // VERCEL_URL is set for preview deployments, use https
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  if (vercelUrl && !vercelUrl.startsWith("http")) {
+    return `https://${vercelUrl}`.replace(/\/$/, "");
+  }
+  if (vercelUrl) return vercelUrl.replace(/\/$/, "");
+
+  // 3. Derive from the current request (works for Vercel production + localhost)
+  const h = await headers();
+  const origin = h.get("origin")?.trim();
+  if (origin) return origin.replace(/\/$/, "");
+
+  const proto = (h.get("x-forwarded-proto") || "http").trim();
+  const host = (h.get("x-forwarded-host") || h.get("host") || "").trim();
+  if (host) {
+    // Ensure https for Vercel deployments
+    const protocol = process.env.VERCEL === "1" ? "https" : proto;
+    return `${protocol}://${host}`.replace(/\/$/, "");
+  }
+
+  // 4. Localhost fallback (development only)
+  return "http://localhost:3000";
+}
 
 /**
  * Send password reset email (for forgot password)
@@ -8,9 +42,10 @@ import { createClient } from "@/core/database/server";
 export async function sendPasswordResetEmail(email: string): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClient();
+    const baseUrl = await getResetRedirectBaseUrl();
     
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/auth/reset-password-confirm`,
+      redirectTo: `${baseUrl}/auth/reset-password-confirm`,
     });
 
     if (error) {

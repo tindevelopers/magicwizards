@@ -50,6 +50,7 @@
     "dev:portal": "turbo run dev --filter=@tinadmin/portal",
     "dev:local": "supabase start && pnpm dev",
     "dev:localhost": "./scripts/start-localhost.sh",
+    "supabase:env:remote": "node scripts/install-remote-supabase-env.mjs jruxnkslobykshunucwa",
     "build": "next build",
     "build:packages": "turbo run build --filter='./packages/*'",
     "build:admin": "turbo run build --filter=@tinadmin/admin",
