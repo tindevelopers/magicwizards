@@ -53,6 +53,7 @@
     "supabase:env:remote": "node scripts/install-remote-supabase-env.mjs jruxnkslobykshunucwa",
     "supabase:sync-vercel": "node scripts/sync-vercel-to-supabase-auth.mjs jruxnkslobykshunucwa",
     "supabase:install-gohighlevel": "node scripts/install-gohighlevel-provider.mjs",
+    "supabase:apply-integration-migration": "node scripts/apply-integration-migration.mjs",
     "build": "next build",
     "build:packages": "turbo run build --filter='./packages/*'",
     "build:admin": "turbo run build --filter=@tinadmin/admin",
