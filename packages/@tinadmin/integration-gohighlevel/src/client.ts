@@ -47,6 +47,98 @@ export class GoHighLevelClient {
     if (params.offset) q.set("offset", String(params.offset));
     return this.request<any>(`/contacts/?${q.toString()}`);
   }
+
+  /**
+   * Create a contact in GoHighLevel
+   */
+  async createContact(params: {
+    locationId: string;
+    firstName: string;
+    lastName: string;
+    email?: string | null;
+    phone?: string | null;
+    mobile?: string | null;
+    address?: Record<string, any> | null;
+    customFields?: Record<string, any>;
+  }) {
+    const body: any = {
+      firstName: params.firstName,
+      lastName: params.lastName,
+      locationId: params.locationId,
+    };
+
+    if (params.email) body.email = params.email;
+    if (params.phone) body.phone = params.phone;
+    if (params.mobile) body.mobile = params.mobile;
+    if (params.address) {
+      body.address1 = params.address.address1 || params.address.street;
+      body.city = params.address.city;
+      body.state = params.address.state;
+      body.postalCode = params.address.postalCode || params.address.zip;
+      body.country = params.address.country;
+    }
+    if (params.customFields) {
+      body.customField = params.customFields;
+    }
+
+    return this.request<any>("/contacts/", {
+      method: "POST",
+      body,
+    });
+  }
+
+  /**
+   * Update a contact in GoHighLevel
+   */
+  async updateContact(params: {
+    contactId: string;
+    locationId: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string | null;
+    phone?: string | null;
+    mobile?: string | null;
+    address?: Record<string, any> | null;
+    customFields?: Record<string, any>;
+  }) {
+    const body: any = {
+      locationId: params.locationId,
+    };
+
+    if (params.firstName !== undefined) body.firstName = params.firstName;
+    if (params.lastName !== undefined) body.lastName = params.lastName;
+    if (params.email !== undefined) body.email = params.email;
+    if (params.phone !== undefined) body.phone = params.phone;
+    if (params.mobile !== undefined) body.mobile = params.mobile;
+    if (params.address !== undefined) {
+      if (params.address) {
+        body.address1 = params.address.address1 || params.address.street;
+        body.city = params.address.city;
+        body.state = params.address.state;
+        body.postalCode = params.address.postalCode || params.address.zip;
+        body.country = params.address.country;
+      }
+    }
+    if (params.customFields !== undefined) {
+      body.customField = params.customFields;
+    }
+
+    return this.request<any>(`/contacts/${params.contactId}`, {
+      method: "PUT",
+      body,
+    });
+  }
+
+  /**
+   * Delete a contact in GoHighLevel
+   */
+  async deleteContact(params: { contactId: string; locationId: string }) {
+    const q = new URLSearchParams();
+    q.set("locationId", params.locationId);
+    return this.request<any>(`/contacts/${params.contactId}?${q.toString()}`, {
+      method: "DELETE",
+    });
+  }
 }
 
 function safeJson(text: string) {
