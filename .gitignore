@@ -56,3 +56,10 @@ supabase/.temp
 
 # Turborepo
 .turbo/
+
+# Cursor (keep rules for the repo)
+.cursor/*
+!.cursor/rules/
+
+# Office lock files
+~$*

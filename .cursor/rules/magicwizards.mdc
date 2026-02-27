@@ -1,0 +1,37 @@
+---
+description: Magic Wizards multi-tenant architecture and safety rules
+globs:
+  - "apps/wizards-api/**"
+  - "packages/@magicwizards/**"
+alwaysApply: true
+---
+
+# Magic Wizards Rules
+
+## Product and scope
+- Product name is **Magic Wizards**.
+- A "Wizard" is an expert agent definition with prompt, tool policy, budget, and model routing policy.
+- Telegram is the first channel; mobile app channels are added later.
+
+## Multi-tenant non-negotiables
+- Every tenant-scoped query must include a `tenant_id` boundary.
+- Never leak cross-tenant state, session IDs, memory, MCP configs, or usage data.
+- Treat tenant identity resolution as mandatory for all inbound channel events.
+- Platform admin overrides must be explicit and auditable.
+
+## Runtime architecture
+- Keep wizard execution runtime-agnostic via a `WizardRuntime` abstraction.
+- Support multiple providers and model tiers (cheap/standard/premium), with cheap-first routing and explicit escalation.
+- Public SaaS flows should not rely on unsafe local CLI bypass-permission execution.
+
+## Safety and compliance
+- Never log API keys, tokens, secrets, full prompt content, or raw PII.
+- Enforce `maxBudgetUsd` and `maxTurns` on all wizard runs.
+- Persist usage events and session outcomes for billing and auditability.
+- Use RLS for all new tenant-scoped tables.
+
+## Implementation conventions
+- Use TypeScript strict mode and avoid implicit `any`.
+- Prefer composable services over monolithic handlers.
+- Keep channel-specific formatting isolated from core runtime logic.
+- Use deterministic migration names and add indexes for high-cardinality filters.
