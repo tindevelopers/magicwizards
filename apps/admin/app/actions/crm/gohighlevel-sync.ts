@@ -106,7 +106,7 @@ export async function syncContactToGHL(params: {
           phone: params.contact.phone,
           mobile: params.contact.mobile,
           address: params.contact.address,
-          customFields: params.contact.custom_fields,
+          customFields: params.contact.custom_fields ?? undefined,
         });
         return existingGHLId;
       } catch (error: any) {
@@ -125,7 +125,7 @@ export async function syncContactToGHL(params: {
       phone: params.contact.phone,
       mobile: params.contact.mobile,
       address: params.contact.address,
-      customFields: params.contact.custom_fields,
+      customFields: params.contact.custom_fields ?? undefined,
     });
 
     const ghlContactId = (result as any)?.contact?.id || (result as any)?.id;
