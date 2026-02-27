@@ -37,6 +37,12 @@ Per-project overrides:
 
 ---
 
+**If portal deployments fail** (e.g. *output directory "apps/admin/.next" was not found at ".../apps/portal/apps/admin/.next"*):
+
+- **Cause:** With Root Directory = `apps/portal`, Vercel was using the repo root `vercel.json` (admin build/output). The repo now has **`apps/portal/vercel.json`** so that when the portal project’s root is `apps/portal`, it uses the portal build and `.next` output there. Redeploy after pulling the latest (no dashboard change required for this fix).
+- **Recommended (cleanest):** Use repository root for the portal project. **Option A – Dashboard:** magicwizards-portal → Settings → General → **Root Directory** = empty. Build & Development: Install = `pnpm install`, Build = `pnpm turbo run build --filter=@tinadmin/portal`, Output = `apps/portal/.next`. Node.js = **22.x**.  
+  **Option B – API:** `VERCEL_TOKEN=your_token ./scripts/vercel-portal-fix-root.sh`, then `vercel pull --yes` and `vercel --prod --yes`.
+
 ## 3. Environment variables
 
 In each project: **Settings → Environment Variables**.
