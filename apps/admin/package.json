@@ -48,10 +48,10 @@
     "server-only": "^0.0.1",
     "simplebar-react": "^3.3.0",
     "stripe": "^20.0.0",
-    "ai": "^3.0.0",
+    "ai": "^5.0.52",
     "@ai-sdk/openai": "^1.0.0",
     "openai": "^4.0.0",
-    "swiper": "^11.2.0",
+    "swiper": "^12.1.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.0.0"
   },
