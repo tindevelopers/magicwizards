@@ -25,6 +25,7 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Storage Policies for support-tickets bucket
 -- Users can upload files to their tenant's folder
+DROP POLICY IF EXISTS "Users can upload support ticket attachments" ON storage.objects;
 CREATE POLICY "Users can upload support ticket attachments"
   ON storage.objects FOR INSERT
   WITH CHECK (
@@ -39,6 +40,7 @@ CREATE POLICY "Users can upload support ticket attachments"
   );
 
 -- Users can view attachments for tickets they can access
+DROP POLICY IF EXISTS "Users can view support ticket attachments" ON storage.objects;
 CREATE POLICY "Users can view support ticket attachments"
   ON storage.objects FOR SELECT
   USING (
@@ -66,6 +68,7 @@ CREATE POLICY "Users can view support ticket attachments"
   );
 
 -- Users can delete their own uploaded files
+DROP POLICY IF EXISTS "Users can delete support ticket attachments" ON storage.objects;
 CREATE POLICY "Users can delete support ticket attachments"
   ON storage.objects FOR DELETE
   USING (

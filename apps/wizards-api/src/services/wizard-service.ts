@@ -51,21 +51,30 @@ export async function runWizardForTenant(input: {
   externalUserRef?: string;
   prompt: string;
   channel: "telegram" | "mobile" | "api";
+  /** When true, skip session/usage/memory/budget persistence (e.g. for dev __mock__ tenant). */
+  skipPersistence?: boolean;
 }): Promise<{ text: string; wizardId: string; costUsd: number; turns: number }> {
   const { wizardId, prompt } = extractWizardIdFromPrompt(input.prompt.trim());
   const wizard = pickWizard(wizardId);
+  const skipPersistence = input.skipPersistence === true;
 
-  await checkBudgetLimit(input.tenantId, input.tenant.plan);
+  if (!skipPersistence) {
+    await checkBudgetLimit(input.tenantId, input.tenant.plan);
+  }
 
-  const sessionId = await createWizardSession({
-    tenantId: input.tenantId,
-    userId: input.userId,
-    wizardId: wizard.id,
-    channel: input.channel,
-  });
+  const sessionId = skipPersistence
+    ? ""
+    : await createWizardSession({
+        tenantId: input.tenantId,
+        userId: input.userId,
+        wizardId: wizard.id,
+        channel: input.channel,
+      });
 
   try {
-    const memoryContext = await getMemoryContext(input.tenantId, input.userId);
+    const memoryContext = skipPersistence
+      ? undefined
+      : await getMemoryContext(input.tenantId, input.userId);
     const combinedPrompt = memoryContext
       ? `${memoryContext}\n\nUser request:\n${prompt}`
       : prompt;
@@ -96,30 +105,32 @@ export async function runWizardForTenant(input: {
       maxTurns: wizard.maxTurns,
     });
 
-    await completeWizardSession({
-      sessionId,
-      totalCostUsd: result.usage.costUsd,
-      turnCount: 1,
-      status: "completed",
-      outputText: result.text,
-    });
+    if (!skipPersistence) {
+      await completeWizardSession({
+        sessionId,
+        totalCostUsd: result.usage.costUsd,
+        turnCount: 1,
+        status: "completed",
+        outputText: result.text,
+      });
 
-    await recordUsage({
-      tenantId: input.tenantId,
-      sessionId,
-      costUsd: result.usage.costUsd,
-      turns: 1,
-      provider: result.provider,
-      model: result.model,
-    });
+      await recordUsage({
+        tenantId: input.tenantId,
+        sessionId,
+        costUsd: result.usage.costUsd,
+        turns: 1,
+        provider: result.provider,
+        model: result.model,
+      });
 
-    await saveMemory({
-      tenantId: input.tenantId,
-      userId: input.userId,
-      externalUserRef: input.externalUserRef,
-      content: `User asked: ${prompt.slice(0, 600)}\nAssistant replied: ${result.text.slice(0, 600)}`,
-      importanceScore: 1,
-    });
+      await saveMemory({
+        tenantId: input.tenantId,
+        userId: input.userId,
+        externalUserRef: input.externalUserRef,
+        content: `User asked: ${prompt.slice(0, 600)}\nAssistant replied: ${result.text.slice(0, 600)}`,
+        importanceScore: 1,
+      });
+    }
 
     return {
       text: result.text,
@@ -128,13 +139,15 @@ export async function runWizardForTenant(input: {
       turns: 1,
     };
   } catch (error) {
-    await completeWizardSession({
-      sessionId,
-      totalCostUsd: 0,
-      turnCount: 0,
-      status: "failed",
-      errorMessage: error instanceof Error ? error.message : "unknown_error",
-    });
+    if (!skipPersistence) {
+      await completeWizardSession({
+        sessionId,
+        totalCostUsd: 0,
+        turnCount: 0,
+        status: "failed",
+        errorMessage: error instanceof Error ? error.message : "unknown_error",
+      });
+    }
 
     if (error instanceof TenantBudgetExceededError) {
       throw error;

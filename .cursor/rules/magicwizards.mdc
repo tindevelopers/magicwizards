@@ -24,6 +24,11 @@ alwaysApply: true
 - Support multiple providers and model tiers (cheap/standard/premium), with cheap-first routing and explicit escalation.
 - Public SaaS flows should not rely on unsafe local CLI bypass-permission execution.
 
+## Agent SDK hosting (Anthropic)
+- Multi-tenancy with the Claude Agent SDK should follow [Anthropic's hosting guide](https://docs.anthropic.com/en/api/agent-sdk/hosting): container-based sandboxing, not a single shared process for all tenants.
+- Prefer: (1) Ephemeral container per task, or (2) Persistent container per tenant, or (3) Pooled containers + queue. Avoid relying on one process running the SDK for many tenants as the only isolation.
+- When changing wizards-api deployment or scaling, consider cold start (ephemeral) vs always-on cost (warm) and document which pattern is in use. See `docs/MULTITENANCY_AGENT_SDK_ASSESSMENT.md`.
+
 ## Safety and compliance
 - Never log API keys, tokens, secrets, full prompt content, or raw PII.
 - Enforce `maxBudgetUsd` and `maxTurns` on all wizard runs.

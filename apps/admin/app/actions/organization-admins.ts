@@ -24,10 +24,16 @@ type OrganizationAdmin = Database["public"]["Tables"]["users"]["Row"] & {
  * Check if current user is a Platform Admin (server-side)
  */
 async function isPlatformAdminServer(): Promise<boolean> {
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'organization-admins.ts:26',message:'isPlatformAdminServer called',data:{},timestamp:Date.now(),runId:'debug-1',hypothesisId:'B'})}).catch(()=>{});
+  // #endregion
   try {
     const supabase = await createClient();
     
     const { data: { user }, error: userError } = await supabase.auth.getUser();
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'organization-admins.ts:31',message:'getUser result',data:{hasUser:!!user,userError:userError?.message,userId:user?.id?.substring(0,8)+'...'},timestamp:Date.now(),runId:'debug-1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     if (userError || !user) return false;
 
     const adminClient = createAdminClient();
@@ -39,13 +45,23 @@ async function isPlatformAdminServer(): Promise<boolean> {
 
     const currentUser = userResult.data;
     const queryError = userResult.error;
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'organization-admins.ts:40',message:'user query result',data:{hasData:!!currentUser,queryError:queryError?.message,roleName:(currentUser?.roles as any)?.name,tenantId:currentUser?.tenant_id},timestamp:Date.now(),runId:'debug-1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
 
     if (queryError || !currentUser) return false;
 
     const roleName = (currentUser.roles as any)?.name;
     const tenantId = currentUser.tenant_id;
-    return roleName === "Platform Admin" && tenantId === null;
+    const isAdmin = roleName === "Platform Admin" && tenantId === null;
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'organization-admins.ts:47',message:'isPlatformAdmin result',data:{isAdmin,roleName,tenantId},timestamp:Date.now(),runId:'debug-1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
+    return isAdmin;
   } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'organization-admins.ts:49',message:'isPlatformAdminServer error',data:{errorMessage:error instanceof Error?error.message:String(error)},timestamp:Date.now(),runId:'debug-1',hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     console.error("[isPlatformAdminServer] Error:", error);
     return false;
   }

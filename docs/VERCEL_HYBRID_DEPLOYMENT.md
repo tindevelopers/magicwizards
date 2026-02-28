@@ -56,6 +56,8 @@ In each project: **Settings → Environment Variables**.
 | `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes | Supabase anon key |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | For Magic Wizards server actions and admin APIs |
+| `WIZARDS_API_URL` | Optional | Base URL of wizards-api for Test Wizard (e.g. Cloud Run URL). Default: `http://localhost:8787` |
+| `ANTHROPIC_API_KEY` | Optional | Not used by Admin; wizards-api (Cloud Run) needs this for Anthropic models |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Optional | Stripe |
 | `STRIPE_SECRET_KEY` | Optional | Stripe |
 | `STRIPE_WEBHOOK_SECRET` | Optional | Stripe webhooks |

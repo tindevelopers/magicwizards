@@ -52,6 +52,9 @@ export default function MagicWizardsSystemAdminPage() {
   }, [tenants]);
 
   async function loadData() {
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards/page.tsx:loadData',message:'loadData called',data:{},timestamp:Date.now(),runId:'debug-1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
     try {
       setLoading(true);
       setError(null);
@@ -61,6 +64,9 @@ export default function MagicWizardsSystemAdminPage() {
         listTelegramIdentities(),
         listTenantMcpServers(),
       ]);
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards/page.tsx:loadData',message:'loadData success',data:{tenantCount:tenantData.length,telegramCount:telegramData.length,mcpCount:mcpData.length},timestamp:Date.now(),runId:'debug-1',hypothesisId:'E'})}).catch(()=>{});
+      // #endregion
 
       setTenants(tenantData);
       setTelegramRows(telegramData);
@@ -75,7 +81,15 @@ export default function MagicWizardsSystemAdminPage() {
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to load Magic Wizards admin data";
-      setError(message);
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards/page.tsx:loadData',message:'loadData error',data:{errorMessage:message,errorType:err?.constructor?.name},timestamp:Date.now(),runId:'debug-1',hypothesisId:'E'})}).catch(()=>{});
+      // #endregion
+      // In production, missing env often surfaces as a generic Server Components error; hint at config.
+      const hint =
+        message.includes("SUPABASE_SERVICE_ROLE_KEY") || message.includes("NEXT_PUBLIC_SUPABASE_URL")
+          ? " Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel for the admin app and redeploy."
+          : "";
+      setError(message + hint);
     } finally {
       setLoading(false);
     }

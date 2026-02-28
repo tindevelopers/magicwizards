@@ -33,21 +33,45 @@ export interface TenantMcpServerRow {
 }
 
 async function enforceSystemAdminAccess(): Promise<void> {
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:35',message:'enforceSystemAdminAccess called',data:{},timestamp:Date.now(),runId:'debug-1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
   await requirePermission("users.read");
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:37',message:'requirePermission passed',data:{},timestamp:Date.now(),runId:'debug-1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
   const admin = await isPlatformAdmin();
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:38',message:'isPlatformAdmin result',data:{isAdmin:admin},timestamp:Date.now(),runId:'debug-1',hypothesisId:'C'})}).catch(()=>{});
+  // #endregion
   if (!admin) {
-    throw new Error("Only Platform Admins can manage Magic Wizards channel mappings.");
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:39',message:'Not platform admin',data:{},timestamp:Date.now(),runId:'debug-1',hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    throw new Error(
+      "Only Platform Admins can manage Magic Wizards channel mappings. " +
+      "Please log out and sign in as systemadmin@tin.info (password: 88888888) to access this page."
+    );
   }
 }
 
 export async function getTenantOptions(): Promise<TenantOption[]> {
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:43',message:'getTenantOptions called',data:{},timestamp:Date.now(),runId:'debug-1',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
   await enforceSystemAdminAccess();
   const client = createAdminClient();
   const { data, error } = await (client.from("tenants") as any)
     .select("id,name,domain,status")
     .order("name", { ascending: true });
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:47',message:'tenants query result',data:{hasData:!!data,dataCount:data?.length,error:error?.message},timestamp:Date.now(),runId:'debug-1',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
 
   if (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:50',message:'tenants query error',data:{errorMessage:error.message},timestamp:Date.now(),runId:'debug-1',hypothesisId:'D'})}).catch(()=>{});
+    // #endregion
     throw new Error(error.message || "Failed to fetch tenants");
   }
   return (data ?? []) as TenantOption[];

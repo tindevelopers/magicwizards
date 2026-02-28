@@ -62,6 +62,7 @@
     "build:admin": "turbo run build --filter=@tinadmin/admin",
     "build:portal": "turbo run build --filter=@tinadmin/portal",
     "build:wizards-api": "turbo run build --filter=@magicwizards/wizards-api",
+    "build:wizards-core": "turbo run build --filter=@magicwizards/wizards-core",
     "build:all": "turbo run build",
     "start": "turbo run start",
     "start:admin": "turbo run start --filter=@tinadmin/admin",
@@ -80,7 +81,8 @@
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
     "docker:ps": "docker ps | grep supabase",
-    "docker:logs": "supabase logs"
+    "docker:logs": "supabase logs",
+    "create:tin-users": "tsx scripts/create-tin-users.ts"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
@@ -127,6 +129,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
     "postcss": "^8",
+    "tsx": "^4.19.2",
     "turbo": "^2.7.1",
     "typescript": "5.9.3",
     "vitest": "^2.1.2"

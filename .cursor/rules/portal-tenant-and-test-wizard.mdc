@@ -1,0 +1,28 @@
+---
+description: Portal tenant context and Test Wizard "Tenant not found" behavior
+globs:
+  - "apps/portal/**"
+  - "packages/@tinadmin/core/src/multi-tenancy/**"
+alwaysApply: false
+---
+
+# Portal tenant context and Test Wizard
+
+## Tenant resolution for Run Wizard
+
+- **Test Wizard** (`/wizards`) calls `POST /api/wizards/run-wizard`, which uses `getCurrentTenant()` from `@/core/multi-tenancy/server` (resolved to `packages/@tinadmin/core` in the portal app).
+- **"Tenant not found"** is returned when `getCurrentTenant()` returns `null`. That happens when:
+  1. **User not signed in** — `supabase.auth.getUser()` has no user.
+  2. **User has no `tenant_id`** — e.g. Platform Admin (`users.tenant_id` is NULL).
+  3. **User row missing or error** — DB error or no `users` row for the auth user.
+
+## Fixing "Tenant not found"
+
+- Ensure the user is **signed in** to the portal (Supabase auth session).
+- Ensure the signed-in user has a **non-null `tenant_id`** in the `users` table (regular tenant users, not Platform Admin).
+- Platform Admins do not have a default tenant; they would need a tenant switcher or to use the admin app for wizard runs in a tenant context.
+
+## Implementation notes
+
+- Portal `@/core` maps to `packages/@tinadmin/core/src`. Do not assume a top-level `src/` for the portal.
+- Run-wizard route proxies to `WIZARDS_API_URL/dev/run-wizard` with `tenantId` in the body; tenant is never taken from the request body, only from server-side `getCurrentTenant()`.

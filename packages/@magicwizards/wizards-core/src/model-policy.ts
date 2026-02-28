@@ -46,25 +46,33 @@ function isHighRisk(prompt: string): boolean {
 export function resolveModelForRequest(
   request: WizardRunRequest,
 ): ResolvedModelDecision {
-  if (request.preferredProvider && request.preferredModel) {
+  // When a provider is chosen (e.g. from cost profile), always use a model that belongs to that
+  // provider from the wizard's policy. Otherwise we can send e.g. claude-sonnet-4 to OpenAI.
+  if (request.preferredProvider) {
+    const policy = request.wizard.defaultModelPolicy;
+    const model =
+      request.preferredProvider === policy.standard.provider
+        ? policy.standard.model
+        : request.preferredProvider === policy.cheap.provider
+          ? policy.cheap.model
+          : policy.standard.model;
+    const chosen: ModelTarget = {
+      provider: request.preferredProvider,
+      model,
+    };
+    return { target: chosen, reason: "preferred_provider" };
+  }
+
+  // Explicit model override only when no provider override (use wizard default provider + given model)
+  if (request.preferredModel) {
+    const policy = request.wizard.defaultModelPolicy;
     return {
       target: {
-        provider: request.preferredProvider,
+        provider: policy.standard.provider,
         model: request.preferredModel,
       },
       reason: "explicit_override",
     };
-  }
-
-  if (request.preferredProvider) {
-    const chosen: ModelTarget = {
-      provider: request.preferredProvider,
-      model:
-        request.preferredProvider === request.wizard.defaultModelPolicy.standard.provider
-          ? request.wizard.defaultModelPolicy.standard.model
-          : request.wizard.defaultModelPolicy.cheap.model,
-    };
-    return { target: chosen, reason: "preferred_provider" };
   }
 
   const prompt = request.prompt;

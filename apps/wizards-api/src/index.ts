@@ -1,6 +1,7 @@
 import cors from "cors";
 import express from "express";
 import { appConfig } from "./config.js";
+import { createDevRouter } from "./dev-router.js";
 import { logger } from "./logger.js";
 import { createTelegramWebhookRouter } from "./telegram/webhook.js";
 
@@ -19,8 +20,14 @@ app.get("/health", (_req, res) => {
 
 app.use("/webhooks", createTelegramWebhookRouter());
 
-const server = app.listen(appConfig.port, () => {
-  logger.info("wizards_api_started", { port: appConfig.port });
+if (appConfig.nodeEnv === "development") {
+  app.use("/dev", createDevRouter());
+  logger.info("dev_routes_enabled", { path: "/dev/run-wizard" });
+}
+
+const host = process.env.HOST ?? "0.0.0.0";
+const server = app.listen(appConfig.port, host, () => {
+  logger.info("wizards_api_started", { host, port: appConfig.port });
 });
 
 function shutdown(signal: string): void {

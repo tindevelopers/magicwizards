@@ -1,0 +1,24 @@
+# Reduce Cloud Build context; Dockerfile copies only what it needs
+.git
+.gitignore
+.node_modules
+**/node_modules
+**/.next
+**/.turbo
+**/dist
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+*.md
+!README.md
+apps/admin
+apps/portal
+packages/@tinadmin
+.cursor
+.vercel
+supabase
+scripts
+*.pdf
+*.docx
