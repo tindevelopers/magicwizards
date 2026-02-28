@@ -1,7 +1,9 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { appConfig } from "./config.js";
 
-export type SupabaseAnyClient = SupabaseClient<Record<string, never>, "public", Record<string, never>>;
+/** Admin client typed loosely so insert/update accept our table payloads without generated DB types. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type SupabaseAnyClient = SupabaseClient<any, "public", any>;
 
 let cachedAdminClient: SupabaseAnyClient | null = null;
 
@@ -16,7 +18,7 @@ export function getSupabaseAdminClient(): SupabaseAnyClient {
           persistSession: false,
         },
       },
-    ) as SupabaseAnyClient;
+    ) as unknown as SupabaseAnyClient;
   }
   return cachedAdminClient;
 }

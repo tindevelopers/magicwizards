@@ -56,7 +56,7 @@ export class AnthropicAdapter implements RuntimeAdapter {
     target: ModelTarget,
   ): Promise<WizardRunResult> {
     const sdk = await import("@anthropic-ai/claude-agent-sdk");
-    const query = (sdk as { query?: QueryFn }).query;
+    const query = (sdk as unknown as { query?: QueryFn }).query;
     if (!query) {
       throw new Error("Anthropic SDK query function is unavailable.");
     }
