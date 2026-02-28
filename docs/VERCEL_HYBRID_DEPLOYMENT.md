@@ -35,6 +35,8 @@ Per-project overrides:
 
 (If you leave Build/Output blank for the admin project, the repo’s root `vercel.json` applies and already points to the admin app.)
 
+**Important:** The root `package.json` script **`"build": "turbo run build --filter=@tinadmin/admin"`** is required so that when Vercel runs `pnpm build` from the repo root (e.g. when Next.js preset overrides the build command), Turbo builds workspace packages (`@tinadmin/integrations-core`, `@tinadmin/integration-gohighlevel`, etc.) before the admin app. Otherwise you get *Module not found: Can't resolve '@tinadmin/integrations-core'*. If you still see that after pulling, in Vercel go to **Deployments → … → Redeploy** and enable **Clear cache and redeploy**.
+
 ---
 
 **If portal deployments fail** (e.g. *output directory "apps/admin/.next" was not found at ".../apps/portal/apps/admin/.next"*):
@@ -117,4 +119,4 @@ Choose 1 (admin), 2 (portal), or 3 (both). The script runs from the root and use
 
 ## 7. wizards-api (not on Vercel)
 
-The **wizards-api** Express app is intended for **Google Cloud Run** (long timeouts, webhooks). See the Cloud Run deployment guide when you add it.
+The **wizards-api** Express app is intended for **Google Cloud Run** (long timeouts, webhooks). See [Cloud Run deployment](CLOUD_RUN_DEPLOYMENT.md) for build and deploy steps.
