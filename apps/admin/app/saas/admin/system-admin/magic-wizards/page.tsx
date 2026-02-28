@@ -17,6 +17,7 @@ import {
   type TenantMcpServerRow,
   type TenantOption,
 } from "@/app/actions/magic-wizards";
+import TestWizardBlock from "@/components/wizards/TestWizardBlock";
 
 export default function MagicWizardsSystemAdminPage() {
   const [loading, setLoading] = useState(true);
@@ -40,6 +41,7 @@ export default function MagicWizardsSystemAdminPage() {
 
   const [savingTelegram, setSavingTelegram] = useState(false);
   const [savingMcp, setSavingMcp] = useState(false);
+  const [testWizardTenantId, setTestWizardTenantId] = useState("__mock__");
 
   const tenantMap = useMemo(() => {
     const map = new Map<string, TenantOption>();
@@ -67,6 +69,9 @@ export default function MagicWizardsSystemAdminPage() {
       if (tenantData.length > 0) {
         setTelegramForm((prev) => ({ ...prev, tenantId: prev.tenantId || tenantData[0].id }));
         setMcpForm((prev) => ({ ...prev, tenantId: prev.tenantId || tenantData[0].id }));
+        setTestWizardTenantId((prev) =>
+          prev === "__mock__" ? "__mock__" : (tenantData.find((t) => t.id === prev) ? prev : tenantData[0].id)
+        );
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Failed to load Magic Wizards admin data";
@@ -405,6 +410,18 @@ export default function MagicWizardsSystemAdminPage() {
           </section>
         </div>
       )}
+
+      <TestWizardBlock
+        tenantOptions={[
+          { value: "__mock__", label: "Mock (no DB, no LLM keys)" },
+          ...tenants.map((t) => ({
+            value: t.id,
+            label: `${t.name} (${t.domain})`,
+          })),
+        ]}
+        selectedTenantId={testWizardTenantId}
+        onTenantChange={setTestWizardTenantId}
+      />
     </div>
   );
 }
