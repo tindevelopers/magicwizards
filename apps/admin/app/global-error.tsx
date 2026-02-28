@@ -43,6 +43,12 @@ export default function GlobalError({
               A critical error occurred. Please try refreshing the page.
             </p>
 
+            {error.message && (
+              <p className="mb-4 text-sm text-left text-gray-600 dark:text-gray-400 break-words max-w-lg mx-auto font-mono bg-gray-100 dark:bg-gray-800 px-3 py-2 rounded">
+                {error.message}
+              </p>
+            )}
+
             {error.digest && (
               <p className="mb-6 text-sm text-gray-500 dark:text-gray-500 font-mono">
                 Error ID: {error.digest}

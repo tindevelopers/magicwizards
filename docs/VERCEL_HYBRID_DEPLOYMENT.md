@@ -62,6 +62,8 @@ In each project: **Settings → Environment Variables**.
 | `NEXT_PUBLIC_MULTI_TENANT_ENABLED` | Optional | e.g. `true` |
 | `NEXT_PUBLIC_SYSTEM_MODE` | Optional | e.g. `multi-tenant` |
 
+If the admin shows a **Critical Error** on `/signin` (or any page), the app is likely missing the required Supabase env vars. Add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` in the admin project’s Environment Variables, then redeploy.
+
 **Portal** (same Supabase; Stripe only if used):
 
 | Variable | Required | Notes |
