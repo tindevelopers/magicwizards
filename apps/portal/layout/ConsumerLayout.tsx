@@ -29,6 +29,12 @@ export default function ConsumerLayout({
             </div>
             <nav className="flex items-center space-x-4">
               <a
+                href="/tools"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              >
+                My Tools
+              </a>
+              <a
                 href="/wizards"
                 className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
               >
