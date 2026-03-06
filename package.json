@@ -85,7 +85,7 @@
     "create:tin-users": "tsx scripts/create-tin-users.ts"
   },
   "dependencies": {
-    "@fullcalendar/core": "^6.1.15",
+    "@fullcalendar/core": "^6.1.20",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/list": "^6.1.15",
