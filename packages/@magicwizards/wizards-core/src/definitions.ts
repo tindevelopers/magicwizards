@@ -95,7 +95,31 @@ export const SalesWizard: WizardDefinition = {
   },
 };
 
+export const OrchestratorWizard: WizardDefinition = {
+  id: "orchestrator",
+  name: "Orchestrator",
+  description:
+    "Routes requests to specialist wizards based on intent classification.",
+  systemPrompt: `You are the orchestrator. Classify the user's intent and route to the appropriate specialist:
+- Research tasks (search, find, compare) -> Research Wizard
+- CRM/sales tasks (contacts, leads, deals) -> Sales Wizard
+- Scheduling/calling tasks -> Ops Wizard
+- Code/implementation tasks -> Builder Wizard
+- Multi-step tasks -> Break into sub-tasks and route each
+Always use the cheapest appropriate wizard. Respond with JSON: {"wizard": "research|sales|ops|builder", "reason": "..."}`,
+  allowedTools: [],
+  maxTurns: 2,
+  maxBudgetUsd: 0.05,
+  defaultModelPolicy: {
+    cheap: { provider: "openai", model: "gpt-4.1-mini" },
+    standard: { provider: "openai", model: "gpt-4.1-mini" },
+    premium: { provider: "openai", model: "gpt-4.1-mini" },
+    escalation: [],
+  },
+};
+
 export const DEFAULT_WIZARDS: Record<string, WizardDefinition> = {
+  [OrchestratorWizard.id]: OrchestratorWizard,
   [ResearchWizard.id]: ResearchWizard,
   [BuilderWizard.id]: BuilderWizard,
   [OpsWizard.id]: OpsWizard,

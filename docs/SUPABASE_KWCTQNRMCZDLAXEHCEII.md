@@ -6,6 +6,17 @@ All apps are configured to use **https://kwctqnrmczdlaxehceii.supabase.co**:
 - **Admin** – `apps/admin/.env.local`
 - **Wizards API** – `apps/wizards-api/.env`
 
+### Quick setup (remote Supabase)
+
+To point all apps at this remote project:
+
+```bash
+# Requires: supabase login (or SUPABASE_ACCESS_TOKEN)
+pnpm exec node scripts/install-remote-supabase-env.mjs kwctqnrmczdlaxehceii
+```
+
+This updates `apps/admin/.env.local`, `apps/portal/.env.local`, and `apps/wizards-api/.env` with the project URL and keys.
+
 ## Linking the CLI to this database
 
 The **service role key** cannot be used to link the CLI. `supabase link` talks to the Supabase **Management API** (project list, settings). It only works when the account you used in `supabase login` has access to the project in the dashboard. The service role key is for your app (Auth, PostgREST); it is not used by the link command.

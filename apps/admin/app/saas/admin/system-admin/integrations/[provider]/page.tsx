@@ -136,6 +136,52 @@ export default async function SystemAdminProviderSettingsPage({
                 </div>
               </div>
             </>
+          ) : provider.slug === "google" || provider.slug === "microsoft" ? (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="oauthClientId">OAuth Client ID</Label>
+                  <Input
+                    id="oauthClientId"
+                    name="oauthClientId"
+                    defaultValue={String(settings.oauthClientId ?? "")}
+                    placeholder={
+                      provider.slug === "microsoft"
+                        ? "Azure App Registration Application (client) ID"
+                        : "Google OAuth Client ID"
+                    }
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="oauthClientSecret">OAuth Client Secret</Label>
+                  <Input
+                    id="oauthClientSecret"
+                    name="oauthClientSecret"
+                    type="password"
+                    defaultValue={String(settings.oauthClientSecret ?? "")}
+                    placeholder={
+                      provider.slug === "microsoft"
+                        ? "Azure App Registration Client Secret"
+                        : "Google OAuth Client Secret"
+                    }
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="oauthRedirectUri">OAuth Redirect URI (optional)</Label>
+                <Input
+                  id="oauthRedirectUri"
+                  name="oauthRedirectUri"
+                  defaultValue={String(settings.oauthRedirectUri ?? "")}
+                  placeholder={
+                    provider.slug === "microsoft"
+                      ? "https://yourdomain.com/api/integrations/microsoft/auth/callback"
+                      : "https://yourdomain.com/api/integrations/google/auth/callback"
+                  }
+                />
+              </div>
+            </>
           ) : (
             <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 dark:border-gray-800 dark:bg-gray-900/40 dark:text-gray-300">
               No provider-specific settings UI has been defined yet for this integration.

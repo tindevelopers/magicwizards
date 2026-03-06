@@ -19,6 +19,17 @@ function requiredUnlessDev(name: string): string {
   return value ?? "";
 }
 
+/** Require one of the given env var names (for Cloud Run vs Vercel naming). */
+function requiredOneOf(...names: string[]): string {
+  for (const name of names) {
+    const value = process.env[name]?.trim();
+    if (value) return value;
+  }
+  throw new Error(
+    `Missing required env: set one of ${names.join(", ")}`,
+  );
+}
+
 export const appConfig = {
   nodeEnv: process.env.NODE_ENV ?? "development",
   port: Number(process.env.WIZARDS_API_PORT ?? process.env.PORT ?? 8787),
@@ -29,7 +40,7 @@ export const appConfig = {
     defaultWizardId: process.env.MAGIC_WIZARDS_DEFAULT_WIZARD_ID ?? "builder",
   },
   supabase: {
-    url: required("NEXT_PUBLIC_SUPABASE_URL"),
+    url: requiredOneOf("NEXT_PUBLIC_SUPABASE_URL", "SUPABASE_URL"),
     serviceRoleKey: required("SUPABASE_SERVICE_ROLE_KEY"),
   },
   runtime: {

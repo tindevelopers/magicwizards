@@ -120,6 +120,11 @@ upsertEnvFile("apps/portal/.env.local", {
   NEXT_PUBLIC_SUPABASE_ANON_KEY: anonKey,
 });
 
+upsertEnvFile("apps/wizards-api/.env", {
+  NEXT_PUBLIC_SUPABASE_URL: SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE_KEY: serviceRoleKey,
+});
+
 console.log("✅ Installed Supabase env vars for remote project:");
 console.log(`   - Project ref: ${PROJECT_REF}`);
 console.log(`   - URL: ${SUPABASE_URL}`);
@@ -129,4 +134,5 @@ console.log("");
 console.log("📄 Updated:");
 console.log("   - apps/admin/.env.local");
 console.log("   - apps/portal/.env.local");
+console.log("   - apps/wizards-api/.env");
 

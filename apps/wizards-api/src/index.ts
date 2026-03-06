@@ -1,9 +1,15 @@
 import cors from "cors";
 import express from "express";
+import { registerApprovalHandler } from "@magicwizards/wizards-core";
 import { appConfig } from "./config.js";
 import { createDevRouter } from "./dev-router.js";
+import { createMcpTelephonyRouter } from "./routes/mcp-telephony.js";
 import { logger } from "./logger.js";
 import { createTelegramWebhookRouter } from "./telegram/webhook.js";
+import { processDueTasks } from "./services/scheduler.js";
+import { telegramApprovalHandler } from "./telegram/approval-handler.js";
+
+registerApprovalHandler("telegram", telegramApprovalHandler);
 
 const app = express();
 app.disable("x-powered-by");
@@ -19,6 +25,23 @@ app.get("/health", (_req, res) => {
 });
 
 app.use("/webhooks", createTelegramWebhookRouter());
+
+// Built-in MCP endpoint for telephony (tenant-scoped via path)
+app.use("/mcp/telephony/:tenantId", createMcpTelephonyRouter());
+
+// Cron endpoint: Cloud Scheduler hits this every 60 seconds
+app.post("/cron/run-due-tasks", async (_req, res) => {
+  try {
+    const result = await processDueTasks();
+    logger.info("cron_run_due_tasks", result);
+    res.json({ status: "ok", ...result });
+  } catch (error) {
+    logger.error("cron_run_due_tasks_failed", {
+      error: error instanceof Error ? error.message : "unknown",
+    });
+    res.status(500).json({ status: "error" });
+  }
+});
 
 if (appConfig.nodeEnv === "development") {
   app.use("/dev", createDevRouter());

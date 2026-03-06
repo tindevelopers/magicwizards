@@ -74,7 +74,7 @@ Required env vars for wizards-api (see `apps/wizards-api/src/config.ts`):
 | Variable | Required | Notes |
 |----------|----------|--------|
 | `MAGIC_WIZARDS_TELEGRAM_BOT_TOKEN` | Yes | Telegram bot token |
-| `NEXT_PUBLIC_SUPABASE_URL` | Yes | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_URL` or `SUPABASE_URL` | Yes | Supabase project URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | Yes | Supabase service role key |
 | `MAGIC_WIZARDS_TELEGRAM_WEBHOOK_SECRET` | Optional | Webhook secret |
 | `WIZARDS_API_PUBLIC_URL` | Optional | Public URL for webhooks (e.g. Cloud Run URL) |

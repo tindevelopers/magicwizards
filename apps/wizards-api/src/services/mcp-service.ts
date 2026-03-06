@@ -1,10 +1,8 @@
+import type { TenantMcpServer } from "@magicwizards/wizards-core";
 import { getSupabaseAdminClient } from "../supabase.js";
 
-export interface TenantMcpConfig {
-  type: "url";
-  name: string;
-  url: string;
-}
+/** @deprecated Use TenantMcpServer from @magicwizards/wizards-core */
+export type TenantMcpConfig = TenantMcpServer;
 
 interface McpRow {
   server_name: string;
@@ -13,7 +11,7 @@ interface McpRow {
 
 export async function getMcpServersForTenant(
   tenantId: string,
-): Promise<TenantMcpConfig[]> {
+): Promise<TenantMcpServer[]> {
   const admin = getSupabaseAdminClient();
   const { data, error } = await admin
     .from("tenant_mcp_servers")
@@ -25,7 +23,7 @@ export async function getMcpServersForTenant(
     return [];
   }
 
-  return (data as McpRow[]).map((row) => ({
+  return (data as McpRow[]).map((row): TenantMcpServer => ({
     type: "url",
     name: row.server_name,
     url: row.server_url,

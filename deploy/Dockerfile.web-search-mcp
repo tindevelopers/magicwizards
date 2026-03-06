@@ -1,0 +1,14 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+COPY apps/web-search-mcp/package.json apps/web-search-mcp/tsconfig.json ./
+COPY apps/web-search-mcp/src ./src/
+
+RUN npm install --omit=dev
+RUN npx tsc
+
+ENV PORT=8080
+EXPOSE 8080
+
+CMD ["node", "dist/index.js"]

@@ -8,6 +8,8 @@ import {
 } from "../services/tenant-resolution.js";
 import { runWizardForTenant } from "../services/wizard-service.js";
 import { sendTelegramText } from "./sender.js";
+import { parseApprovalCallback } from "./approval-handler.js";
+import { resolveApproval } from "../services/approval-store.js";
 
 function verifyTelegramSecret(secretHeader: string | undefined): boolean {
   if (!appConfig.telegram.webhookSecret) {
@@ -16,7 +18,32 @@ function verifyTelegramSecret(secretHeader: string | undefined): boolean {
   return secretHeader === appConfig.telegram.webhookSecret;
 }
 
+async function handleApprovalCallback(callbackQuery: TelegramUpdate["callback_query"]): Promise<boolean> {
+  if (!callbackQuery?.data) return false;
+  const parsed = parseApprovalCallback(callbackQuery.data);
+  if (!parsed) return false;
+
+  const resolved = resolveApproval(parsed.approvalId, parsed.decision);
+  if (resolved) {
+    const endpoint = `https://api.telegram.org/bot${appConfig.telegram.botToken}/answerCallbackQuery`;
+    await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        callback_query_id: callbackQuery.id,
+        text: parsed.decision === "approved" ? "Approved" : "Denied",
+      }),
+    });
+  }
+  return resolved;
+}
+
 async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
+  if (update.callback_query) {
+    const handled = await handleApprovalCallback(update.callback_query);
+    if (handled) return;
+  }
+
   const message = update.message;
   if (!message?.text) {
     return;
@@ -54,6 +81,7 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
       externalUserRef: telegramUserId ? String(telegramUserId) : undefined,
       prompt: message.text,
       channel: "telegram",
+      channelMetadata: { telegramChatId: message.chat.id },
     });
 
     await sendTelegramText(message.chat.id, result.text);
