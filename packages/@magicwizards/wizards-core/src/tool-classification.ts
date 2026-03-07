@@ -53,6 +53,33 @@ const TOOL_RISK_REGISTRY: Record<string, ToolRiskLevel> = {
   "salesforce/get_opportunities": "read",
   "salesforce/create_opportunity": "write",
   "salesforce/run_report": "read",
+
+  // Lead Discovery (outreach)
+  "lead-discovery/search_instagram": "read",
+  "lead-discovery/search_google_maps": "read",
+  "lead-discovery/search_web": "read",
+  "lead-discovery/enrich_contact": "read",
+  "lead-discovery/save_leads": "write",
+  "lead-discovery/list_leads": "read",
+
+  // Email Outreach (outreach)
+  "email-outreach/send_outreach_email": "write",
+  "email-outreach/send_campaign_batch": "write",
+  "email-outreach/preview_email": "read",
+  "email-outreach/check_email_status": "read",
+  "email-outreach/handle_reply": "write",
+
+  // Campaign Tracker (outreach)
+  "campaign-tracker/create_campaign": "write",
+  "campaign-tracker/get_campaign": "read",
+  "campaign-tracker/list_campaigns": "read",
+  "campaign-tracker/update_campaign_status": "write",
+  "campaign-tracker/get_pipeline_summary": "read",
+  "campaign-tracker/create_sequence": "write",
+  "campaign-tracker/list_sequences": "read",
+  "campaign-tracker/promote_to_crm": "write",
+  "campaign-tracker/schedule_campaign": "write",
+  "campaign-tracker/get_due_followups": "read",
 };
 
 /**

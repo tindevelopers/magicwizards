@@ -191,6 +191,26 @@ export async function runWizardForTenant(input: {
           ];
         }
       }
+
+      // Inject outreach MCP servers when plan allows
+      const outreachMcpNames = ["lead-discovery", "email-outreach", "campaign-tracker"] as const;
+      const baseUrl =
+        appConfig.publicBaseUrl || `http://localhost:${appConfig.port}`;
+      for (const mcpName of outreachMcpNames) {
+        const allowed =
+          profile.allowedMcpServers.includes(mcpName) ||
+          profile.allowedMcpServers.includes("*");
+        if (allowed) {
+          mcpServers = [
+            ...mcpServers,
+            {
+              type: "url",
+              name: mcpName,
+              url: `${baseUrl}/mcp/${mcpName}/${input.tenantId}`,
+            },
+          ];
+        }
+      }
     }
 
     // Store user message in working memory

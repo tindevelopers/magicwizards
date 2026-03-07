@@ -14,6 +14,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@magicwizards/outreach": "workspace:*",
     "@magicwizards/wizards-core": "workspace:*",
     "@supabase/supabase-js": "^2.89.0",
     "cors": "^2.8.5",

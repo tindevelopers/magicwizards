@@ -4,6 +4,13 @@ import { registerApprovalHandler } from "@magicwizards/wizards-core";
 import { appConfig } from "./config.js";
 import { createDevRouter } from "./dev-router.js";
 import { createMcpTelephonyRouter } from "./routes/mcp-telephony.js";
+import {
+  createLeadDiscoveryMcpRouter,
+  createEmailOutreachMcpRouter,
+  createCampaignTrackerMcpRouter,
+  createEmailWebhookRouter,
+} from "@magicwizards/outreach";
+import { createOutreachContext } from "./outreach/context-factory.js";
 import { logger } from "./logger.js";
 import { createTelegramWebhookRouter } from "./telegram/webhook.js";
 import { processDueTasks } from "./services/scheduler.js";
@@ -28,6 +35,14 @@ app.use("/webhooks", createTelegramWebhookRouter());
 
 // Built-in MCP endpoint for telephony (tenant-scoped via path)
 app.use("/mcp/telephony/:tenantId", createMcpTelephonyRouter());
+
+// Outreach MCP endpoints (tenant-scoped via path)
+app.use("/mcp/lead-discovery/:tenantId", createLeadDiscoveryMcpRouter(createOutreachContext));
+app.use("/mcp/email-outreach/:tenantId", createEmailOutreachMcpRouter(createOutreachContext));
+app.use("/mcp/campaign-tracker/:tenantId", createCampaignTrackerMcpRouter(createOutreachContext));
+
+// Email tracking webhooks (Resend, SendGrid, SES)
+app.use("/webhooks/email", createEmailWebhookRouter(createOutreachContext));
 
 // Cron endpoint: Cloud Scheduler hits this every 60 seconds
 app.post("/cron/run-due-tasks", async (_req, res) => {
