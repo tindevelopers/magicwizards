@@ -1,0 +1,45 @@
+{
+  "name": "@magicwizards/outreach",
+  "version": "0.1.0",
+  "description": "Autonomous outreach system — lead discovery, email campaigns, pipeline tracking, CRM conversion",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "outreach",
+    "email-campaigns",
+    "lead-discovery",
+    "mcp",
+    "multi-tenant"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20",
+    "typescript": "^5.9.3"
+  }
+}
