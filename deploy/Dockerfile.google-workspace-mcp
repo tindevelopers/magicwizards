@@ -1,0 +1,8 @@
+# Thin wrapper around aaronsb/google-workspace-mcp for Cloud Run.
+# OAuth tokens are injected by wizards-api token proxy per request.
+FROM ghcr.io/aaronsb/google-workspace-mcp:latest
+
+ENV LOG_MODE=strict
+ENV PORT=8080
+
+EXPOSE 8080

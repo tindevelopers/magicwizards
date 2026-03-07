@@ -838,6 +838,235 @@ export interface Database {
           created_at?: string;
         };
       };
+
+      // ============================================================================
+      // INTEGRATIONS
+      // ============================================================================
+      integration_providers: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          category: string;
+          description: string | null;
+          icon_slug: string | null;
+          auth_type: "oauth2" | "api_key" | "webhook_only";
+          is_beta: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          name: string;
+          category: string;
+          description?: string | null;
+          icon_slug?: string | null;
+          auth_type?: "oauth2" | "api_key" | "webhook_only";
+          is_beta?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          name?: string;
+          category?: string;
+          description?: string | null;
+          icon_slug?: string | null;
+          auth_type?: "oauth2" | "api_key" | "webhook_only";
+          is_beta?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      platform_integration_settings: {
+        Row: {
+          id: string;
+          provider_id: string;
+          enabled: boolean;
+          settings: Record<string, any>;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          enabled?: boolean;
+          settings?: Record<string, any>;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          enabled?: boolean;
+          settings?: Record<string, any>;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      integration_connections: {
+        Row: {
+          id: string;
+          provider_id: string;
+          tenant_id: string;
+          status: "disconnected" | "connected" | "pending" | "error";
+          display_name: string | null;
+          scopes: string[];
+          metadata: Record<string, any>;
+          last_sync_at: string | null;
+          last_error: string | null;
+          created_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          tenant_id: string;
+          status?: "disconnected" | "connected" | "pending" | "error";
+          display_name?: string | null;
+          scopes?: string[];
+          metadata?: Record<string, any>;
+          last_sync_at?: string | null;
+          last_error?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          tenant_id?: string;
+          status?: "disconnected" | "connected" | "pending" | "error";
+          display_name?: string | null;
+          scopes?: string[];
+          metadata?: Record<string, any>;
+          last_sync_at?: string | null;
+          last_error?: string | null;
+          created_by?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      integration_connection_secrets: {
+        Row: {
+          connection_id: string;
+          secrets_ciphertext: string;
+          secrets_iv: string;
+          secrets_tag: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          connection_id: string;
+          secrets_ciphertext: string;
+          secrets_iv: string;
+          secrets_tag: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          connection_id?: string;
+          secrets_ciphertext?: string;
+          secrets_iv?: string;
+          secrets_tag?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
+      integration_webhook_events: {
+        Row: {
+          id: string;
+          provider_id: string;
+          tenant_id: string | null;
+          connection_id: string | null;
+          idempotency_key: string;
+          event_type: string | null;
+          headers: Record<string, any>;
+          payload: Record<string, any>;
+          status: "received" | "processed" | "failed";
+          error: string | null;
+          received_at: string;
+          processed_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          tenant_id?: string | null;
+          connection_id?: string | null;
+          idempotency_key: string;
+          event_type?: string | null;
+          headers?: Record<string, any>;
+          payload: Record<string, any>;
+          status?: "received" | "processed" | "failed";
+          error?: string | null;
+          received_at?: string;
+          processed_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          tenant_id?: string | null;
+          connection_id?: string | null;
+          idempotency_key?: string;
+          event_type?: string | null;
+          headers?: Record<string, any>;
+          payload?: Record<string, any>;
+          status?: "received" | "processed" | "failed";
+          error?: string | null;
+          received_at?: string;
+          processed_at?: string | null;
+        };
+      };
+      integration_jobs: {
+        Row: {
+          id: string;
+          provider_id: string;
+          tenant_id: string | null;
+          connection_id: string | null;
+          job_type: string;
+          payload: Record<string, any>;
+          status: "queued" | "running" | "succeeded" | "failed" | "dead";
+          run_at: string;
+          attempts: number;
+          last_error: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          provider_id: string;
+          tenant_id?: string | null;
+          connection_id?: string | null;
+          job_type: string;
+          payload?: Record<string, any>;
+          status?: "queued" | "running" | "succeeded" | "failed" | "dead";
+          run_at?: string;
+          attempts?: number;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          provider_id?: string;
+          tenant_id?: string | null;
+          connection_id?: string | null;
+          job_type?: string;
+          payload?: Record<string, any>;
+          status?: "queued" | "running" | "succeeded" | "failed" | "dead";
+          run_at?: string;
+          attempts?: number;
+          last_error?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+      };
     };
   };
 }

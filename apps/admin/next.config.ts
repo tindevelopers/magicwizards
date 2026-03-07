@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
+import nodePath from "node:path";
 
 const nextConfig: NextConfig = {
+  // Fix Next.js monorepo root inference when multiple lockfiles exist on the machine.
+  // This should point at the monorepo root (two levels up from apps/admin).
+  outputFileTracingRoot: nodePath.resolve(__dirname, "../.."),
+
   // Server external packages (moved from experimental in Next.js 16)
   serverExternalPackages: ['openai'],
   

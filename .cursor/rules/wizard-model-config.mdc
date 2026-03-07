@@ -1,0 +1,28 @@
+---
+description: Magic Wizards multi-wizard and model config (Opus 4.6, Sonnet, etc.)
+globs:
+  - "packages/@magicwizards/wizards-core/**"
+  - "apps/wizards-api/**"
+  - ".env*"
+alwaysApply: false
+---
+
+# Wizard and model configuration
+
+## Multi-wizard (multi-agent) config
+
+- **There is no separate "multi-agent" product config.** The product has multiple **Wizards** (builder, research, ops, sales), each defined in `packages/@magicwizards/wizards-core/src/definitions.ts`.
+- Each wizard has: `id`, `name`, `systemPrompt`, `allowedTools`, `maxTurns`, `maxBudgetUsd`, and `defaultModelPolicy` (cheap / standard / premium tiers and escalation rules).
+- **Wizards API** env: `MAGIC_WIZARDS_DEFAULT_WIZARD_ID` (default `builder`), `MAGIC_WIZARDS_DEFAULT_PROVIDER`, `MAGIC_WIZARDS_DEFAULT_MODEL`. Per-tenant overrides can come from `tenants.wizard_provider`, `tenants.wizard_model`, `tenants.wizard_budget_usd` via `getTenantConfig()`.
+
+## Supported models (Anthropic)
+
+- Definitions currently use: `claude-sonnet-4` (standard), `claude-opus-4.1` (premium/escalation).
+- **Opus 4.6** is supported by the API: use model id **`claude-opus-4-6`** (Anthropic, 2026). For Opus 4.5 use **`claude-opus-4-5`**.
+- To use Opus 4.6 everywhere: set `MAGIC_WIZARDS_DEFAULT_MODEL=claude-opus-4-6` (and optionally `MAGIC_WIZARDS_DEFAULT_PROVIDER=anthropic`). Or set per-tenant `wizard_model` in the database.
+- Runtime picks model from: tenant config → app config (`MAGIC_WIZARDS_DEFAULT_MODEL`) → wizard default policy (standard/premium).
+
+## Where to change defaults
+
+- **App default:** `apps/wizards-api/src/config.ts` and `.env` / `.env.example`: `MAGIC_WIZARDS_DEFAULT_MODEL`, `MAGIC_WIZARDS_DEFAULT_PROVIDER`.
+- **Wizard-tier defaults:** `packages/@magicwizards/wizards-core/src/definitions.ts` — edit `defaultModelPolicy.standard.model` / `premium.model` or escalation `target.model` to add or switch to `claude-opus-4-6` if desired.

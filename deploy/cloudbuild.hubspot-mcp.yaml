@@ -1,0 +1,28 @@
+# Build HubSpot MCP server for Cloud Run.
+# Clones peakmojo/mcp-hubspot and builds.
+# Run from repo root: gcloud builds submit --config=deploy/cloudbuild.hubspot-mcp.yaml
+steps:
+  - name: 'gcr.io/cloud-builders/git'
+    args: ['clone', '--depth', '1', 'https://github.com/peakmojo/mcp-hubspot.git', '/workspace/mcp-hubspot']
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: '/workspace/mcp-hubspot'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/hubspot-mcp:$BUILD_ID'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/hubspot-mcp:latest'
+      - '.'
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/hubspot-mcp:$BUILD_ID'
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/hubspot-mcp:latest'
+images:
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/hubspot-mcp:$BUILD_ID'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/cloud-run-source-deploy/hubspot-mcp:latest'
+options:
+  logging: CLOUD_LOGGING_ONLY

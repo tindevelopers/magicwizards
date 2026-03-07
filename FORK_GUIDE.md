@@ -280,7 +280,7 @@ See `CONTRIBUTING.md` for guidelines.
 
 ## Attribution
 
-This project is forked from the [SaaS Platform Template](https://github.com/tindevelopers/tinadmin-saas-base-turborepo).
+This project is forked from the [SaaS Platform Template](https://github.com/the-info-network/tinadmin-saas-base-turborepo).
 
 Consider keeping attribution in your footer or about page:
 ```

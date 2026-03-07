@@ -1,0 +1,20 @@
+{
+  "name": "@tinadmin/integration-gohighlevel",
+  "version": "0.1.0",
+  "private": true,
+  "description": "GoHighLevel integration SDK: OAuth, API client, sync and webhook helpers.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tinadmin/integrations-core": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}
+

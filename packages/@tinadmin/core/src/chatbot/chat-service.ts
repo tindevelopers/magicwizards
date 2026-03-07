@@ -66,13 +66,14 @@ export async function processChatMessage(
     { role: 'user', content: request.message },
   ];
 
-  // Generate response using Vercel AI SDK
+  // Generate response using Vercel AI SDK (maxTokens in v3, maxOutputTokens in v5+)
   const result = await generateText({
     model: openai(model) as any,
     messages,
     temperature,
     maxTokens,
-  });
+    maxOutputTokens: maxTokens,
+  } as any);
 
   // Get the response text
   const responseText = result.text;

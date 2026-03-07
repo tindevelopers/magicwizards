@@ -1,0 +1,37 @@
+# Build stage: monorepo root so workspace deps (@magicwizards/wizards-core) resolve
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@10.6.1 --activate
+
+# Copy workspace config and turbo (needed for turbo run)
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
+COPY packages/@magicwizards packages/@magicwizards
+COPY apps/wizards-api apps/wizards-api
+
+# Only install prod deps for wizards-api and its workspace deps (no dev)
+RUN pnpm install --frozen-lockfile
+
+# Build wizards-core and wizards-api via Turbo (root script)
+RUN pnpm run build:wizards-api
+
+# Runtime stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+# Cloud Run sets PORT
+ENV PORT=8080
+
+# Copy minimal runtime surface: root node_modules, workspace package, app dist
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/node_modules node_modules
+COPY --from=builder /app/packages packages
+COPY --from=builder /app/apps/wizards-api apps/wizards-api
+
+EXPOSE 8080
+
+CMD ["node", "apps/wizards-api/dist/index.js"]

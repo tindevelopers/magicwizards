@@ -4,6 +4,8 @@ import { getTicketAttachments } from "@/app/actions/support/attachments";
 import TicketDetail from "@/components/support/TicketDetail";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
+
 export default async function TicketDetailPage({
   params,
 }: {

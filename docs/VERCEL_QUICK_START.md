@@ -1,6 +1,10 @@
 # Vercel Deployment - Quick Start Guide
 
-## Quick Deployment Steps
+**Magic Wizards (hybrid):** For deploying **Admin** and **Portal** from this monorepo with Turbo, use **[docs/VERCEL_HYBRID_DEPLOYMENT.md](VERCEL_HYBRID_DEPLOYMENT.md)** and run `./scripts/deploy-vercel.sh` from the repo root.
+
+---
+
+## Quick Deployment Steps (legacy / single-app)
 
 ### 1. Install Prerequisites
 

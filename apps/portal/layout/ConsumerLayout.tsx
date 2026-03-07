@@ -28,8 +28,12 @@ export default function ConsumerLayout({
               </h1>
             </div>
             <nav className="flex items-center space-x-4">
-              {/* Consumer navigation items */}
-              {/* Add consumer-specific navigation here */}
+              <a
+                href="/wizards"
+                className="text-sm font-medium text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+              >
+                Test Wizard
+              </a>
             </nav>
           </div>
         </div>

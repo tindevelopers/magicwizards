@@ -17,6 +17,8 @@
     "@tinadmin/core": "workspace:*",
     "@tinadmin/ui-admin": "workspace:*",
     "@tinadmin/config": "workspace:*",
+    "@tinadmin/integrations-core": "workspace:*",
+    "@tinadmin/integration-gohighlevel": "workspace:*",
     "@fullcalendar/core": "^6.1.15",
     "@fullcalendar/daygrid": "^6.1.15",
     "@fullcalendar/interaction": "^6.1.15",

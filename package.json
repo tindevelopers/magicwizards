@@ -18,12 +18,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-org/your-saas-platform.git"
+    "url": "git+https://github.com/the-info-network/tinadmin-saas-base-turborepo.git"
   },
   "bugs": {
-    "url": "https://github.com/your-org/your-saas-platform/issues"
+    "url": "https://github.com/the-info-network/tinadmin-saas-base-turborepo/issues"
   },
-  "homepage": "https://github.com/your-org/your-saas-platform#readme",
+  "homepage": "https://github.com/the-info-network/tinadmin-saas-base-turborepo#readme",
   "author": "Your Organization",
   "license": "MIT",
   "main": "./src/app/page.tsx",
@@ -48,19 +48,30 @@
     "dev": "turbo run dev",
     "dev:admin": "turbo run dev --filter=@tinadmin/admin",
     "dev:portal": "turbo run dev --filter=@tinadmin/portal",
+    "dev:wizards-api": "turbo run dev --filter=@magicwizards/wizards-api",
     "dev:local": "supabase start && pnpm dev",
     "dev:localhost": "./scripts/start-localhost.sh",
-    "build": "next build",
+    "supabase:env:remote": "node scripts/install-remote-supabase-env.mjs jruxnkslobykshunucwa",
+    "supabase:sync-vercel": "node scripts/sync-vercel-to-supabase-auth.mjs jruxnkslobykshunucwa",
+    "vercel:env-from-supabase": "node scripts/sync-supabase-env-to-vercel.mjs jruxnkslobykshunucwa magicwizards-admin",
+    "vercel:env-from-supabase:file": "node scripts/sync-supabase-env-to-vercel.mjs --from-file apps/admin/.env.local magicwizards-admin",
+    "supabase:install-gohighlevel": "node scripts/install-gohighlevel-provider.mjs",
+    "supabase:apply-integration-migration": "node scripts/apply-integration-migration.mjs",
+    "build": "turbo run build --filter=@tinadmin/admin",
     "build:packages": "turbo run build --filter='./packages/*'",
     "build:admin": "turbo run build --filter=@tinadmin/admin",
     "build:portal": "turbo run build --filter=@tinadmin/portal",
+    "build:wizards-api": "turbo run build --filter=@magicwizards/wizards-api",
+    "build:wizards-core": "turbo run build --filter=@magicwizards/wizards-core",
     "build:all": "turbo run build",
     "start": "turbo run start",
     "start:admin": "turbo run start --filter=@tinadmin/admin",
     "start:portal": "turbo run start --filter=@tinadmin/portal",
+    "start:wizards-api": "turbo run start --filter=@magicwizards/wizards-api",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "type-check": "turbo run type-check",
+    "type-check:wizards-api": "turbo run type-check --filter=@magicwizards/wizards-api",
     "clean": "turbo run clean && rm -rf node_modules .turbo",
     "audit": "pnpm audit --audit-level=moderate",
     "deps:check": "npx npm-check-updates",
@@ -70,7 +81,8 @@
     "supabase:status": "supabase status",
     "supabase:reset": "supabase db reset",
     "docker:ps": "docker ps | grep supabase",
-    "docker:logs": "supabase logs"
+    "docker:logs": "supabase logs",
+    "create:tin-users": "tsx scripts/create-tin-users.ts"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
@@ -117,6 +129,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.0",
     "postcss": "^8",
+    "tsx": "^4.19.2",
     "turbo": "^2.7.1",
     "typescript": "5.9.3",
     "vitest": "^2.1.2"
