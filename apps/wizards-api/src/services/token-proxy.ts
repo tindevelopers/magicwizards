@@ -55,6 +55,9 @@ const RATE_LIMITS: Record<string, { maxRequests: number; windowMs: number }> = {
   "telephony": { maxRequests: 20, windowMs: 60_000 },
   "web-search": { maxRequests: 30, windowMs: 10_000 },
   "salesforce": { maxRequests: 100, windowMs: 10_000 },
+  "lead-discovery": { maxRequests: 20, windowMs: 60_000 },
+  "email-outreach": { maxRequests: 30, windowMs: 60_000 },
+  "campaign-tracker": { maxRequests: 50, windowMs: 10_000 },
 };
 
 const DEFAULT_RATE_LIMIT = { maxRequests: 50, windowMs: 10_000 };

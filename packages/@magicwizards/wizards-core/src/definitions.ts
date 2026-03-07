@@ -1,4 +1,5 @@
 import type { WizardDefinition } from "./types.js";
+import { OUTREACH_WIZARD_DEFINITION } from "@magicwizards/outreach";
 
 const sharedEscalation = [
   {
@@ -118,10 +119,27 @@ Always use the cheapest appropriate wizard. Respond with JSON: {"wizard": "resea
   },
 };
 
+export const OutreachWizard: WizardDefinition = {
+  id: OUTREACH_WIZARD_DEFINITION.id,
+  name: OUTREACH_WIZARD_DEFINITION.name,
+  description: OUTREACH_WIZARD_DEFINITION.description,
+  systemPrompt: OUTREACH_WIZARD_DEFINITION.systemPrompt,
+  allowedTools: [...OUTREACH_WIZARD_DEFINITION.allowedTools],
+  maxTurns: OUTREACH_WIZARD_DEFINITION.maxTurns,
+  maxBudgetUsd: OUTREACH_WIZARD_DEFINITION.maxBudgetUsd,
+  defaultModelPolicy: {
+    cheap: { provider: "openai", model: "gpt-4.1-mini" },
+    standard: { provider: "anthropic", model: "claude-sonnet-4" },
+    premium: { provider: "anthropic", model: "claude-opus-4.1" },
+    escalation: sharedEscalation,
+  },
+};
+
 export const DEFAULT_WIZARDS: Record<string, WizardDefinition> = {
   [OrchestratorWizard.id]: OrchestratorWizard,
   [ResearchWizard.id]: ResearchWizard,
   [BuilderWizard.id]: BuilderWizard,
   [OpsWizard.id]: OpsWizard,
   [SalesWizard.id]: SalesWizard,
+  [OutreachWizard.id]: OutreachWizard,
 };
