@@ -20,17 +20,32 @@ export async function resolveTenantIdentityFromTelegram(
   telegramUserId?: number,
 ): Promise<TenantIdentity | null> {
   const admin = getSupabaseAdminClient();
-  let query = admin
+
+  // Try user-specific match first (telegram_user_id set), then fall back to
+  // chat-wide match (telegram_user_id is null = all users in chat).
+  if (telegramUserId) {
+    const { data } = await admin
+      .from("tenant_telegram_identities")
+      .select("tenant_id,user_id")
+      .eq("telegram_chat_id", String(chatId))
+      .eq("telegram_user_id", String(telegramUserId))
+      .eq("is_active", true)
+      .maybeSingle<TelegramIdentityRow>();
+
+    if (data) {
+      return { tenantId: data.tenant_id, userId: data.user_id ?? undefined };
+    }
+  }
+
+  // Fall back to chat-wide identity (no specific user restriction)
+  const { data, error } = await admin
     .from("tenant_telegram_identities")
     .select("tenant_id,user_id")
     .eq("telegram_chat_id", String(chatId))
-    .eq("is_active", true);
+    .is("telegram_user_id", null)
+    .eq("is_active", true)
+    .maybeSingle<TelegramIdentityRow>();
 
-  if (telegramUserId) {
-    query = query.eq("telegram_user_id", String(telegramUserId));
-  }
-
-  const { data, error } = await query.maybeSingle<TelegramIdentityRow>();
   if (error || !data) {
     return null;
   }
