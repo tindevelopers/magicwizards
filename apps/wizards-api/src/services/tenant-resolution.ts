@@ -16,19 +16,24 @@ interface TenantRow {
 }
 
 export async function resolveTenantIdentityFromTelegram(
-  chatId: number,
-  telegramUserId?: number,
+  chatId: number | string,
+  telegramUserId?: number | string,
 ): Promise<TenantIdentity | null> {
   const admin = getSupabaseAdminClient();
+  const chatIdStr = String(chatId);
+  const telegramUserIdStr =
+    telegramUserId !== undefined && telegramUserId !== null
+      ? String(telegramUserId)
+      : undefined;
 
   // Try user-specific match first (telegram_user_id set), then fall back to
   // chat-wide match (telegram_user_id is null = all users in chat).
-  if (telegramUserId) {
+  if (telegramUserIdStr) {
     const { data } = await admin
       .from("tenant_telegram_identities")
       .select("tenant_id,user_id")
-      .eq("telegram_chat_id", String(chatId))
-      .eq("telegram_user_id", String(telegramUserId))
+      .eq("telegram_chat_id", chatIdStr)
+      .eq("telegram_user_id", telegramUserIdStr)
       .eq("is_active", true)
       .maybeSingle<TelegramIdentityRow>();
 
@@ -41,7 +46,7 @@ export async function resolveTenantIdentityFromTelegram(
   const { data, error } = await admin
     .from("tenant_telegram_identities")
     .select("tenant_id,user_id")
-    .eq("telegram_chat_id", String(chatId))
+    .eq("telegram_chat_id", chatIdStr)
     .is("telegram_user_id", null)
     .eq("is_active", true)
     .maybeSingle<TelegramIdentityRow>();

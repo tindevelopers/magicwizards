@@ -49,15 +49,28 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
     return;
   }
 
+  const chatId = message.chat.id;
   const telegramUserId = message.from?.id;
+  logger.info("telegram_webhook_message", {
+    update_id: update.update_id,
+    chatIdType: typeof chatId,
+    hasFrom: !!message.from,
+    telegramUserIdType: message.from ? typeof message.from.id : "n/a",
+  });
+
   const identity = await resolveTenantIdentityFromTelegram(
-    message.chat.id,
+    chatId,
     telegramUserId,
   );
 
   if (!identity) {
+    logger.warn("telegram_tenant_not_linked", {
+      update_id: update.update_id,
+      chatIdType: typeof chatId,
+      telegramUserIdType: message.from ? typeof message.from.id : "n/a",
+    });
     await sendTelegramText(
-      message.chat.id,
+      chatId,
       "This chat is not linked to a tenant. Please contact your workspace admin.",
     );
     return;
@@ -66,7 +79,7 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
   const tenant = await getTenantConfig(identity.tenantId);
   if (!tenant || tenant.status !== "active") {
     await sendTelegramText(
-      message.chat.id,
+      chatId,
       "Your tenant is inactive or missing. Please contact support.",
     );
     return;
@@ -81,10 +94,10 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
       externalUserRef: telegramUserId ? String(telegramUserId) : undefined,
       prompt: message.text,
       channel: "telegram",
-      channelMetadata: { telegramChatId: message.chat.id },
+      channelMetadata: { telegramChatId: chatId },
     });
 
-    await sendTelegramText(message.chat.id, result.text);
+    await sendTelegramText(chatId, result.text);
     logger.info("telegram_wizard_run_completed", {
       tenantId: identity.tenantId,
       wizardId: result.wizardId,
@@ -98,7 +111,7 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
       error: error instanceof Error ? error.message : "unknown_error",
     });
     await sendTelegramText(
-      message.chat.id,
+      chatId,
       "Magic Wizards hit an error while processing your request.",
     );
   }

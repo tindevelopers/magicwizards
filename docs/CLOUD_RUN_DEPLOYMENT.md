@@ -124,6 +124,8 @@ Set them in [Cloud Run → magicwizards-git → Edit & deploy new revision → V
 - **Health**: `https://<service-url>/health`
 - **Telegram webhook**: Set your bot webhook to `https://<service-url>/webhooks/telegram` (and set `WIZARDS_API_PUBLIC_URL` to the same base URL).
 
+**Telegram “not linked” intermittently:** If the bot sometimes replies and sometimes says “This chat is not linked to a tenant,” traffic may be split across old and new revisions. In [Cloud Run → magicwizards-git → Revisions](https://console.cloud.google.com/run/detail/europe-west1/magicwizards-git/revisions?project=magicwizards), set **100% traffic** to the latest revision so only the current code serves requests.
+
 ## 8. Files added for Cloud Run
 
 | File | Purpose |

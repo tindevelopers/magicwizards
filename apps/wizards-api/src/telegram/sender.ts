@@ -3,7 +3,7 @@ import { logger } from "../logger.js";
 import { escapeTelegramHtml, splitTelegramMessage } from "./format.js";
 
 export async function sendTelegramText(
-  chatId: number,
+  chatId: number | string,
   text: string,
 ): Promise<void> {
   const endpoint = `https://api.telegram.org/bot${appConfig.telegram.botToken}/sendMessage`;
