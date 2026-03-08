@@ -428,11 +428,14 @@ export async function runWizardForTenant(input: {
       throw error;
     }
 
+    const err = error instanceof Error ? error : new Error("unknown_error");
+    const cause = err.cause instanceof Error ? err.cause.message : err.cause;
     logger.error("wizard_execution_failed", {
       tenantId: input.tenantId,
       wizardId: wizard.id,
       sessionId,
-      error: error instanceof Error ? error.message : "unknown_error",
+      error: err.message,
+      cause: cause ?? undefined,
     });
     throw error;
   }

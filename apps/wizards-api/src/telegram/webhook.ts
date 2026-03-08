@@ -120,9 +120,12 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
     });
   } catch (error) {
     clearInterval(typingInterval);
+    const err = error instanceof Error ? error : new Error("unknown_error");
+    const cause = err.cause instanceof Error ? err.cause.message : err.cause;
     logger.error("telegram_wizard_run_failed", {
       tenantId: identity.tenantId,
-      error: error instanceof Error ? error.message : "unknown_error",
+      error: err.message,
+      cause: cause ?? undefined,
     });
     await sendTelegramText(
       chatId,
