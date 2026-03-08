@@ -154,6 +154,7 @@ export default function MagicWizardsSystemAdminPage() {
   }
 
   async function onDeleteTelegram(id: string) {
+    if (!confirm("Remove this Telegram identity permanently? This cannot be undone.")) return;
     setError(null);
     try {
       await deleteTelegramIdentity(id);
@@ -296,7 +297,7 @@ export default function MagicWizardsSystemAdminPage() {
                           </span>
                         </td>
                         <td className="py-2 text-right">
-                          <div className="flex justify-end gap-2">
+                          <div className="flex flex-wrap justify-end gap-2">
                             <Button
                               size="sm"
                               variant="outline"
@@ -307,9 +308,10 @@ export default function MagicWizardsSystemAdminPage() {
                             <Button
                               size="sm"
                               variant="outline"
+                              className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
                               onClick={() => onDeleteTelegram(row.id)}
                             >
-                              Delete
+                              Remove
                             </Button>
                           </div>
                         </td>
