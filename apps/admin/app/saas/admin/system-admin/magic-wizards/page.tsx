@@ -13,6 +13,7 @@ import {
   listTenantMcpServers,
   toggleTelegramIdentity,
   toggleTenantMcpServer,
+  updateTenantWizardDefaults,
   type TelegramIdentityRow,
   type TenantMcpServerRow,
   type TenantOption,
@@ -41,6 +42,12 @@ export default function MagicWizardsSystemAdminPage() {
 
   const [savingTelegram, setSavingTelegram] = useState(false);
   const [savingMcp, setSavingMcp] = useState(false);
+  const [savingWizard, setSavingWizard] = useState(false);
+  const [wizardForm, setWizardForm] = useState({
+    tenantId: "",
+    wizard_provider: "",
+    wizard_model: "",
+  });
   const [testWizardTenantId, setTestWizardTenantId] = useState("__mock__");
 
   const tenantMap = useMemo(() => {
@@ -75,6 +82,15 @@ export default function MagicWizardsSystemAdminPage() {
       if (tenantData.length > 0) {
         setTelegramForm((prev) => ({ ...prev, tenantId: prev.tenantId || tenantData[0].id }));
         setMcpForm((prev) => ({ ...prev, tenantId: prev.tenantId || tenantData[0].id }));
+        setWizardForm((prev) => {
+          const tid = prev.tenantId || tenantData[0].id;
+          const t = tenantData.find((x) => x.id === tid) ?? tenantData[0];
+          return {
+            tenantId: tid,
+            wizard_provider: t.wizard_provider ?? "",
+            wizard_model: t.wizard_model ?? "",
+          };
+        });
         setTestWizardTenantId((prev) =>
           prev === "__mock__" ? "__mock__" : (tenantData.find((t) => t.id === prev) ? prev : tenantData[0].id)
         );
@@ -181,6 +197,41 @@ export default function MagicWizardsSystemAdminPage() {
       await loadData();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to delete MCP server");
+    }
+  }
+
+  function onWizardTenantChange(tenantId: string) {
+    const t = tenantMap.get(tenantId);
+    setWizardForm({
+      tenantId,
+      wizard_provider: t?.wizard_provider ?? "",
+      wizard_model: t?.wizard_model ?? "",
+    });
+  }
+
+  async function onSaveWizardDefaults(e: React.FormEvent) {
+    e.preventDefault();
+    if (!wizardForm.tenantId) return;
+    setError(null);
+    setSavingWizard(true);
+    try {
+      await updateTenantWizardDefaults(wizardForm.tenantId, {
+        wizard_provider: wizardForm.wizard_provider || null,
+        wizard_model: wizardForm.wizard_model || null,
+      });
+      await loadData();
+      setWizardForm((prev) => {
+        const t = tenantMap.get(prev.tenantId);
+        return {
+          ...prev,
+          wizard_provider: t?.wizard_provider ?? prev.wizard_provider,
+          wizard_model: t?.wizard_model ?? prev.wizard_model,
+        };
+      });
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to update wizard defaults");
+    } finally {
+      setSavingWizard(false);
     }
   }
 
@@ -423,6 +474,66 @@ export default function MagicWizardsSystemAdminPage() {
                 </tbody>
               </table>
             </div>
+          </section>
+
+          <section className="space-y-4 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              Tenant wizard defaults
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Override the LLM provider and model for a tenant. Leave blank to use the app default (env). Affects Telegram and API wizard runs.
+            </p>
+            <form className="grid gap-3 max-w-xl" onSubmit={onSaveWizardDefaults}>
+              <div>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Tenant</label>
+                <select
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  value={wizardForm.tenantId}
+                  onChange={(e) => onWizardTenantChange(e.target.value)}
+                  required
+                >
+                  {tenants.map((tenant) => (
+                    <option key={tenant.id} value={tenant.id}>
+                      {tenant.name} ({tenant.domain})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Wizard provider</label>
+                  <select
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    value={wizardForm.wizard_provider}
+                    onChange={(e) => setWizardForm((prev) => ({ ...prev, wizard_provider: e.target.value }))}
+                  >
+                    <option value="">App default</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="anthropic">Anthropic</option>
+                    <option value="google">Google</option>
+                    <option value="mock">Mock</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Wizard model</label>
+                  <select
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                    value={wizardForm.wizard_model}
+                    onChange={(e) => setWizardForm((prev) => ({ ...prev, wizard_model: e.target.value }))}
+                  >
+                    <option value="">App default</option>
+                    <option value="gpt-4.1-mini">OpenAI gpt-4.1-mini</option>
+                    <option value="gpt-4o-mini">OpenAI gpt-4o-mini</option>
+                    <option value="claude-sonnet-4">Anthropic claude-sonnet-4</option>
+                    <option value="claude-opus-4-5">Anthropic claude-opus-4-5</option>
+                    <option value="claude-opus-4-6">Anthropic claude-opus-4-6</option>
+                  </select>
+                </div>
+              </div>
+              <Button type="submit" size="sm" disabled={savingWizard}>
+                {savingWizard ? "Saving..." : "Save wizard defaults"}
+              </Button>
+            </form>
           </section>
         </div>
       )}

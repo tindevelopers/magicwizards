@@ -64,6 +64,8 @@ export default function TenantManagementPage() {
     plan: "free",
     region: "us-east-1",
     status: "active",
+    wizard_provider: null,
+    wizard_model: null,
   });
 
   useEffect(() => {
@@ -149,6 +151,8 @@ export default function TenantManagementPage() {
         plan: "free",
         region: "us-east-1",
         status: "active",
+        wizard_provider: null,
+        wizard_model: null,
       });
       setShowCreateModal(false);
       
@@ -529,6 +533,45 @@ export default function TenantManagementPage() {
                   <option value="pending">Pending</option>
                   <option value="suspended">Suspended</option>
                 </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Wizard provider
+                  </label>
+                  <select
+                    value={formData.wizard_provider ?? ""}
+                    onChange={(e) => setFormData({ ...formData, wizard_provider: e.target.value || null })}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="">App default</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="anthropic">Anthropic</option>
+                    <option value="google">Google</option>
+                    <option value="mock">Mock</option>
+                  </select>
+                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                    LLM for Magic Wizards (optional)
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Wizard model
+                  </label>
+                  <select
+                    value={formData.wizard_model ?? ""}
+                    onChange={(e) => setFormData({ ...formData, wizard_model: e.target.value || null })}
+                    className="w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="">App default</option>
+                    <option value="gpt-4.1-mini">OpenAI gpt-4.1-mini</option>
+                    <option value="gpt-4o-mini">OpenAI gpt-4o-mini</option>
+                    <option value="claude-sonnet-4">Anthropic claude-sonnet-4</option>
+                    <option value="claude-opus-4-5">Anthropic claude-opus-4-5</option>
+                    <option value="claude-opus-4-6">Anthropic claude-opus-4-6</option>
+                  </select>
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-4">

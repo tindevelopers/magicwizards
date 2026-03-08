@@ -165,6 +165,8 @@ export interface CreateTenantData {
   plan?: string;
   region?: string;
   status?: "active" | "pending" | "suspended";
+  wizard_provider?: string | null;
+  wizard_model?: string | null;
 }
 
 /**
@@ -250,6 +252,8 @@ export async function createTenant(data: CreateTenantData): Promise<Tenant> {
         region: data.region || "us-east-1",
         status: data.status || "active",
         features: [],
+        wizard_provider: (data.wizard_provider?.trim() || null) as string | null,
+        wizard_model: (data.wizard_model?.trim() || null) as string | null,
       })
       .select()
       .single();

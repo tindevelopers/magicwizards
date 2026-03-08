@@ -9,6 +9,8 @@ export interface TenantOption {
   name: string;
   domain: string;
   status: string;
+  wizard_provider?: string | null;
+  wizard_model?: string | null;
 }
 
 export interface TelegramIdentityRow {
@@ -62,7 +64,7 @@ export async function getTenantOptions(): Promise<TenantOption[]> {
   await enforceSystemAdminAccess();
   const client = createAdminClient();
   const { data, error } = await (client.from("tenants") as any)
-    .select("id,name,domain,status")
+    .select("id,name,domain,status,wizard_provider,wizard_model")
     .order("name", { ascending: true });
   // #region agent log
   fetch('http://127.0.0.1:7245/ingest/612994c7-6727-4770-9f27-7d8df0a11c7b',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'magic-wizards.ts:47',message:'tenants query result',data:{hasData:!!data,dataCount:data?.length,error:error?.message},timestamp:Date.now(),runId:'debug-1',hypothesisId:'D'})}).catch(()=>{});
@@ -75,6 +77,23 @@ export async function getTenantOptions(): Promise<TenantOption[]> {
     throw new Error(error.message || "Failed to fetch tenants");
   }
   return (data ?? []) as TenantOption[];
+}
+
+export async function updateTenantWizardDefaults(tenantId: string, input: {
+  wizard_provider?: string | null;
+  wizard_model?: string | null;
+}): Promise<void> {
+  await enforceSystemAdminAccess();
+  const client = createAdminClient();
+  const { error } = await (client.from("tenants") as any)
+    .update({
+      wizard_provider: input.wizard_provider ?? null,
+      wizard_model: input.wizard_model ?? null,
+    })
+    .eq("id", tenantId);
+  if (error) {
+    throw new Error(error.message ?? "Failed to update tenant wizard defaults");
+  }
 }
 
 export async function listTelegramIdentities(): Promise<TelegramIdentityRow[]> {
