@@ -236,7 +236,7 @@ export async function runWizardForTenant(input: {
     }
 
     const runStartedAt = Date.now();
-    const result = await runtime.run({
+    const runOptions = {
       wizard,
       prompt: combinedPrompt,
       context: {
@@ -268,7 +268,37 @@ export async function runWizardForTenant(input: {
         input.channel === "telegram"
           ? Math.min(3, profile.maxTurnsOverride ?? wizard.maxTurns)
           : profile.maxTurnsOverride ?? wizard.maxTurns,
-    });
+    };
+
+    const isRetryableConnectionError = (err: unknown): boolean => {
+      const e = err instanceof Error ? err : null;
+      if (!e || e.message !== "fetch failed") return false;
+      const cause =
+        e.cause instanceof Error ? e.cause.message : String(e.cause ?? "");
+      return (
+        cause.includes("other side closed") ||
+        cause.includes("write EPIPE") ||
+        cause.includes("ECONNRESET")
+      );
+    };
+
+    let result: Awaited<ReturnType<typeof runtime.run>>;
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a33dc4'},body:JSON.stringify({sessionId:'a33dc4',location:'wizard-service.ts:before_run',message:'runtime.run attempt',data:{tenantId:input.tenantId,wizardId:wizard.id,attempt:1},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{});
+    // #endregion
+    try {
+      result = await runtime.run(runOptions);
+    } catch (firstErr) {
+      const retryable = isRetryableConnectionError(firstErr);
+      const e = firstErr instanceof Error ? firstErr : new Error("unknown");
+      const cause = e.cause instanceof Error ? e.cause.message : e.cause;
+      // #region agent log
+      fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a33dc4'},body:JSON.stringify({sessionId:'a33dc4',location:'wizard-service.ts:catch_retry',message:'runtime.run failed',data:{tenantId:input.tenantId,error:e.message,cause:cause??undefined,retryable},timestamp:Date.now(),hypothesisId:'D'})}).catch(()=>{});
+      // #endregion
+      if (!retryable) throw firstErr;
+      await new Promise((r) => setTimeout(r, 1500));
+      result = await runtime.run(runOptions);
+    }
 
     timings.llmRun = Date.now() - runStartedAt;
 

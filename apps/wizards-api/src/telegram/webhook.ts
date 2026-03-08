@@ -98,6 +98,9 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
     void sendTelegramChatAction(chatId, "typing");
   }, 4000);
 
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a33dc4'},body:JSON.stringify({sessionId:'a33dc4',location:'webhook.ts:before_run',message:'telegram runWizardForTenant start',data:{tenantId:identity.tenantId,promptLen:message.text?.length},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
+  // #endregion
   try {
     const result = await runWizardForTenant({
       tenant,
@@ -122,6 +125,9 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
     clearInterval(typingInterval);
     const err = error instanceof Error ? error : new Error("unknown_error");
     const cause = err.cause instanceof Error ? err.cause.message : err.cause;
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a33dc4'},body:JSON.stringify({sessionId:'a33dc4',location:'webhook.ts:catch',message:'telegram runWizardForTenant failed',data:{tenantId:identity.tenantId,error:err.message,cause:cause??undefined},timestamp:Date.now(),hypothesisId:'B'})}).catch(()=>{});
+    // #endregion
     logger.error("telegram_wizard_run_failed", {
       tenantId: identity.tenantId,
       error: err.message,
