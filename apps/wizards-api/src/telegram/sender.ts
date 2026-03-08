@@ -51,6 +51,10 @@ export async function sendTelegramText(
         responseText,
         chatId: String(chatId),
       });
+      throw new Error(
+        `Telegram sendMessage failed: ${response.status} ${responseText}`,
+        { cause: new Error(responseText) },
+      );
     }
   }
 }
