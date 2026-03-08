@@ -110,10 +110,12 @@ export async function runWizardForTenant(input: {
   const wizard = pickWizard(wizardId);
   const skipPersistence = input.skipPersistence === true;
 
-  // Run budget check and session creation in parallel to cut Supabase round-trips
-  const tPreDb = Date.now();
+  // For Telegram: skip budget+session pre-check to avoid 25-47s Supabase latency.
+  // Budget and session are created after the reply for audit, but don't block the user.
+  const deferPersistence = input.channel === "telegram" && !skipPersistence;
   let sessionId = "";
-  if (!skipPersistence) {
+  const tPreDb = Date.now();
+  if (!skipPersistence && !deferPersistence) {
     const [, sess] = await Promise.all([
       checkBudgetLimit(input.tenantId, input.tenant.plan),
       createWizardSession({
@@ -291,12 +293,25 @@ export async function runWizardForTenant(input: {
       model: result.model,
     });
 
-    // Run all post-processing persistence in parallel to cut Supabase round-trips
+    // Persistence: run in parallel. For Telegram, fire-and-forget so the reply isn't blocked.
     const tPost = Date.now();
-    if (!skipPersistence) {
+    const doPersist = async () => {
+      if (skipPersistence) return;
+
+      // When persistence was deferred (Telegram), create the session now
+      let sid = sessionId;
+      if (deferPersistence) {
+        sid = await createWizardSession({
+          tenantId: input.tenantId,
+          userId: input.userId,
+          wizardId: wizard.id,
+          channel: input.channel,
+        });
+      }
+
       const postOps: Promise<unknown>[] = [
         completeWizardSession({
-          sessionId,
+          sessionId: sid,
           totalCostUsd: result.usage.costUsd,
           turnCount: 1,
           status: "completed",
@@ -304,7 +319,7 @@ export async function runWizardForTenant(input: {
         }),
         recordUsage({
           tenantId: input.tenantId,
-          sessionId,
+          sessionId: sid,
           costUsd: result.usage.costUsd,
           turns: 1,
           provider: result.provider,
@@ -319,9 +334,9 @@ export async function runWizardForTenant(input: {
         }),
       ];
 
-      if (sessionId) {
+      if (sid) {
         postOps.push(
-          appendSessionMessage(sessionId, {
+          appendSessionMessage(sid, {
             role: "assistant",
             content: result.text,
           }),
@@ -330,35 +345,44 @@ export async function runWizardForTenant(input: {
 
       await Promise.all(postOps);
 
-      // Advanced memory extraction (professional + enterprise tiers) — fire-and-forget
       if (usesAdvancedMemory && input.userId) {
         const conversation = `User: ${prompt}\nAssistant: ${result.text}`;
         processSemanticExtraction({
           tenantId: input.tenantId,
           userId: input.userId,
           conversation,
-          sessionId,
+          sessionId: sid,
         }).catch((err) =>
           logger.error("semantic_extraction_bg_failed", {
             error: err instanceof Error ? err.message : "unknown",
           }),
         );
-
         processEpisodicExtraction({
           tenantId: input.tenantId,
           userId: input.userId,
           prompt,
           result: result.text,
           toolsUsed: [],
-          sessionId,
+          sessionId: sid,
         }).catch((err) =>
           logger.error("episodic_extraction_bg_failed", {
             error: err instanceof Error ? err.message : "unknown",
           }),
         );
       }
+    };
+
+    if (deferPersistence) {
+      doPersist().catch((err) =>
+        logger.error("deferred_persistence_failed", {
+          error: err instanceof Error ? err.message : "unknown",
+        }),
+      );
+      timings.postProcess = 0;
+    } else {
+      await doPersist();
+      timings.postProcess = Date.now() - tPost;
     }
-    timings.postProcess = Date.now() - tPost;
     timings.total = Date.now() - t0;
 
     logger.info("wizard_run_timings", {
