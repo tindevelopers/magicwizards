@@ -110,22 +110,22 @@ export async function runWizardForTenant(input: {
   const wizard = pickWizard(wizardId);
   const skipPersistence = input.skipPersistence === true;
 
+  // Run budget check and session creation in parallel to cut Supabase round-trips
+  const tPreDb = Date.now();
+  let sessionId = "";
   if (!skipPersistence) {
-    const tBudget = Date.now();
-    await checkBudgetLimit(input.tenantId, input.tenant.plan);
-    timings.checkBudget = Date.now() - tBudget;
-  }
-
-  const tSession = Date.now();
-  const sessionId = skipPersistence
-    ? ""
-    : await createWizardSession({
+    const [, sess] = await Promise.all([
+      checkBudgetLimit(input.tenantId, input.tenant.plan),
+      createWizardSession({
         tenantId: input.tenantId,
         userId: input.userId,
         wizardId: wizard.id,
         channel: input.channel,
-      });
-  timings.createSession = Date.now() - tSession;
+      }),
+    ]);
+    sessionId = sess;
+  }
+  timings.preDb = Date.now() - tPreDb;
 
   const traceCollector = new TraceCollector({
     tenantId: input.tenantId,
@@ -226,11 +226,11 @@ export async function runWizardForTenant(input: {
 
     timings.mcpResolve = Date.now() - tMcp;
 
-    // Store user message in working memory
+    // Store user message in working memory (fire-and-forget, don't block LLM)
     if (!skipPersistence && sessionId) {
-      const tAppend = Date.now();
-      await appendSessionMessage(sessionId, { role: "user", content: prompt });
-      timings.appendUserMsg = Date.now() - tAppend;
+      appendSessionMessage(sessionId, { role: "user", content: prompt }).catch(
+        () => {},
+      );
     }
 
     const runStartedAt = Date.now();
@@ -291,43 +291,46 @@ export async function runWizardForTenant(input: {
       model: result.model,
     });
 
+    // Run all post-processing persistence in parallel to cut Supabase round-trips
     const tPost = Date.now();
     if (!skipPersistence) {
-      // Store assistant message in working memory
+      const postOps: Promise<unknown>[] = [
+        completeWizardSession({
+          sessionId,
+          totalCostUsd: result.usage.costUsd,
+          turnCount: 1,
+          status: "completed",
+          outputText: result.text,
+        }),
+        recordUsage({
+          tenantId: input.tenantId,
+          sessionId,
+          costUsd: result.usage.costUsd,
+          turns: 1,
+          provider: result.provider,
+          model: result.model,
+        }),
+        saveMemory({
+          tenantId: input.tenantId,
+          userId: input.userId,
+          externalUserRef: input.externalUserRef,
+          content: `User asked: ${prompt.slice(0, 600)}\nAssistant replied: ${result.text.slice(0, 600)}`,
+          importanceScore: 1,
+        }),
+      ];
+
       if (sessionId) {
-        await appendSessionMessage(sessionId, {
-          role: "assistant",
-          content: result.text,
-        });
+        postOps.push(
+          appendSessionMessage(sessionId, {
+            role: "assistant",
+            content: result.text,
+          }),
+        );
       }
 
-      await completeWizardSession({
-        sessionId,
-        totalCostUsd: result.usage.costUsd,
-        turnCount: 1,
-        status: "completed",
-        outputText: result.text,
-      });
+      await Promise.all(postOps);
 
-      await recordUsage({
-        tenantId: input.tenantId,
-        sessionId,
-        costUsd: result.usage.costUsd,
-        turns: 1,
-        provider: result.provider,
-        model: result.model,
-      });
-
-      // Legacy memory (all tiers)
-      await saveMemory({
-        tenantId: input.tenantId,
-        userId: input.userId,
-        externalUserRef: input.externalUserRef,
-        content: `User asked: ${prompt.slice(0, 600)}\nAssistant replied: ${result.text.slice(0, 600)}`,
-        importanceScore: 1,
-      });
-
-      // Advanced memory extraction (professional + enterprise tiers)
+      // Advanced memory extraction (professional + enterprise tiers) — fire-and-forget
       if (usesAdvancedMemory && input.userId) {
         const conversation = `User: ${prompt}\nAssistant: ${result.text}`;
         processSemanticExtraction({
