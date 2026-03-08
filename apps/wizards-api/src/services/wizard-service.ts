@@ -80,6 +80,9 @@ export async function runWizardForTenant(input: {
   /** When true, skip session/usage/memory/budget persistence (e.g. for dev __mock__ tenant). */
   skipPersistence?: boolean;
 }): Promise<{ text: string; wizardId: string; costUsd: number; turns: number }> {
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:entry',message:'runWizardForTenant entry',data:{tenantId:input.tenantId,channel:input.channel,deferPersistence:input.channel==='telegram'&&!input.skipPersistence},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
+  // #endregion
   const profile = getTenantCostProfile(input.tenant.plan);
   const trimmedPrompt = input.prompt.trim();
   const t0 = Date.now();
@@ -128,6 +131,9 @@ export async function runWizardForTenant(input: {
     sessionId = sess;
   }
   timings.preDb = Date.now() - tPreDb;
+  // #region agent log
+  fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:past_orchestrator_db',message:'past orchestrator and DB',data:{tenantId:input.tenantId,sessionId},timestamp:Date.now(),hypothesisId:'H2_H3'})}).catch(()=>{});
+  // #endregion
 
   const traceCollector = new TraceCollector({
     tenantId: input.tenantId,
@@ -169,6 +175,9 @@ export async function runWizardForTenant(input: {
       }
     }
     timings.memory = Date.now() - tMemory;
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:past_memory',message:'past memory',data:{tenantId:input.tenantId},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
+    // #endregion
 
     const combinedPrompt = memoryContext
       ? `${memoryContext}\n\nUser request:\n${prompt}`
@@ -284,7 +293,7 @@ export async function runWizardForTenant(input: {
 
     let result: Awaited<ReturnType<typeof runtime.run>>;
     // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a33dc4'},body:JSON.stringify({sessionId:'a33dc4',location:'wizard-service.ts:before_run',message:'runtime.run attempt',data:{tenantId:input.tenantId,wizardId:wizard.id,attempt:1},timestamp:Date.now(),hypothesisId:'C'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:before_run',message:'runtime.run attempt',data:{tenantId:input.tenantId,wizardId:wizard.id,attempt:1},timestamp:Date.now(),hypothesisId:'H1_H4'})}).catch(()=>{});
     // #endregion
     try {
       result = await runtime.run(runOptions);
@@ -293,7 +302,7 @@ export async function runWizardForTenant(input: {
       const e = firstErr instanceof Error ? firstErr : new Error("unknown");
       const cause = e.cause instanceof Error ? e.cause.message : e.cause;
       // #region agent log
-      fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'a33dc4'},body:JSON.stringify({sessionId:'a33dc4',location:'wizard-service.ts:catch_retry',message:'runtime.run failed',data:{tenantId:input.tenantId,error:e.message,cause:cause??undefined,retryable},timestamp:Date.now(),hypothesisId:'D'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:catch_retry',message:'runtime.run failed',data:{tenantId:input.tenantId,error:e.message,errorName:e.name,cause:cause??undefined,retryable},timestamp:Date.now(),hypothesisId:'H1_H4'})}).catch(()=>{});
       // #endregion
       if (!retryable) throw firstErr;
       await new Promise((r) => setTimeout(r, 1500));
@@ -434,6 +443,11 @@ export async function runWizardForTenant(input: {
       turns: 1,
     };
   } catch (error) {
+    const outerErr = error instanceof Error ? error : new Error("unknown_error");
+    const outerCause = outerErr.cause instanceof Error ? outerErr.cause.message : outerErr.cause;
+    // #region agent log
+    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:outer_catch',message:'wizard_execution outer catch',data:{tenantId:input.tenantId,wizardId:wizard?.id,error:outerErr.message,errorName:outerErr.name,cause:outerCause??undefined},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
+    // #endregion
     if (traceCollector) {
       traceCollector.complete("failed");
       logger.info("wizard_trace", {

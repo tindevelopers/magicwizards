@@ -44,6 +44,15 @@ export class WizardRuntime {
   }
 
   async run(request: WizardRunRequest): Promise<WizardRunResult> {
+    // When preferred provider is mock, always use provider-based dispatch so the mock adapter is used.
+    if (request.preferredProvider === "mock") {
+      const decision = resolveModelForRequest(request);
+      const adapter = this.adaptersByProvider.get("mock");
+      if (adapter) {
+        return adapter.run(request, decision.target);
+      }
+    }
+
     const profile = request.costProfile;
 
     if (profile) {
