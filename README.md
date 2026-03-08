@@ -205,6 +205,15 @@ See [**FORK_GUIDE.md**](FORK_GUIDE.md) for detailed customization instructions.
 - **Text Generator** - AI text generation
 - **Video Generator** - AI video generation
 
+### 🧙 Magic Wizards (Agent Platform)
+- **Wizard agents** - Builder, research, ops, sales, outreach experts with MCP tools
+- **Telegram channel** - Chat with your bot; messages routed by tenant and wizard
+- **wizards-api** - Express backend (Cloud Run); webhooks, token proxy, memory, orchestrator
+- **System Admin → Magic Wizards** - Link Telegram chat IDs to tenants; add/remove identities; Test Wizard block
+- **System Admin → Integrations** - Enable platform integrations (Google, Microsoft, HubSpot, etc.); OAuth per provider
+- **Cloud Run + Secret Manager** - Secure env for bot token, Supabase, LLM keys; `scripts/setup-cloudrun-secrets.sh`
+- **Portal: My Tools / Wizards** - End-user tools page and Test Wizard
+
 ### 📅 Calendar & Scheduling
 - **Calendar View** - Full calendar interface
 - **Event Management** - Create and manage events
@@ -282,7 +291,64 @@ pnpm dev
 
 - **Admin Dashboard:** http://localhost:3001
 - **Consumer Portal:** http://localhost:3002
+- **Wizards API:** http://localhost:8787
+- **Web Search MCP:** http://localhost:8080
 - **Supabase Studio:** http://localhost:54323
+
+---
+
+## 🧙 Magic Wizards Setup
+
+Magic Wizards is an agent platform: wizard experts (builder, research, ops, sales, outreach) run via **wizards-api**, with **Telegram** as the first channel.
+
+### 1. Telegram bot
+
+1. Create a bot with [@BotFather](https://t.me/BotFather) in Telegram (`/newbot`).
+2. Copy the bot token. Put it in `apps/wizards-api/.env`:
+   ```bash
+   MAGIC_WIZARDS_TELEGRAM_BOT_TOKEN=your-token
+   ```
+3. (Optional) Generate a webhook secret and set it in Telegram and `.env`:
+   ```bash
+   openssl rand -hex 32
+   # Use in setWebhook URL as &secret_token=... and as MAGIC_WIZARDS_TELEGRAM_WEBHOOK_SECRET
+   ```
+
+### 2. Set the Telegram webhook
+
+Point Telegram at your wizards-api URL (e.g. Cloud Run):
+
+```
+https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook?url=https://<YOUR_WIZARDS_API_URL>/webhooks/telegram&secret_token=<YOUR_SECRET>
+```
+
+### 3. Link your chat to a tenant
+
+1. Get your **numeric chat ID** (e.g. message [@userinfobot](https://t.me/userinfobot) — it replies with your Id).
+2. In **Admin → System Admin → Magic Wizards**, under **Tenant Telegram Identities**:
+   - Select **Platform Tenant** (e.g. TIN).
+   - Enter your **Telegram chat id** (e.g. `7949353206`).
+   - Click **Add Telegram Identity**.
+3. Use **Disable** / **Enable** to turn an identity off or on; use **Remove** to delete it permanently.
+
+### 4. Cloud Run deployment (production)
+
+Deploy wizards-api to Google Cloud Run and store secrets in Secret Manager:
+
+```bash
+# One-time: add real values to apps/wizards-api/.env (token, Supabase, LLM keys, webhook secret)
+./scripts/setup-cloudrun-secrets.sh
+```
+
+This creates secrets, grants the Cloud Run service account access, and updates the service. See [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) for manual build/deploy.
+
+### 5. Using the bot
+
+- Open your bot in Telegram (e.g. `t.me/YourBotName`).
+- Send a message (e.g. `hello`). The orchestrator routes to the right wizard.
+- Use `/wizard <id> <prompt>` to pick a wizard (e.g. `/wizard research Summarize this`).
+
+See [docs/LOCAL_AGENT_TESTING.md](docs/LOCAL_AGENT_TESTING.md) for dev routes and Test Wizard in Admin/Portal.
 
 ---
 
@@ -291,17 +357,18 @@ pnpm dev
 ```
 .
 ├── apps/
-│   ├── admin/          # Admin dashboard (port 3001)
-│   └── portal/        # Consumer portal (port 3002)
+│   ├── admin/           # Admin dashboard (port 3001)
+│   ├── portal/          # Consumer portal (port 3002)
+│   ├── wizards-api/     # Magic Wizards backend – Telegram, wizards, MCP (port 8787)
+│   └── web-search-mcp/ # Web search MCP server (port 8080)
 ├── packages/
-│   └── @tinadmin/
-│       ├── core/       # Core SaaS modules (auth, billing, database)
-│       ├── config/     # Shared configuration
-│       ├── ui-admin/   # Admin UI components
-│       └── ui-consumer/# Consumer UI components
-├── scripts/            # Utility scripts
-├── supabase/          # Database migrations
-└── docs/              # Documentation
+│   ├── @tinadmin/       # Core SaaS modules (auth, billing, database), config, UI
+│   └── @magicwizards/
+│       ├── wizards-core/# Wizard definitions, runtime, cost routing, tool classification
+│       └── outreach/    # Outreach MCP (campaigns, leads, email) – optional
+├── scripts/             # Utility scripts (incl. setup-cloudrun-secrets.sh)
+├── supabase/            # Database migrations
+└── docs/                # Documentation
 ```
 
 ---
@@ -311,9 +378,11 @@ pnpm dev
 ### Run All Apps
 
 ```bash
-pnpm dev                 # All apps
+pnpm dev                 # All apps (admin, portal, wizards-api, web-search-mcp, packages)
+pnpm dev --concurrency=15  # If you have 10+ persistent tasks (e.g. on develop with outreach)
 pnpm dev:admin          # Admin only
 pnpm dev:portal         # Portal only
+pnpm dev:wizards-api    # Wizards API only
 ```
 
 ### Build
@@ -322,6 +391,8 @@ pnpm dev:portal         # Portal only
 pnpm build:all          # Build everything
 pnpm build:admin        # Build admin app
 pnpm build:portal       # Build portal app
+pnpm build:wizards-api  # Build wizards-api
+pnpm build:wizards-core # Build wizard definitions/runtime (required before wizards-api)
 pnpm build:packages     # Build packages only
 ```
 
@@ -351,7 +422,7 @@ npx tsx scripts/create-system-admin.ts
 
 ## 🚢 Deployment
 
-### Vercel (Recommended)
+### Vercel (Admin & Portal)
 
 ```bash
 # Deploy both apps
@@ -362,21 +433,41 @@ vercel --cwd apps/admin
 vercel --cwd apps/portal
 ```
 
+Recommended project names: **magicwizards-admin**, **magicwizards-portal**. See [docs/VERCEL_HYBRID_DEPLOYMENT.md](docs/VERCEL_HYBRID_DEPLOYMENT.md).
+
+### Cloud Run (wizards-api)
+
+The wizards-api (Telegram webhook, wizard runtime) is deployed to **Google Cloud Run**:
+
+```bash
+# Secure: create Secret Manager secrets and update Cloud Run (requires apps/wizards-api/.env with real values)
+./scripts/setup-cloudrun-secrets.sh
+
+# Or manual build + deploy
+gcloud builds submit --config=cloudbuild.wizards-api.yaml --project=magicwizards
+gcloud run deploy wizards-api --image=... --set-secrets=...  # see docs
+```
+
+See [docs/CLOUD_RUN_DEPLOYMENT.md](docs/CLOUD_RUN_DEPLOYMENT.md) for full steps.
+
 ### Environment Variables
 
 Set these in your deployment platform:
 
-**Required:**
+**Required (Admin/Portal):**
 - `NEXT_PUBLIC_SUPABASE_URL`
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - `SUPABASE_SERVICE_ROLE_KEY`
 
+**Required (wizards-api on Cloud Run):**
+- `MAGIC_WIZARDS_TELEGRAM_BOT_TOKEN`
+- `NEXT_PUBLIC_SUPABASE_URL` or `SUPABASE_URL`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- At least one LLM key: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, or `GOOGLE_API_KEY`
+
 **Optional:**
-- `STRIPE_SECRET_KEY`
-- `STRIPE_PUBLISHABLE_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `EMAIL_PROVIDER` (resend, sendgrid, ses)
-- Email provider API keys
+- `STRIPE_*`, `EMAIL_PROVIDER`, email API keys
+- `MAGIC_WIZARDS_TELEGRAM_WEBHOOK_SECRET`, `WIZARDS_API_PUBLIC_URL`
 
 See [`.env.example`](.env.example) for complete list.
 
@@ -391,6 +482,13 @@ See [`.env.example`](.env.example) for complete list.
 - [**Stripe Setup**](docs/STRIPE_SETUP.md) - Payment integration
 - [**Deployment**](docs/DEPLOYMENT.md) - Production deployment
 - [**User Guide**](docs/USER_GUIDE.md) - End-user documentation
+
+**Magic Wizards:**
+- [**Local Agent Testing**](docs/LOCAL_AGENT_TESTING.md) - Run wizards-api locally, dev route, Test Wizard
+- [**Cloud Run Deployment**](docs/CLOUD_RUN_DEPLOYMENT.md) - Deploy wizards-api to Google Cloud Run
+- [**Vercel Hybrid Deployment**](docs/VERCEL_HYBRID_DEPLOYMENT.md) - Admin/Portal on Vercel, wizards-api on Cloud Run
+- [**Microsoft 365 Mail Setup**](docs/MICROSOFT_365_MAIL_SETUP.md) - OAuth and token proxy for Microsoft
+- [**Deploy MCP Servers**](docs/DEPLOY_MCP_SERVERS.md) - Google Workspace, HubSpot, web-search MCP
 
 ---
 
@@ -457,7 +555,9 @@ See [`.env.example`](.env.example) for complete list.
 - Billing and subscriptions
 - Settings and configuration
 - Audit logs
-- Integrations management
+- **System Admin → Magic Wizards** – Telegram identities (add/disable/remove), Test Wizard, MCP servers
+- **System Admin → Integrations** – Platform integrations (Google, Microsoft, HubSpot, etc.)
+- Integrations management (tenant-level)
 - Support ticket system
 - Feature flags
 - White-label configuration
