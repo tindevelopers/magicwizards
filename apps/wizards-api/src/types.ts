@@ -41,4 +41,5 @@ export interface TenantConfig {
   wizardProvider?: string | null;
   wizardModel?: string | null;
   wizardBudgetUsd?: number | null;
+  defaultWizardId?: string | null;
 }

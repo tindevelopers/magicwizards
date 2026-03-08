@@ -13,6 +13,7 @@ interface TenantRow {
   wizard_provider?: string | null;
   wizard_model?: string | null;
   wizard_budget_usd?: number | null;
+  default_wizard_id?: string | null;
 }
 
 export async function resolveTenantIdentityFromTelegram(
@@ -65,7 +66,9 @@ export async function getTenantConfig(tenantId: string): Promise<TenantConfig | 
   const admin = getSupabaseAdminClient();
   const { data, error } = await admin
     .from("tenants")
-    .select("id,plan,status,wizard_provider,wizard_model,wizard_budget_usd")
+    .select(
+      "id,plan,status,wizard_provider,wizard_model,wizard_budget_usd,default_wizard_id",
+    )
     .eq("id", tenantId)
     .maybeSingle<TenantRow>();
 
@@ -80,5 +83,6 @@ export async function getTenantConfig(tenantId: string): Promise<TenantConfig | 
     wizardProvider: data.wizard_provider,
     wizardModel: data.wizard_model,
     wizardBudgetUsd: data.wizard_budget_usd,
+    defaultWizardId: data.default_wizard_id,
   };
 }

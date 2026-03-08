@@ -167,6 +167,7 @@ export interface CreateTenantData {
   status?: "active" | "pending" | "suspended";
   wizard_provider?: string | null;
   wizard_model?: string | null;
+  default_wizard_id?: string | null;
 }
 
 /**
@@ -254,6 +255,7 @@ export async function createTenant(data: CreateTenantData): Promise<Tenant> {
         features: [],
         wizard_provider: (data.wizard_provider?.trim() || null) as string | null,
         wizard_model: (data.wizard_model?.trim() || null) as string | null,
+        default_wizard_id: (data.default_wizard_id?.trim() || null) as string | null,
       })
       .select()
       .single();

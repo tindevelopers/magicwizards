@@ -3,6 +3,7 @@
 import TenantBreadcrumbs from "@/components/tenant/TenantBreadcrumbs";
 import { useTenant } from "@/core/multi-tenancy";
 import ChatbotWidget from "@/components/chatbot/ChatbotWidget";
+import TenantWizardInstructionsCard from "@/components/wizards/TenantWizardInstructionsCard";
 import React from "react";
 
 export default function ChatbotPage() {
@@ -32,6 +33,8 @@ export default function ChatbotPage() {
       <div className="rounded-3xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
         <ChatbotWidget />
       </div>
+
+      <TenantWizardInstructionsCard />
     </div>
   );
 }

@@ -34,6 +34,10 @@ import {
   checkBudgetLimit,
   recordUsage,
 } from "./usage-service.js";
+import {
+  getEffectiveWizardPrompt,
+  getPlatformRuntimeDefaults,
+} from "./wizard-governance.js";
 
 // Legacy provider-based adapters (backwards compatibility)
 const runtime = new WizardRuntime([
@@ -52,7 +56,10 @@ function pickWizard(id: string): WizardDefinition {
   return DEFAULT_WIZARDS[id] ?? BuilderWizard;
 }
 
-function extractWizardIdFromPrompt(input: string): {
+function extractWizardIdFromPrompt(
+  input: string,
+  fallbackWizardId: string,
+): {
   wizardId: string;
   prompt: string;
   usedOrchestrator?: boolean;
@@ -61,11 +68,11 @@ function extractWizardIdFromPrompt(input: string): {
     const [, candidate = "", ...rest] = input.split(" ");
     const prompt = rest.join(" ").trim();
     return {
-      wizardId: candidate || appConfig.telegram.defaultWizardId,
+      wizardId: candidate || fallbackWizardId,
       prompt: prompt || "Continue with the prior context.",
     };
   }
-  return { wizardId: appConfig.telegram.defaultWizardId, prompt: input };
+  return { wizardId: fallbackWizardId, prompt: input };
 }
 
 export async function runWizardForTenant(input: {
@@ -80,13 +87,15 @@ export async function runWizardForTenant(input: {
   /** When true, skip session/usage/memory/budget persistence (e.g. for dev __mock__ tenant). */
   skipPersistence?: boolean;
 }): Promise<{ text: string; wizardId: string; costUsd: number; turns: number }> {
-  // #region agent log
-  fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:entry',message:'runWizardForTenant entry',data:{tenantId:input.tenantId,channel:input.channel,deferPersistence:input.channel==='telegram'&&!input.skipPersistence},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
-  // #endregion
   const profile = getTenantCostProfile(input.tenant.plan);
   const trimmedPrompt = input.prompt.trim();
   const t0 = Date.now();
   const timings: Record<string, number> = {};
+  const platformDefaults = await getPlatformRuntimeDefaults();
+  const fallbackWizardId =
+    input.tenant.defaultWizardId ??
+    platformDefaults.defaultWizardId ??
+    appConfig.telegram.defaultWizardId;
 
   let wizardId: string;
   let prompt: string;
@@ -105,7 +114,7 @@ export async function runWizardForTenant(input: {
       ms: timings.orchestrator,
     });
   } else {
-    const extracted = extractWizardIdFromPrompt(trimmedPrompt);
+    const extracted = extractWizardIdFromPrompt(trimmedPrompt, fallbackWizardId);
     wizardId = extracted.wizardId;
     prompt = extracted.prompt;
   }
@@ -131,9 +140,6 @@ export async function runWizardForTenant(input: {
     sessionId = sess;
   }
   timings.preDb = Date.now() - tPreDb;
-  // #region agent log
-  fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:past_orchestrator_db',message:'past orchestrator and DB',data:{tenantId:input.tenantId,sessionId},timestamp:Date.now(),hypothesisId:'H2_H3'})}).catch(()=>{});
-  // #endregion
 
   const traceCollector = new TraceCollector({
     tenantId: input.tenantId,
@@ -175,9 +181,6 @@ export async function runWizardForTenant(input: {
       }
     }
     timings.memory = Date.now() - tMemory;
-    // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:past_memory',message:'past memory',data:{tenantId:input.tenantId},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
-    // #endregion
 
     const combinedPrompt = memoryContext
       ? `${memoryContext}\n\nUser request:\n${prompt}`
@@ -244,9 +247,52 @@ export async function runWizardForTenant(input: {
       );
     }
 
+    const effectiveSystemPrompt = await getEffectiveWizardPrompt({
+      tenantId: input.tenantId,
+      wizardId: wizard.id,
+      fallbackPrompt: wizard.systemPrompt,
+    });
+    const runtimeWizard: WizardDefinition = {
+      ...wizard,
+      systemPrompt: effectiveSystemPrompt,
+    };
+
+    const envDefaultProvider =
+      (process.env.MAGIC_WIZARDS_DEFAULT_PROVIDER?.trim() as
+        | "anthropic"
+        | "openai"
+        | "google"
+        | "mistral"
+        | "together"
+        | "fireworks"
+        | "groq"
+        | "ollama"
+        | "mock"
+        | undefined) ?? null;
+    const providerOverride =
+      (input.tenant.wizardProvider ??
+        platformDefaults.defaultProvider ??
+        envDefaultProvider ??
+        null) as
+        | "anthropic"
+        | "openai"
+        | "google"
+        | "mistral"
+        | "together"
+        | "fireworks"
+        | "groq"
+        | "ollama"
+        | "mock"
+        | null;
+    const envDefaultModel = process.env.MAGIC_WIZARDS_DEFAULT_MODEL?.trim() || null;
+    const modelOverride =
+      input.tenant.wizardModel ??
+      platformDefaults.defaultModel ??
+      envDefaultModel;
+
     const runStartedAt = Date.now();
     const runOptions = {
-      wizard,
+      wizard: runtimeWizard,
       prompt: combinedPrompt,
       context: {
         tenantId: input.tenantId,
@@ -258,19 +304,9 @@ export async function runWizardForTenant(input: {
       costProfile: profile,
       mcpServers,
       traceCollector,
-      preferredProvider:
-        (input.tenant.wizardProvider as
-          | "anthropic"
-          | "openai"
-          | "google"
-          | "mistral"
-          | "together"
-          | "fireworks"
-          | "groq"
-          | "ollama"
-          | "mock"
-          | undefined) ?? profile.preferredProviders[0],
-      preferredModel: input.tenant.wizardModel ?? appConfig.runtime.defaultModel,
+      preferredProvider: providerOverride ?? undefined,
+      preferredModel:
+        providerOverride && modelOverride ? modelOverride : undefined,
       maxBudgetUsd: input.tenant.wizardBudgetUsd ?? wizard.maxBudgetUsd,
       // Cap turns for Telegram so replies return in seconds, not 60–90s
       maxTurns:
@@ -292,18 +328,10 @@ export async function runWizardForTenant(input: {
     };
 
     let result: Awaited<ReturnType<typeof runtime.run>>;
-    // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:before_run',message:'runtime.run attempt',data:{tenantId:input.tenantId,wizardId:wizard.id,attempt:1},timestamp:Date.now(),hypothesisId:'H1_H4'})}).catch(()=>{});
-    // #endregion
     try {
       result = await runtime.run(runOptions);
     } catch (firstErr) {
       const retryable = isRetryableConnectionError(firstErr);
-      const e = firstErr instanceof Error ? firstErr : new Error("unknown");
-      const cause = e.cause instanceof Error ? e.cause.message : e.cause;
-      // #region agent log
-      fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:catch_retry',message:'runtime.run failed',data:{tenantId:input.tenantId,error:e.message,errorName:e.name,cause:cause??undefined,retryable},timestamp:Date.now(),hypothesisId:'H1_H4'})}).catch(()=>{});
-      // #endregion
       if (!retryable) throw firstErr;
       await new Promise((r) => setTimeout(r, 1500));
       result = await runtime.run(runOptions);
@@ -443,11 +471,6 @@ export async function runWizardForTenant(input: {
       turns: 1,
     };
   } catch (error) {
-    const outerErr = error instanceof Error ? error : new Error("unknown_error");
-    const outerCause = outerErr.cause instanceof Error ? outerErr.cause.message : outerErr.cause;
-    // #region agent log
-    fetch('http://127.0.0.1:7245/ingest/896b39a6-1fb3-4826-9d73-69dcc70bd414',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'45912c'},body:JSON.stringify({sessionId:'45912c',location:'wizard-service.ts:outer_catch',message:'wizard_execution outer catch',data:{tenantId:input.tenantId,wizardId:wizard?.id,error:outerErr.message,errorName:outerErr.name,cause:outerCause??undefined},timestamp:Date.now(),hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     if (traceCollector) {
       traceCollector.complete("failed");
       logger.info("wizard_trace", {

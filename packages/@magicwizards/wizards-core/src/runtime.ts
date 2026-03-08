@@ -44,10 +44,10 @@ export class WizardRuntime {
   }
 
   async run(request: WizardRunRequest): Promise<WizardRunResult> {
-    // When preferred provider is mock, always use provider-based dispatch so the mock adapter is used.
-    if (request.preferredProvider === "mock") {
+    // Explicit provider selection (tenant/platform override) should bypass plan SDK routing.
+    if (request.preferredProvider) {
       const decision = resolveModelForRequest(request);
-      const adapter = this.adaptersByProvider.get("mock");
+      const adapter = this.adaptersByProvider.get(decision.target.provider);
       if (adapter) {
         return adapter.run(request, decision.target);
       }

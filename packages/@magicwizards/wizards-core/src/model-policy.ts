@@ -49,6 +49,15 @@ export function resolveModelForRequest(
   // When a provider is chosen (e.g. from cost profile), always use a model that belongs to that
   // provider from the wizard's policy. Otherwise we can send e.g. claude-sonnet-4 to OpenAI.
   if (request.preferredProvider) {
+    if (request.preferredModel) {
+      return {
+        target: {
+          provider: request.preferredProvider,
+          model: request.preferredModel,
+        },
+        reason: "preferred_provider_and_model",
+      };
+    }
     const policy = request.wizard.defaultModelPolicy;
     const model =
       request.preferredProvider === policy.standard.provider
