@@ -7,7 +7,7 @@ import {
   resolveTenantIdentityFromTelegram,
 } from "../services/tenant-resolution.js";
 import { runWizardForTenant } from "../services/wizard-service.js";
-import { sendTelegramText } from "./sender.js";
+import { sendTelegramChatAction, sendTelegramText } from "./sender.js";
 import { parseApprovalCallback } from "./approval-handler.js";
 import { resolveApproval } from "../services/approval-store.js";
 
@@ -78,6 +78,12 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
 
   const tenant = await getTenantConfig(identity.tenantId);
   if (!tenant || tenant.status !== "active") {
+    logger.warn("telegram_tenant_inactive_or_missing", {
+      update_id: update.update_id,
+      tenantId: identity.tenantId,
+      tenantNull: !tenant,
+      status: tenant?.status ?? "n/a",
+    });
     await sendTelegramText(
       chatId,
       "Your tenant is inactive or missing. Please contact support.",
@@ -86,6 +92,12 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
   }
 
   const startedAt = Date.now();
+  // Show typing immediately; keep it alive every 4s until we reply (wizard can take 60s+)
+  void sendTelegramChatAction(chatId, "typing");
+  const typingInterval = setInterval(() => {
+    void sendTelegramChatAction(chatId, "typing");
+  }, 4000);
+
   try {
     const result = await runWizardForTenant({
       tenant,
@@ -97,6 +109,7 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
       channelMetadata: { telegramChatId: chatId },
     });
 
+    clearInterval(typingInterval);
     await sendTelegramText(chatId, result.text);
     logger.info("telegram_wizard_run_completed", {
       tenantId: identity.tenantId,
@@ -106,6 +119,7 @@ async function handleTelegramUpdate(update: TelegramUpdate): Promise<void> {
       durationMs: Date.now() - startedAt,
     });
   } catch (error) {
+    clearInterval(typingInterval);
     logger.error("telegram_wizard_run_failed", {
       tenantId: identity.tenantId,
       error: error instanceof Error ? error.message : "unknown_error",

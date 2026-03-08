@@ -246,7 +246,11 @@ export async function runWizardForTenant(input: {
           | undefined) ?? profile.preferredProviders[0],
       preferredModel: input.tenant.wizardModel ?? appConfig.runtime.defaultModel,
       maxBudgetUsd: input.tenant.wizardBudgetUsd ?? wizard.maxBudgetUsd,
-      maxTurns: profile.maxTurnsOverride ?? wizard.maxTurns,
+      // Cap turns for Telegram so replies return in seconds, not 60–90s
+      maxTurns:
+        input.channel === "telegram"
+          ? Math.min(3, profile.maxTurnsOverride ?? wizard.maxTurns)
+          : profile.maxTurnsOverride ?? wizard.maxTurns,
     });
 
     traceCollector.recordLlmCall({

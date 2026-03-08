@@ -2,6 +2,25 @@ import { appConfig } from "../config.js";
 import { logger } from "../logger.js";
 import { escapeTelegramHtml, splitTelegramMessage } from "./format.js";
 
+/** Send a chat action (e.g. "typing") so the user sees the bot is working. Safe to call repeatedly. */
+export async function sendTelegramChatAction(
+  chatId: number | string,
+  action: "typing" | "send_message",
+): Promise<void> {
+  const endpoint = `https://api.telegram.org/bot${appConfig.telegram.botToken}/sendChatAction`;
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ chat_id: chatId, action }),
+  });
+  if (!response.ok) {
+    logger.error("telegram_chat_action_failed", {
+      status: response.status,
+      chatId: String(chatId),
+    });
+  }
+}
+
 export async function sendTelegramText(
   chatId: number | string,
   text: string,
