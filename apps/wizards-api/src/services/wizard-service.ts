@@ -82,6 +82,8 @@ export async function runWizardForTenant(input: {
 }): Promise<{ text: string; wizardId: string; costUsd: number; turns: number }> {
   const profile = getTenantCostProfile(input.tenant.plan);
   const trimmedPrompt = input.prompt.trim();
+  const t0 = Date.now();
+  const timings: Record<string, number> = {};
 
   let wizardId: string;
   let prompt: string;
@@ -91,11 +93,13 @@ export async function runWizardForTenant(input: {
     !trimmedPrompt.startsWith("/wizard ")
   ) {
     const classification = await classifyIntent(trimmedPrompt);
+    timings.orchestrator = Date.now() - t0;
     wizardId = classification.wizard;
     prompt = trimmedPrompt;
     logger.info("orchestrator_routed", {
       wizardId,
       reason: classification.reason,
+      ms: timings.orchestrator,
     });
   } else {
     const extracted = extractWizardIdFromPrompt(trimmedPrompt);
@@ -107,9 +111,12 @@ export async function runWizardForTenant(input: {
   const skipPersistence = input.skipPersistence === true;
 
   if (!skipPersistence) {
+    const tBudget = Date.now();
     await checkBudgetLimit(input.tenantId, input.tenant.plan);
+    timings.checkBudget = Date.now() - tBudget;
   }
 
+  const tSession = Date.now();
   const sessionId = skipPersistence
     ? ""
     : await createWizardSession({
@@ -118,6 +125,7 @@ export async function runWizardForTenant(input: {
         wizardId: wizard.id,
         channel: input.channel,
       });
+  timings.createSession = Date.now() - tSession;
 
   const traceCollector = new TraceCollector({
     tenantId: input.tenantId,
@@ -132,6 +140,7 @@ export async function runWizardForTenant(input: {
       profile.runtimeMode === "agentic" || profile.runtimeMode === "function_calling";
 
     // Build memory context based on plan tier
+    const tMemory = Date.now();
     let memoryContext = "";
     if (!skipPersistence) {
       if (usesAdvancedMemory && input.userId) {
@@ -157,12 +166,14 @@ export async function runWizardForTenant(input: {
         memoryContext = await getMemoryContext(input.tenantId, input.userId);
       }
     }
+    timings.memory = Date.now() - tMemory;
 
     const combinedPrompt = memoryContext
       ? `${memoryContext}\n\nUser request:\n${prompt}`
       : prompt;
 
     // Resolve MCP servers
+    const tMcp = Date.now();
     let mcpServers: TenantMcpServer[] = [];
     if (profile.allowedMcpServers.length > 0) {
       const allServers = await getMcpServersForTenant(input.tenantId);
@@ -213,9 +224,13 @@ export async function runWizardForTenant(input: {
       }
     }
 
+    timings.mcpResolve = Date.now() - tMcp;
+
     // Store user message in working memory
     if (!skipPersistence && sessionId) {
+      const tAppend = Date.now();
       await appendSessionMessage(sessionId, { role: "user", content: prompt });
+      timings.appendUserMsg = Date.now() - tAppend;
     }
 
     const runStartedAt = Date.now();
@@ -253,13 +268,15 @@ export async function runWizardForTenant(input: {
           : profile.maxTurnsOverride ?? wizard.maxTurns,
     });
 
+    timings.llmRun = Date.now() - runStartedAt;
+
     traceCollector.recordLlmCall({
       provider: result.provider,
       model: result.model,
       inputTokens: result.usage.inputTokens ?? 0,
       outputTokens: result.usage.outputTokens ?? 0,
       costUsd: result.usage.costUsd,
-      latencyMs: Date.now() - runStartedAt,
+      latencyMs: timings.llmRun,
       startedAt: new Date(runStartedAt),
     });
     const trace = traceCollector.complete("completed");
@@ -270,8 +287,11 @@ export async function runWizardForTenant(input: {
       sessionId,
       totalCostUsd: trace.totalCostUsd,
       durationMs: trace.totalDurationMs,
+      provider: result.provider,
+      model: result.model,
     });
 
+    const tPost = Date.now();
     if (!skipPersistence) {
       // Store assistant message in working memory
       if (sessionId) {
@@ -335,6 +355,20 @@ export async function runWizardForTenant(input: {
         );
       }
     }
+    timings.postProcess = Date.now() - tPost;
+    timings.total = Date.now() - t0;
+
+    logger.info("wizard_run_timings", {
+      tenantId: input.tenantId,
+      wizardId: wizard.id,
+      plan: input.tenant.plan,
+      sdk: profile.sdk,
+      runtimeMode: profile.runtimeMode,
+      provider: result.provider,
+      model: result.model,
+      channel: input.channel,
+      timings,
+    });
 
     return {
       text: result.text,
