@@ -10,7 +10,7 @@
  */
 import { logger } from "../logger.js";
 
-export type WizardRoute = "research" | "sales" | "ops" | "builder";
+export type WizardRoute = "research" | "sales" | "ops" | "builder" | "outreach";
 
 interface ClassificationResult {
   wizard: WizardRoute;
@@ -44,7 +44,8 @@ export async function classifyIntent(prompt: string): Promise<ClassificationResu
 
 Categories:
 - "research": search, find information, compare, look up, analyze data
-- "sales": CRM, contacts, leads, deals, outreach, emails to prospects
+- "sales": CRM, contacts, leads, deals, pipeline management
+- "outreach": find leads, discover contacts, email campaigns, cold outreach, follow-ups, lead generation, prospecting, send emails to prospects, email sequences
 - "ops": calling, scheduling, infrastructure, deployment, monitoring
 - "builder": code, implementation, development, technical tasks
 
@@ -71,7 +72,7 @@ Return: {"wizard": "<category>", "reason": "<one sentence why>"}`,
     }
 
     const parsed = JSON.parse(content) as { wizard?: string; reason?: string };
-    const validWizards: WizardRoute[] = ["research", "sales", "ops", "builder"];
+    const validWizards: WizardRoute[] = ["research", "sales", "ops", "builder", "outreach"];
     const wizard = validWizards.includes(parsed.wizard as WizardRoute)
       ? (parsed.wizard as WizardRoute)
       : "builder";

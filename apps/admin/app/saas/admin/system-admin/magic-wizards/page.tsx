@@ -154,6 +154,7 @@ export default function MagicWizardsSystemAdminPage() {
   }
 
   async function onDeleteTelegram(id: string) {
+    if (!confirm("Remove this Telegram identity permanently? This cannot be undone.")) return;
     setError(null);
     try {
       await deleteTelegramIdentity(id);
@@ -256,13 +257,13 @@ export default function MagicWizardsSystemAdminPage() {
             </form>
 
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[540px] text-left text-sm">
+              <table className="w-full min-w-[640px] text-left text-sm">
                 <thead className="text-xs uppercase text-gray-500 dark:text-gray-400">
                   <tr>
                     <th className="pb-2">Tenant</th>
                     <th className="pb-2">Chat/User</th>
                     <th className="pb-2">Status</th>
-                    <th className="pb-2 text-right">Actions</th>
+                    <th className="pb-2 text-right min-w-[180px]">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
@@ -295,7 +296,7 @@ export default function MagicWizardsSystemAdminPage() {
                             {row.is_active ? "active" : "inactive"}
                           </span>
                         </td>
-                        <td className="py-2 text-right">
+                        <td className="py-2 text-right whitespace-nowrap">
                           <div className="flex justify-end gap-2">
                             <Button
                               size="sm"
@@ -307,9 +308,10 @@ export default function MagicWizardsSystemAdminPage() {
                             <Button
                               size="sm"
                               variant="outline"
+                              className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-500/10 dark:hover:text-red-300"
                               onClick={() => onDeleteTelegram(row.id)}
                             >
-                              Delete
+                              Remove
                             </Button>
                           </div>
                         </td>

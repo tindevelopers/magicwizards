@@ -153,6 +153,7 @@ const navItems: NavItem[] = [
       { name: "Organization Admins", path: "/saas/admin/system-admin/organization-admins" },
       { name: "API Configuration", path: "/saas/admin/system-admin/api-configuration" },
       { name: "Magic Wizards", path: "/saas/admin/system-admin/magic-wizards", new: true },
+      { name: "Integrations", path: "/saas/admin/system-admin/integrations", new: true },
       { name: "Multi-Tenant", path: "/multi-tenant", new: true },
       {
         name: "Subscriptions",
