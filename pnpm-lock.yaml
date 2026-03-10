@@ -29,19 +29,19 @@ importers:
         version: 6.1.19(@fullcalendar/core@6.1.19)
       '@fullcalendar/react':
         specifier: ^6.1.15
-        version: 6.1.19(@fullcalendar/core@6.1.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 6.1.19(@fullcalendar/core@6.1.19)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       '@fullcalendar/timegrid':
         specifier: ^6.1.15
         version: 6.1.19(@fullcalendar/core@6.1.19)
       '@heroicons/react':
         specifier: ^2.2.0
-        version: 2.2.0(react@19.2.3)
+        version: 2.2.0(react@19.2.4)
       '@popperjs/core':
         specifier: ^2.11.8
         version: 2.11.8
       '@stripe/react-stripe-js':
         specifier: ^5.4.1
-        version: 5.4.1(@stripe/stripe-js@8.6.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 5.4.1(@stripe/stripe-js@8.6.0)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       '@stripe/stripe-js':
         specifier: ^8.5.3
         version: 8.6.0
@@ -71,34 +71,34 @@ importers:
         version: 4.6.13
       next:
         specifier: ^16.1.5
-        version: 16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       prismjs:
         specifier: ^1.30.0
         version: 1.30.0
       react:
-        specifier: ^19.2.3
-        version: 19.2.3
+        specifier: ^19.2.4
+        version: 19.2.4
       react-apexcharts:
         specifier: ^1.7.0
-        version: 1.9.0(apexcharts@4.7.0)(react@19.2.3)
+        version: 1.9.0(apexcharts@4.7.0)(react@19.2.4)
       react-dnd:
         specifier: ^16.0.1
-        version: 16.0.1(@types/node@20.19.27)(@types/react@19.2.7)(react@19.2.3)
+        version: 16.0.1(@types/node@20.19.27)(@types/react@19.2.14)(react@19.2.4)
       react-dnd-html5-backend:
         specifier: ^16.0.1
         version: 16.0.1
       react-dom:
         specifier: ^19.2.3
-        version: 19.2.3(react@19.2.3)
+        version: 19.2.3(react@19.2.4)
       react-dropzone:
         specifier: ^14.3.5
-        version: 14.3.8(react@19.2.3)
+        version: 14.3.8(react@19.2.4)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
       simplebar-react:
         specifier: ^3.3.0
-        version: 3.3.2(react@19.2.3)
+        version: 3.3.2(react@19.2.4)
       stripe:
         specifier: ^20.0.0
         version: 20.1.0(@types/node@20.19.27)
@@ -125,11 +125,11 @@ importers:
         specifier: ^1.26.5
         version: 1.26.5
       '@types/react':
-        specifier: ^19.2.7
-        version: 19.2.7
+        specifier: ^19.2.14
+        version: 19.2.14
       '@types/react-dom':
         specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.7)
+        version: 19.2.3(@types/react@19.2.14)
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -174,19 +174,19 @@ importers:
         version: 6.1.19(@fullcalendar/core@6.1.19)
       '@fullcalendar/react':
         specifier: ^6.1.15
-        version: 6.1.19(@fullcalendar/core@6.1.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 6.1.19(@fullcalendar/core@6.1.19)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       '@fullcalendar/timegrid':
         specifier: ^6.1.15
         version: 6.1.19(@fullcalendar/core@6.1.19)
       '@heroicons/react':
         specifier: ^2.2.0
-        version: 2.2.0(react@19.2.3)
+        version: 2.2.0(react@19.2.4)
       '@popperjs/core':
         specifier: ^2.11.8
         version: 2.11.8
       '@stripe/react-stripe-js':
         specifier: ^5.4.1
-        version: 5.4.1(@stripe/stripe-js@8.6.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 5.4.1(@stripe/stripe-js@8.6.0)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       '@stripe/stripe-js':
         specifier: ^8.5.3
         version: 8.6.0
@@ -219,7 +219,7 @@ importers:
         version: link:../../packages/@tinadmin/ui-admin
       ai:
         specifier: ^3.0.0
-        version: 3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.3)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1)
+        version: 3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.4)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1)
       apexcharts:
         specifier: ^4.3.0
         version: 4.7.0
@@ -234,7 +234,7 @@ importers:
         version: 4.6.13
       next:
         specifier: ^16.1.5
-        version: 16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       openai:
         specifier: ^4.0.0
         version: 4.104.0(ws@8.18.3)(zod@4.2.1)
@@ -242,29 +242,29 @@ importers:
         specifier: ^1.30.0
         version: 1.30.0
       react:
-        specifier: ^19.2.3
-        version: 19.2.3
+        specifier: ^19.2.4
+        version: 19.2.4
       react-apexcharts:
         specifier: ^1.7.0
-        version: 1.9.0(apexcharts@4.7.0)(react@19.2.3)
+        version: 1.9.0(apexcharts@4.7.0)(react@19.2.4)
       react-dnd:
         specifier: ^16.0.1
-        version: 16.0.1(@types/node@20.19.27)(@types/react@19.2.7)(react@19.2.3)
+        version: 16.0.1(@types/node@20.19.27)(@types/react@19.2.14)(react@19.2.4)
       react-dnd-html5-backend:
         specifier: ^16.0.1
         version: 16.0.1
       react-dom:
         specifier: ^19.2.3
-        version: 19.2.3(react@19.2.3)
+        version: 19.2.3(react@19.2.4)
       react-dropzone:
         specifier: ^14.3.5
-        version: 14.3.8(react@19.2.3)
+        version: 14.3.8(react@19.2.4)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
       simplebar-react:
         specifier: ^3.3.0
-        version: 3.3.2(react@19.2.3)
+        version: 3.3.2(react@19.2.4)
       stripe:
         specifier: ^20.0.0
         version: 20.1.0(@types/node@20.19.27)
@@ -291,11 +291,11 @@ importers:
         specifier: ^1.26.5
         version: 1.26.5
       '@types/react':
-        specifier: ^19.2.7
-        version: 19.2.7
+        specifier: ^19.2.14
+        version: 19.2.14
       '@types/react-dom':
         specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.7)
+        version: 19.2.3(@types/react@19.2.14)
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -322,7 +322,7 @@ importers:
         version: 1.3.24(zod@4.2.1)
       '@heroicons/react':
         specifier: ^2.2.0
-        version: 2.2.0(react@19.2.3)
+        version: 2.2.0(react@19.2.4)
       '@supabase/ssr':
         specifier: ^0.8.0
         version: 0.8.0(@supabase/supabase-js@2.89.0)
@@ -346,7 +346,7 @@ importers:
         version: link:../../packages/@tinadmin/ui-consumer
       ai:
         specifier: ^3.4.33
-        version: 3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.3)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1)
+        version: 3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.4)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1)
       autoprefixer:
         specifier: ^10.4.20
         version: 10.4.23(postcss@8.5.6)
@@ -355,16 +355,16 @@ importers:
         version: 2.1.1
       next:
         specifier: ^16.1.5
-        version: 16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       openai:
         specifier: ^4.104.0
         version: 4.104.0(ws@8.18.3)(zod@4.2.1)
       react:
-        specifier: ^19.2.3
-        version: 19.2.3
+        specifier: ^19.2.4
+        version: 19.2.4
       react-dom:
         specifier: ^19.2.3
-        version: 19.2.3(react@19.2.3)
+        version: 19.2.3(react@19.2.4)
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -385,11 +385,11 @@ importers:
         specifier: ^20
         version: 20.19.27
       '@types/react':
-        specifier: ^19.2.7
-        version: 19.2.7
+        specifier: ^19.2.14
+        version: 19.2.14
       '@types/react-dom':
         specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.7)
+        version: 19.2.3(@types/react@19.2.14)
       dotenv:
         specifier: ^17.2.3
         version: 17.2.3
@@ -513,19 +513,19 @@ importers:
         version: 2.89.0
       ai:
         specifier: ^3.0.0
-        version: 3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.3)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1)
+        version: 3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.4)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1)
       openai:
         specifier: ^4.0.0
         version: 4.104.0(ws@8.18.3)(zod@4.2.1)
       react:
         specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.3
+        version: 19.2.4
       react-dom:
         specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.3(react@19.2.3)
+        version: 19.2.3(react@19.2.4)
       resend:
         specifier: ^4.0.0
-        version: 4.8.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+        version: 4.8.0(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
       stripe:
         specifier: ^20.0.0
         version: 20.1.0(@types/node@20.19.27)
@@ -564,7 +564,7 @@ importers:
     dependencies:
       '@heroicons/react':
         specifier: ^2.2.0
-        version: 2.2.0(react@19.2.3)
+        version: 2.2.0(react@19.2.4)
       '@tinadmin/core':
         specifier: workspace:*
         version: link:../core
@@ -573,20 +573,20 @@ importers:
         version: 2.1.1
       react:
         specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.3
+        version: 19.2.4
       react-dom:
         specifier: ^18.0.0 || ^19.0.0
-        version: 19.2.3(react@19.2.3)
+        version: 19.2.3(react@19.2.4)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
     devDependencies:
       '@types/react':
-        specifier: ^19.2.7
-        version: 19.2.7
+        specifier: ^19.2.14
+        version: 19.2.14
       '@types/react-dom':
         specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.7)
+        version: 19.2.3(@types/react@19.2.14)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -595,7 +595,7 @@ importers:
     dependencies:
       '@heroicons/react':
         specifier: ^2.2.0
-        version: 2.2.0(react@19.2.3)
+        version: 2.2.0(react@19.2.4)
       '@tinadmin/core':
         specifier: workspace:*
         version: link:../core
@@ -603,21 +603,21 @@ importers:
         specifier: ^2.1.1
         version: 2.1.1
       react:
-        specifier: ^19.2.3
-        version: 19.2.3
+        specifier: ^19.2.4
+        version: 19.2.4
       react-dom:
         specifier: ^19.2.3
-        version: 19.2.3(react@19.2.3)
+        version: 19.2.3(react@19.2.4)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
     devDependencies:
       '@types/react':
-        specifier: ^19.2.7
-        version: 19.2.7
+        specifier: ^19.2.14
+        version: 19.2.14
       '@types/react-dom':
         specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.7)
+        version: 19.2.3(@types/react@19.2.14)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -816,6 +816,11 @@ packages:
 
   '@babel/parser@7.28.5':
     resolution: {integrity: sha512-KKBU1VGYR7ORr3At5HAtUQ+TV3SzRCXmA/8OdDZiLDBIZxVyzXuztPjfLd3BV1PRAQGCMWWSHYhL0F8d5uHBDQ==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
+  '@babel/parser@7.29.0':
+    resolution: {integrity: sha512-IyDgFV5GeDUVX4YdF/3CPULtVGSXXMLh1xVIgdCgxApktqnQV0r7/8Nqthg+8YLGaAtdyIlo2qIdZrbCv4+7ww==}
     engines: {node: '>=6.0.0'}
     hasBin: true
 
@@ -1264,6 +1269,10 @@ packages:
 
   '@babel/types@7.28.5':
     resolution: {integrity: sha512-qQ5m48eI/MFLQ5PxQj4PFaprjyCTLI37ElWMmNs0K8Lk3dVeOdNpB3ks8jc7yM5CDmVC73eMVk/trk3fgmrUpA==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/types@7.29.0':
+    resolution: {integrity: sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A==}
     engines: {node: '>=6.9.0'}
 
   '@emnapi/core@1.7.1':
@@ -2161,8 +2170,8 @@ packages:
     resolution: {integrity: sha512-KlaRwSfFA0fD73PYVMHj5/iXFtQGCcX7PSx0FdQwYEEw9b2wqM7GxadY+5YwcmuEhalmjFB/YvqaoNVF+sWUlg==}
     engines: {node: '>=20.0.0'}
 
-  '@sveltejs/acorn-typescript@1.0.8':
-    resolution: {integrity: sha512-esgN+54+q0NjB0Y/4BomT9samII7jGwNy/2a3wNZbT2A2RpmXsXwUt24LvLhx6jUq2gVk4cWEvcRO6MFQbOfNA==}
+  '@sveltejs/acorn-typescript@1.0.9':
+    resolution: {integrity: sha512-lVJX6qEgs/4DOcRTpo56tmKzVPtoWAaVbL4hfO7t7NVwl9AAXzQR6cihesW1BmNMPl+bK6dreu2sOKBP2Q9CIA==}
     peerDependencies:
       acorn: ^8.9.0
 
@@ -2427,8 +2436,8 @@ packages:
     peerDependencies:
       '@types/react': ^19.2.0
 
-  '@types/react@19.2.7':
-    resolution: {integrity: sha512-MWtvHrGZLFttgeEj28VXHxpmwYbor/ATPYbBfSFZEIRK0ecCFLl2Qo55z52Hss+UV9CRN7trSeq1zbgx7YDWWg==}
+  '@types/react@19.2.14':
+    resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
 
   '@types/send@0.17.6':
     resolution: {integrity: sha512-Uqt8rPBE8SY0RK8JB1EzVOIZ32uqy8HwdxCnoCOsYrvnswqmFZ/k+9Ikidlk/ImhsdvBsloHbAlewb2IEBV/Og==}
@@ -2672,6 +2681,11 @@ packages:
 
   acorn@8.15.0:
     resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
+    engines: {node: '>=0.4.0'}
+    hasBin: true
+
+  acorn@8.16.0:
+    resolution: {integrity: sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -3106,8 +3120,8 @@ packages:
     resolution: {integrity: sha512-V0hjH4dGPh9Ao5p0MoRY6BVqtwCjhz6vI5LT8AJ55H+4g9/4vbHx1I54fS0XuclLhDHArPQCiMjDxjaL8fPxhw==}
     engines: {node: '>=0.12'}
 
-  entities@7.0.0:
-    resolution: {integrity: sha512-FDWG5cmEYf2Z00IkYRhbFrwIwvdFKH07uV8dvNy0omp/Qb1xcyCWp2UDtcwJF4QZZvk0sLudP6/hAu42TaqVhQ==}
+  entities@7.0.1:
+    resolution: {integrity: sha512-TWrgLOFUQTH994YUyl1yT4uyavY5nNB5muff+RtWaqNVCAK408b5ZnnbNAUEWLTCpum9w6arT70i1XdQ4UeOPA==}
     engines: {node: '>=0.12'}
 
   error-ex@1.3.4:
@@ -3276,8 +3290,8 @@ packages:
     resolution: {integrity: sha512-ca9pw9fomFcKPvFLXhBKUK90ZvGibiGOvRJNbjljY7s7uq/5YO4BOzcYtJqExdx99rF6aAcnRxHmcUHcz6sQsg==}
     engines: {node: '>=0.10'}
 
-  esrap@2.2.1:
-    resolution: {integrity: sha512-GiYWG34AN/4CUyaWAgunGt0Rxvr1PTMlGC0vvEov/uOQYWne2bpN03Um+k8jT+q3op33mKouP2zeJ6OlM+qeUg==}
+  esrap@2.2.3:
+    resolution: {integrity: sha512-8fOS+GIGCQZl/ZIlhl59htOlms6U8NvX6ZYgYHpRU/b6tVSh3uHkOHZikl3D4cMbYM0JlpBe+p/BkZEi8J9XIQ==}
 
   esrecurse@4.3.0:
     resolution: {integrity: sha512-KmfKL3b6G+RXvP8N1vr3Tq1kL/oCFgn2NYXEtqP8/L3pKapUA4G8cFVaoF3SU323CD4XypR/ffioHmkti6/Tag==}
@@ -4100,6 +4114,10 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
+  postcss@8.5.8:
+    resolution: {integrity: sha512-OW/rX8O/jXnm82Ey1k44pObPtdblfiuWnrd8X7GJ7emImCOstunGbXUpp7HdBrFQX6rJzn3sPT397Wp5aCwCHg==}
+    engines: {node: ^10 || ^12 || >=14}
+
   preact@10.12.1:
     resolution: {integrity: sha512-l8386ixSsBdbreOAkqtrwqHwdvR35ID8c3rKPa8lCWuO86dBi32QWHV4vfsZK1utLLFMvw+Z5Ad4XLkZzchscg==}
 
@@ -4183,8 +4201,8 @@ packages:
   react-promise-suspense@0.3.4:
     resolution: {integrity: sha512-I42jl7L3Ze6kZaq+7zXWSunBa3b1on5yfvUW6Eo/3fFOj6dZ5Bqmcd264nJbTK/gn1HjjILAjSwnZbV4RpSaNQ==}
 
-  react@19.2.3:
-    resolution: {integrity: sha512-Ku/hhYbVjOQnXDZFv2+RibmLFGwFdeeKHFcOTlrt7xplBnya5OGn/hIRDsqDiSUcfORsDC7MPxwork8jBwsIWA==}
+  react@19.2.4:
+    resolution: {integrity: sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==}
     engines: {node: '>=0.10.0'}
 
   redux@4.2.1:
@@ -4838,14 +4856,14 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@0.0.70(react@19.2.3)(zod@4.2.1)':
+  '@ai-sdk/react@0.0.70(react@19.2.4)(zod@4.2.1)':
     dependencies:
       '@ai-sdk/provider-utils': 1.0.22(zod@4.2.1)
       '@ai-sdk/ui-utils': 0.0.50(zod@4.2.1)
-      swr: 2.3.8(react@19.2.3)
+      swr: 2.3.8(react@19.2.4)
       throttleit: 2.1.0
     optionalDependencies:
-      react: 19.2.3
+      react: 19.2.4
       zod: 4.2.1
 
   '@ai-sdk/solid@0.0.54(zod@4.2.1)':
@@ -5057,6 +5075,10 @@ snapshots:
   '@babel/parser@7.28.5':
     dependencies:
       '@babel/types': 7.28.5
+
+  '@babel/parser@7.29.0':
+    dependencies:
+      '@babel/types': 7.29.0
 
   '@babel/plugin-bugfix-firefox-class-in-computed-class-key@7.28.5(@babel/core@7.28.5)':
     dependencies:
@@ -5632,6 +5654,11 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.28.5
 
+  '@babel/types@7.29.0':
+    dependencies:
+      '@babel/helper-string-parser': 7.27.1
+      '@babel/helper-validator-identifier': 7.28.5
+
   '@emnapi/core@1.7.1':
     dependencies:
       '@emnapi/wasi-threads': 1.1.0
@@ -5857,20 +5884,20 @@ snapshots:
     dependencies:
       '@fullcalendar/core': 6.1.19
 
-  '@fullcalendar/react@6.1.19(@fullcalendar/core@6.1.19)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@fullcalendar/react@6.1.19(@fullcalendar/core@6.1.19)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@fullcalendar/core': 6.1.19
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
+      react: 19.2.4
+      react-dom: 19.2.3(react@19.2.4)
 
   '@fullcalendar/timegrid@6.1.19(@fullcalendar/core@6.1.19)':
     dependencies:
       '@fullcalendar/core': 6.1.19
       '@fullcalendar/daygrid': 6.1.19(@fullcalendar/core@6.1.19)
 
-  '@heroicons/react@2.2.0(react@19.2.3)':
+  '@heroicons/react@2.2.0(react@19.2.4)':
     dependencies:
-      react: 19.2.3
+      react: 19.2.4
 
   '@humanfs/core@0.19.1': {}
 
@@ -6119,12 +6146,12 @@ snapshots:
 
   '@react-dnd/shallowequal@4.0.2': {}
 
-  '@react-email/render@1.1.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@react-email/render@1.1.2(react-dom@19.2.3(react@19.2.4))(react@19.2.4)':
     dependencies:
       html-to-text: 9.0.5
       prettier: 3.7.4
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
+      react: 19.2.4
+      react-dom: 19.2.3(react@19.2.4)
       react-promise-suspense: 0.3.4
 
   '@rollup/rollup-android-arm-eabi@4.59.0':
@@ -6209,12 +6236,12 @@ snapshots:
       domhandler: 5.0.3
       selderee: 0.11.0
 
-  '@stripe/react-stripe-js@5.4.1(@stripe/stripe-js@8.6.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+  '@stripe/react-stripe-js@5.4.1(@stripe/stripe-js@8.6.0)(react-dom@19.2.3(react@19.2.4))(react@19.2.4)':
     dependencies:
       '@stripe/stripe-js': 8.6.0
       prop-types: 15.8.1
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
+      react: 19.2.4
+      react-dom: 19.2.3(react@19.2.4)
 
   '@stripe/stripe-js@8.6.0': {}
 
@@ -6261,9 +6288,9 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@sveltejs/acorn-typescript@1.0.8(acorn@8.15.0)':
+  '@sveltejs/acorn-typescript@1.0.9(acorn@8.16.0)':
     dependencies:
-      acorn: 8.15.0
+      acorn: 8.16.0
 
   '@svgdotjs/svg.draggable.js@3.0.6(@svgdotjs/svg.js@3.2.5)':
     dependencies:
@@ -6520,11 +6547,11 @@ snapshots:
 
   '@types/range-parser@1.2.7': {}
 
-  '@types/react-dom@19.2.3(@types/react@19.2.7)':
+  '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
-      '@types/react': 19.2.7
+      '@types/react': 19.2.14
 
-  '@types/react@19.2.7':
+  '@types/react@19.2.14':
     dependencies:
       csstype: 3.2.3
 
@@ -6739,9 +6766,9 @@ snapshots:
 
   '@vue/compiler-core@3.5.26':
     dependencies:
-      '@babel/parser': 7.28.5
+      '@babel/parser': 7.29.0
       '@vue/shared': 3.5.26
-      entities: 7.0.0
+      entities: 7.0.1
       estree-walker: 2.0.2
       source-map-js: 1.2.1
 
@@ -6752,14 +6779,14 @@ snapshots:
 
   '@vue/compiler-sfc@3.5.26':
     dependencies:
-      '@babel/parser': 7.28.5
+      '@babel/parser': 7.29.0
       '@vue/compiler-core': 3.5.26
       '@vue/compiler-dom': 3.5.26
       '@vue/compiler-ssr': 3.5.26
       '@vue/shared': 3.5.26
       estree-walker: 2.0.2
       magic-string: 0.30.21
-      postcss: 8.5.6
+      postcss: 8.5.8
       source-map-js: 1.2.1
 
   '@vue/compiler-ssr@3.5.26':
@@ -6808,15 +6835,17 @@ snapshots:
 
   acorn@8.15.0: {}
 
+  acorn@8.16.0: {}
+
   agentkeepalive@4.6.0:
     dependencies:
       humanize-ms: 1.2.1
 
-  ai@3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.3)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1):
+  ai@3.4.33(openai@4.104.0(ws@8.18.3)(zod@4.2.1))(react@19.2.4)(sswr@2.2.0(svelte@5.46.0))(svelte@5.46.0)(vue@3.5.26(typescript@5.9.3))(zod@4.2.1):
     dependencies:
       '@ai-sdk/provider': 0.0.26
       '@ai-sdk/provider-utils': 1.0.22(zod@4.2.1)
-      '@ai-sdk/react': 0.0.70(react@19.2.3)(zod@4.2.1)
+      '@ai-sdk/react': 0.0.70(react@19.2.4)(zod@4.2.1)
       '@ai-sdk/solid': 0.0.54(zod@4.2.1)
       '@ai-sdk/svelte': 0.0.57(svelte@5.46.0)(zod@4.2.1)
       '@ai-sdk/ui-utils': 0.0.50(zod@4.2.1)
@@ -6829,7 +6858,7 @@ snapshots:
       zod-to-json-schema: 3.25.0(zod@4.2.1)
     optionalDependencies:
       openai: 4.104.0(ws@8.18.3)(zod@4.2.1)
-      react: 19.2.3
+      react: 19.2.4
       sswr: 2.2.0(svelte@5.46.0)
       svelte: 5.46.0
       zod: 4.2.1
@@ -7271,7 +7300,7 @@ snapshots:
 
   entities@4.5.0: {}
 
-  entities@7.0.0: {}
+  entities@7.0.1: {}
 
   error-ex@1.3.4:
     dependencies:
@@ -7685,7 +7714,7 @@ snapshots:
     dependencies:
       estraverse: 5.3.0
 
-  esrap@2.2.1:
+  esrap@2.2.3:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.5
 
@@ -8310,16 +8339,16 @@ snapshots:
 
   negotiator@0.6.3: {}
 
-  next@16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  next@16.1.6(@babel/core@7.28.5)(@opentelemetry/api@1.9.0)(react-dom@19.2.3(react@19.2.4))(react@19.2.4):
     dependencies:
       '@next/env': 16.1.6
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.9.9
       caniuse-lite: 1.0.30001760
       postcss: 8.4.31
-      react: 19.2.3
-      react-dom: 19.2.3(react@19.2.3)
-      styled-jsx: 5.1.6(@babel/core@7.28.5)(react@19.2.3)
+      react: 19.2.4
+      react-dom: 19.2.3(react@19.2.4)
+      styled-jsx: 5.1.6(@babel/core@7.28.5)(react@19.2.4)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.1.6
       '@next/swc-darwin-x64': 16.1.6
@@ -8492,6 +8521,12 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
+  postcss@8.5.8:
+    dependencies:
+      nanoid: 3.3.11
+      picocolors: 1.1.1
+      source-map-js: 1.2.1
+
   preact@10.12.1: {}
 
   prelude-ls@1.2.1: {}
@@ -8528,39 +8563,39 @@ snapshots:
       iconv-lite: 0.4.24
       unpipe: 1.0.0
 
-  react-apexcharts@1.9.0(apexcharts@4.7.0)(react@19.2.3):
+  react-apexcharts@1.9.0(apexcharts@4.7.0)(react@19.2.4):
     dependencies:
       apexcharts: 4.7.0
       prop-types: 15.8.1
-      react: 19.2.3
+      react: 19.2.4
 
   react-dnd-html5-backend@16.0.1:
     dependencies:
       dnd-core: 16.0.1
 
-  react-dnd@16.0.1(@types/node@20.19.27)(@types/react@19.2.7)(react@19.2.3):
+  react-dnd@16.0.1(@types/node@20.19.27)(@types/react@19.2.14)(react@19.2.4):
     dependencies:
       '@react-dnd/invariant': 4.0.2
       '@react-dnd/shallowequal': 4.0.2
       dnd-core: 16.0.1
       fast-deep-equal: 3.1.3
       hoist-non-react-statics: 3.3.2
-      react: 19.2.3
+      react: 19.2.4
     optionalDependencies:
       '@types/node': 20.19.27
-      '@types/react': 19.2.7
+      '@types/react': 19.2.14
 
-  react-dom@19.2.3(react@19.2.3):
+  react-dom@19.2.3(react@19.2.4):
     dependencies:
-      react: 19.2.3
+      react: 19.2.4
       scheduler: 0.27.0
 
-  react-dropzone@14.3.8(react@19.2.3):
+  react-dropzone@14.3.8(react@19.2.4):
     dependencies:
       attr-accept: 2.2.5
       file-selector: 2.1.2
       prop-types: 15.8.1
-      react: 19.2.3
+      react: 19.2.4
 
   react-is@16.13.1: {}
 
@@ -8568,7 +8603,7 @@ snapshots:
     dependencies:
       fast-deep-equal: 2.0.1
 
-  react@19.2.3: {}
+  react@19.2.4: {}
 
   redux@4.2.1:
     dependencies:
@@ -8615,9 +8650,9 @@ snapshots:
     dependencies:
       jsesc: 3.1.0
 
-  resend@4.8.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
+  resend@4.8.0(react-dom@19.2.3(react@19.2.4))(react@19.2.4):
     dependencies:
-      '@react-email/render': 1.1.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@react-email/render': 1.1.2(react-dom@19.2.3(react@19.2.4))(react@19.2.4)
     transitivePeerDependencies:
       - react
       - react-dom
@@ -8838,9 +8873,9 @@ snapshots:
       lodash: 4.17.21
       lodash-es: 4.17.22
 
-  simplebar-react@3.3.2(react@19.2.3):
+  simplebar-react@3.3.2(react@19.2.4):
     dependencies:
-      react: 19.2.3
+      react: 19.2.4
       simplebar-core: 1.3.2
 
   snake-case@3.0.4:
@@ -8928,10 +8963,10 @@ snapshots:
     optionalDependencies:
       '@types/node': 20.19.27
 
-  styled-jsx@5.1.6(@babel/core@7.28.5)(react@19.2.3):
+  styled-jsx@5.1.6(@babel/core@7.28.5)(react@19.2.4):
     dependencies:
       client-only: 0.0.1
-      react: 19.2.3
+      react: 19.2.4
     optionalDependencies:
       '@babel/core': 7.28.5
 
@@ -8945,15 +8980,15 @@ snapshots:
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.5.5
-      '@sveltejs/acorn-typescript': 1.0.8(acorn@8.15.0)
+      '@sveltejs/acorn-typescript': 1.0.9(acorn@8.16.0)
       '@types/estree': 1.0.8
-      acorn: 8.15.0
+      acorn: 8.16.0
       aria-query: 5.3.2
       axobject-query: 4.1.0
       clsx: 2.1.1
       devalue: 5.6.3
       esm-env: 1.2.2
-      esrap: 2.2.1
+      esrap: 2.2.3
       is-reference: 3.0.3
       locate-character: 3.0.0
       magic-string: 0.30.21
@@ -8973,11 +9008,11 @@ snapshots:
 
   swiper@12.1.2: {}
 
-  swr@2.3.8(react@19.2.3):
+  swr@2.3.8(react@19.2.4):
     dependencies:
       dequal: 2.0.3
-      react: 19.2.3
-      use-sync-external-store: 1.6.0(react@19.2.3)
+      react: 19.2.4
+      use-sync-external-store: 1.6.0(react@19.2.4)
 
   swrev@4.0.0: {}
 
@@ -9176,9 +9211,9 @@ snapshots:
     dependencies:
       punycode: 2.3.1
 
-  use-sync-external-store@1.6.0(react@19.2.3):
+  use-sync-external-store@1.6.0(react@19.2.4):
     dependencies:
-      react: 19.2.3
+      react: 19.2.4
 
   utils-merge@1.0.1: {}
 
