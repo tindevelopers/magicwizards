@@ -1,7 +1,7 @@
 /**
  * Enterprise-tier adapter: Anthropic Agent SDK (@anthropic-ai/claude-agent-sdk).
  *
- * Features: native mcpServers, allowedTools, PreToolUse hooks for guardrails,
+ * Features: native mcpServers, allowedTools, canUseTool for guardrails,
  * session resume, CostTracker integration.
  */
 import { CostTracker, BudgetExceededError } from "../cost-circuit-breaker.js";
@@ -15,7 +15,10 @@ import type {
   WizardRunResult,
 } from "../types.js";
 
-type QueryFn = (input: Record<string, unknown>) => AsyncIterable<unknown>;
+type QueryFn = (params: {
+  prompt: string;
+  options?: Record<string, unknown>;
+}) => AsyncIterable<unknown>;
 
 function buildPrompt(request: WizardRunRequest): string {
   const history = (request.history ?? [])
@@ -34,10 +37,9 @@ function buildPrompt(request: WizardRunRequest): string {
 function extractResultText(event: unknown): string | null {
   if (!event || typeof event !== "object") return null;
   const record = event as Record<string, unknown>;
-  if (record.type === "result") {
-    const resultObj = record.result as Record<string, unknown> | undefined;
-    const text = resultObj?.result;
-    return typeof text === "string" ? text : null;
+  // SDKResultMessage: { type: 'result', result: string, ... }
+  if (record.type === "result" && typeof record.result === "string") {
+    return record.result;
   }
   return null;
 }
@@ -45,18 +47,21 @@ function extractResultText(event: unknown): string | null {
 function extractCostUsd(event: unknown): number {
   if (!event || typeof event !== "object") return 0;
   const record = event as Record<string, unknown>;
-  const cost = record.cost_usd ?? record.costUsd;
+  // SDKResultMessage uses total_cost_usd
+  const cost = record.total_cost_usd ?? record.cost_usd ?? record.costUsd;
   return typeof cost === "number" ? cost : 0;
 }
 
+/**
+ * Build MCP server configs as a Record keyed by server name.
+ * SDK Options.mcpServers expects: Record<string, McpServerConfig>
+ */
 function buildMcpServerConfigs(
   servers: TenantMcpServer[],
-): Array<{ type: string; name: string; url: string }> {
-  return servers.map((s) => ({
-    type: "url",
-    name: s.name,
-    url: s.url,
-  }));
+): Record<string, { type: "http"; url: string }> {
+  return Object.fromEntries(
+    servers.map((s) => [s.name, { type: "http" as const, url: s.url }]),
+  );
 }
 
 function buildAllowedToolsList(servers: TenantMcpServer[]): string[] {
@@ -81,60 +86,74 @@ export class AnthropicAgenticAdapter implements RuntimeAdapter {
     const budgetUsd = request.maxBudgetUsd ?? request.wizard.maxBudgetUsd;
     const costTracker = new CostTracker(budgetUsd);
 
-    const input: Record<string, unknown> = {
-      prompt: buildPrompt(request),
-      maxTurns: request.maxTurns ?? request.wizard.maxTurns,
-      max_budget_usd: budgetUsd,
+    const options: Record<string, unknown> = {
       model: target.model,
+      maxTurns: request.maxTurns ?? request.wizard.maxTurns,
+      maxBudgetUsd: budgetUsd,
+      // Disable built-in Claude Code filesystem tools; only allow MCP tools
+      tools: [],
+      persistSession: false,
     };
 
-    // Session resume: pass conversationId when available for native Agent SDK continuity
+    // Session resume: pass conversationId for native Agent SDK continuity
     const conversationId = request.context.conversationId;
     if (conversationId) {
-      input.resume = conversationId;
+      options.resume = conversationId;
     }
 
     if (mcpServers.length > 0) {
-      input.mcpServers = buildMcpServerConfigs(mcpServers);
-      input.allowedTools = buildAllowedToolsList(mcpServers);
+      options.mcpServers = buildMcpServerConfigs(mcpServers);
+      options.allowedTools = buildAllowedToolsList(mcpServers);
     }
 
     if (profile) {
-      input.hooks = {
-        preToolUse: async (toolName: string, toolInput: Record<string, unknown>) => {
-          const serverName = extractServerName(toolName);
-          const tool = extractToolName(toolName);
-          const decision = evaluateToolCall(serverName, tool, profile.approvalMode);
+      options.canUseTool = async (
+        toolName: string,
+        toolInput: Record<string, unknown>,
+      ) => {
+        const serverName = extractServerName(toolName);
+        const tool = extractToolName(toolName);
+        const decision = evaluateToolCall(serverName, tool, profile.approvalMode);
 
-          if (decision === "block") {
-            return { permissionDecision: "deny", reason: "Destructive operations are blocked." };
+        if (decision === "block") {
+          return {
+            behavior: "deny" as const,
+            message: "Destructive operations are blocked.",
+            interrupt: false,
+          };
+        }
+
+        if (decision === "approve" && request.context.channel) {
+          const result = await requestToolApproval({
+            tenantId: request.context.tenantId,
+            userId: request.context.userId,
+            sessionId: request.context.conversationId ?? "",
+            mcpServer: serverName,
+            toolName: tool,
+            toolInput,
+            channel: request.context.channel as "telegram" | "portal" | "api",
+            channelMetadata: request.context.metadata,
+          });
+          if (result.decision !== "approved") {
+            return {
+              behavior: "deny" as const,
+              message: `User ${result.decision} the action.`,
+              interrupt: true,
+            };
           }
+        }
 
-          if (decision === "approve" && request.context.channel) {
-            const result = await requestToolApproval({
-              tenantId: request.context.tenantId,
-              userId: request.context.userId,
-              sessionId: request.context.conversationId ?? "",
-              mcpServer: serverName,
-              toolName: tool,
-              toolInput,
-              channel: request.context.channel as "telegram" | "portal" | "api",
-              channelMetadata: request.context.metadata,
-            });
-            if (result.decision !== "approved") {
-              return { permissionDecision: "deny", reason: `User ${result.decision} the action.` };
-            }
-          }
-
-          return { permissionDecision: "allow" };
-        },
+        return { behavior: "allow" as const, updatedInput: {} };
       };
     }
 
     let text = "";
     let totalCost = 0;
     try {
-      for await (const event of query(input)) {
+      for await (const event of query({
+        prompt: buildPrompt(request),
+        options,
+      })) {
         const eventCost = extractCostUsd(event);
         if (eventCost > 0) {
           totalCost += eventCost;

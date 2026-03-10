@@ -5,7 +5,10 @@ import type {
   WizardRunResult,
 } from "../types.js";
 
-type QueryFn = (input: Record<string, unknown>) => AsyncIterable<unknown>;
+type QueryFn = (params: {
+  prompt: string;
+  options?: Record<string, unknown>;
+}) => AsyncIterable<unknown>;
 
 function buildPrompt(request: WizardRunRequest): string {
   const history = (request.history ?? [])
@@ -25,14 +28,11 @@ function extractResultText(event: unknown): string | null {
   if (!event || typeof event !== "object") {
     return null;
   }
-
   const record = event as Record<string, unknown>;
-  if (record.type === "result") {
-    const resultObj = record.result as Record<string, unknown> | undefined;
-    const text = resultObj?.result;
-    return typeof text === "string" ? text : null;
+  // SDKResultMessage: { type: 'result', result: string, ... }
+  if (record.type === "result" && typeof record.result === "string") {
+    return record.result;
   }
-
   return null;
 }
 
@@ -41,7 +41,8 @@ function extractApproxCost(event: unknown): number {
     return 0;
   }
   const record = event as Record<string, unknown>;
-  const cost = record.cost_usd ?? record.costUsd;
+  // SDKResultMessage uses total_cost_usd
+  const cost = record.total_cost_usd ?? record.cost_usd ?? record.costUsd;
   if (typeof cost === "number") {
     return cost;
   }
@@ -61,16 +62,19 @@ export class AnthropicAdapter implements RuntimeAdapter {
       throw new Error("Anthropic SDK query function is unavailable.");
     }
 
-    const input: Record<string, unknown> = {
-      prompt: buildPrompt(request),
-      maxTurns: request.maxTurns ?? request.wizard.maxTurns,
-      max_budget_usd: request.maxBudgetUsd ?? request.wizard.maxBudgetUsd,
-      model: target.model,
-    };
-
     let text = "";
     let totalCost = 0;
-    for await (const event of query(input)) {
+    for await (const event of query({
+      prompt: buildPrompt(request),
+      options: {
+        model: target.model,
+        maxTurns: request.maxTurns ?? request.wizard.maxTurns,
+        maxBudgetUsd: request.maxBudgetUsd ?? request.wizard.maxBudgetUsd,
+        // Disable built-in Claude Code tools — pure chat only
+        tools: [],
+        persistSession: false,
+      },
+    })) {
       totalCost += extractApproxCost(event);
       const result = extractResultText(event);
       if (result) {
