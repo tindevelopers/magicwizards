@@ -51,10 +51,13 @@
     "dev:wizards-api": "turbo run dev --filter=@magicwizards/wizards-api",
     "dev:local": "supabase start && pnpm dev",
     "dev:localhost": "./scripts/start-localhost.sh",
-    "supabase:env:remote": "node scripts/install-remote-supabase-env.mjs jruxnkslobykshunucwa",
+    "supabase:env:remote": "node scripts/install-remote-supabase-env.mjs kwctqnrmczdlaxehceii",
     "supabase:sync-vercel": "node scripts/sync-vercel-to-supabase-auth.mjs jruxnkslobykshunucwa",
     "vercel:env-from-supabase": "node scripts/sync-supabase-env-to-vercel.mjs jruxnkslobykshunucwa magicwizards-admin",
     "vercel:env-from-supabase:file": "node scripts/sync-supabase-env-to-vercel.mjs --from-file apps/admin/.env.local magicwizards-admin",
+    "env:pull:vercel": "vercel env pull",
+    "env:pull:cloudrun": "./scripts/pull-env-cloudrun.sh",
+    "env:pull:cloudrun:replace": "./scripts/pull-env-cloudrun.sh --replace",
     "supabase:install-gohighlevel": "node scripts/install-gohighlevel-provider.mjs",
     "supabase:apply-integration-migration": "node scripts/apply-integration-migration.mjs",
     "build": "turbo run build --filter=@tinadmin/admin",
@@ -103,7 +106,7 @@
     "autoprefixer": "^10.4.20",
     "clsx": "^2.1.1",
     "flatpickr": "^4.6.13",
-    "next": "^16.1.1",
+    "next": "^16.1.5",
     "prismjs": "^1.30.0",
     "react": "^19.2.3",
     "react-apexcharts": "^1.7.0",
@@ -114,7 +117,7 @@
     "server-only": "^0.0.1",
     "simplebar-react": "^3.3.0",
     "stripe": "^20.0.0",
-    "swiper": "^11.2.0",
+    "swiper": "^12.1.2",
     "tailwind-merge": "^2.6.0",
     "tailwindcss": "^4.0.0"
   },
@@ -127,11 +130,20 @@
     "@types/react-dom": "^19.2.3",
     "dotenv": "^17.2.3",
     "eslint": "^9",
-    "eslint-config-next": "16.1.0",
+    "eslint-config-next": "^16.1.5",
     "postcss": "^8",
     "tsx": "^4.19.2",
     "turbo": "^2.7.1",
     "typescript": "5.9.3",
     "vitest": "^2.1.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "minimatch@3": "^3.1.4",
+      "minimatch@9": "^9.0.7",
+      "svgo": "^3.3.3",
+      "rollup": "^4.59.0",
+      "devalue": "^5.6.2"
+    }
   }
 }
